@@ -1,14 +1,23 @@
-# Use official OpenJDK 17 image
-FROM openjdk:17-jdk-alpine
+# Use official Maven + JDK image to build
+FROM maven:3.9.2-eclipse-temurin-17 AS build
 
-# Set working directory inside the container
 WORKDIR /app
 
-# Copy the Maven build output JAR into the container
-COPY target/*.jar app.jar
+# Copy pom.xml and source code
+COPY pom.xml .
+COPY src ./src
 
-# Expose the port your app will run on
+# Build the JAR
+RUN mvn clean package -DskipTests
+
+# Use smaller JDK image for runtime
+FROM openjdk:17-jdk-alpine
+
+WORKDIR /app
+
+# Copy the built JAR from the build stage
+COPY --from=build /app/target/*.jar app.jar
+
 EXPOSE 8080
 
-# Run the Spring Boot JAR
 ENTRYPOINT ["java", "-jar", "app.jar"]
