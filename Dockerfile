@@ -1,14 +1,14 @@
-# Use lightweight JDK image
+# Use official OpenJDK image
 FROM openjdk:17-jdk-alpine
 
-# Set working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy the prebuilt JAR into the container
+# Copy the built JAR
 COPY target/*.jar app.jar
 
-# Expose port 8080
+# Expose port (Render will assign via $PORT)
 EXPOSE 8080
 
-# Run the Spring Boot JAR
+# Run the app
 ENTRYPOINT ["java", "-jar", "app.jar"]
