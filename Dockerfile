@@ -1,23 +1,14 @@
-# Use official Maven + JDK image to build
-FROM maven:3.9.2-eclipse-temurin-17 AS build
-
-WORKDIR /app
-
-# Copy pom.xml and source code
-COPY pom.xml .
-COPY src ./src
-
-# Build the JAR
-RUN mvn clean package -DskipTests
-
-# Use smaller JDK image for runtime
+# Use lightweight JDK image
 FROM openjdk:17-jdk-alpine
 
+# Set working directory inside the container
 WORKDIR /app
 
-# Copy the built JAR from the build stage
-COPY --from=build /app/target/*.jar app.jar
+# Copy the prebuilt JAR into the container
+COPY target/*.jar app.jar
 
+# Expose port 8080
 EXPOSE 8080
 
+# Run the Spring Boot JAR
 ENTRYPOINT ["java", "-jar", "app.jar"]
