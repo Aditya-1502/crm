@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Order Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            border: 1px solid #777;
+            padding: 8px 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #dce6f1;
+            color: #000;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f4f4f4;
+        }
+
+        tr:hover {
+            background-color: #eef;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Order Search Results</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Route Card No</th>
+        <th>Date</th>
+        <th>Component Name</th>
+        <th>Customer Name</th>
+        <th>Customer No</th>
+        <th>Enquiry No</th>
+        <th>Quotation No</th>
+        <th>Purchase Order</th>
+        <th>Formulation No</th>
+        <th>Method</th>
+        <th>Material</th>
+        <th>Tool/Die No</th>
+        <th>Weight/Meter</th>
+        <th>Temperature</th>
+        <th>RPM Extruder</th>
+        <th>RPM Conveyor</th>
+        <th>No of Cavity</th>
+        <th>Planned Qty</th>
+        <th>Work Order No</th>
+        <th>Coating</th>
+        <th>Tool Status</th>
+        <th>Responsible Person</th>
+        <th>Tool Maker</th>
+        <th>ETA</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="order : ${orders}">
+        <td th:text="${order.routeCardNo}">Route Card No</td>
+        <td th:text="${#dates.format(order.date, 'dd-MM-yyyy')}">Date</td>
+        <td th:text="${order.componentName}">Component Name</td>
+        <td th:text="${order.customerName}">Customer Name</td>
+        <td th:text="${order.customerNo}">Customer No</td>
+        <td th:text="${order.enquiryNo}">Enquiry No</td>
+        <td th:text="${order.quotationNo}">Quotation No</td>
+        <td th:text="${order.purchaseOrder}">Purchase Order</td>
+        <td th:text="${order.formulationNo}">Formulation No</td>
+        <td th:text="${order.method}">Method</td>
+        <td th:text="${order.material}">Material</td>
+        <td th:text="${order.toolDieNo}">Tool/Die No</td>
+        <td th:text="${order.weightMeter}">Weight/Meter</td>
+        <td th:text="${order.temperature}">Temperature</td>
+        <td th:text="${order.rpmExtruder}">RPM Extruder</td>
+        <td th:text="${order.rpmConveyor}">RPM Conveyor</td>
+        <td th:text="${order.noOfCavity}">No of Cavity</td>
+        <td th:text="${order.plannedQty}">Planned Qty</td>
+        <td th:text="${order.workOrderNo}">Work Order No</td>
+        <td th:text="${order.coating}">Coating</td>
+        <td th:text="${order.toolStatus}">Tool Status</td>
+        <td th:text="${order.responsiblePerson}">Responsible Person</td>
+        <td th:text="${order.toolMaker}">Tool Maker</td>
+        <td th:text="${#dates.format(order.eta, 'dd-MM-yyyy')}">ETA</td>
+    </tr>
+    </tbody>
+</table>
+<button onclick="window.print()">print</button>
+</body>
+</html>

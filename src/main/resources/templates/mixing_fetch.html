@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+ <a href="/vmixing"><button type="reset" class="btn-reset">view report</button></a>
+ <h1 style="color:green ; justify-content: center;" th:text="${message}"></h1>
+	<div align="center">
+		<h1>Mixing Details</h1>
+<h1 style="color:green ; justify-content: center;" th:text="${message}"></h1>
+		<table border="1">
+
+			<tr>
+				<th>Route card no</th>
+				<th>Date</th>
+				<th>Batch no</th>
+				<th>Hardness</th>
+				<th>Sheet Thickness</th>
+				<th>Lot No</th>
+				<th>Formulation Code</th>
+				<th>Batch Weight</th>
+				<th>Colour</th>
+				<th>Mixing By</th>
+			</tr>
+			
+
+			<tr th:each="mixing:${list}">
+				<td th:text="${mixing.routeCardNo}"></td>
+				<td th:src="${mixing.date}"></td>
+				<td th:text="${mixing.batchNo}"></td>
+				<td th:text="${mixing.hardness}"></td>
+				<td th:text="${mixing.sheetThickness}"></td>
+				<td th:text="${mixing.lotNo}"></td>
+				<td th:text="${mixing.formulationCode}"></td>
+				<td th:text="${mixing.batchWeight}"></td>
+				<td th:text="${mixing.colour}"></td>
+				<td th:text="${mixing.mixingBy}"></td>
+				<td>
+				<a th:href="'/delete?id='+${mixing.id}"><button>Delete</button> </a>
+					<a th:href="'/edit?id='+${mixing.id}"><button>Edit</button> </a>
+					
+				</td>
+			</tr>
+
+		</table>
+
+		<br> <a href="/"><button>Back</button></a>
+	</div>
+</body>
+</html>

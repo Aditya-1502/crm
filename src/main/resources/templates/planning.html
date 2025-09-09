@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ManufacturePro CRM - Planning Department</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Manufacturing CRM Color Palette - Consistent with mixing.html */
+      --primary-color: rgb(255, 0, 0);
+      --primary-dark: #1e3a8a;
+       --primary-light: rgb(0, 0, 0);
+      --secondary-color: #f59e0b;
+      --accent-color: #10b981;
+      --success-color: #059669;
+      --warning-color: #d97706;
+      --error-color: #dc2626;
+      --info-color: #0284c7;
+      
+      /* Background & Surface Colors */
+      --background-primary: #f8fafc;
+      --background-secondary: #f1f5f9;
+      --card-background: #ffffff;
+      --sidebar-background: rgb(128, 0, 0);
+      --sidebar-hover: #F3CE14;
+      
+      /* Text Colors */
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --text-light: #9ca3af;
+      --text-white: #ffffff;
+      
+      /* Border & Shadow */
+      --border-color: #e5e7eb;
+      --border-light: #f3f4f6;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      
+      /* Gradients */
+      --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      --gradient-secondary: linear-gradient(135deg, var(--secondary-color) 0%, #ea580c 100%);
+      --gradient-success: linear-gradient(135deg, var(--accent-color) 0%, var(--success-color) 100%);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Container Layout */
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Enhanced Sidebar - EXACT SAME AS MIXING.HTML */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar-background);
+      color: var(--text-white);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      box-shadow: var(--shadow-xl);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Sidebar Header - FIXED POSITION */
+    .sidebar-header {
+      position: sticky;
+      top: 0;
+      padding: 24px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-background);
+       background: linear-gradient(135deg, rgb(255, 128, 0) 0%, rgba(30, 58, 138, 0.1) 100%);
+      z-index: 1001;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .sidebar h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+    }
+
+    .sidebar h2 i {
+      font-size: 24px;
+      color: var(--primary-light);
+    }
+
+    /* Sidebar Body - SCROLLABLE AREA */
+    .sidebar-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Navigation Links Container - SCROLLABLE */
+    .nav-container {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 0;
+    }
+
+    /* Custom Scrollbar for Sidebar */
+    .nav-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .nav-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    .nav-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Navigation Links */
+    .nav-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-links li {
+      margin: 0;
+      position: relative;
+    }
+
+    .nav-links li.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: var(--primary-light);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .nav-links li.active {
+      background: var(--sidebar-hover);
+    }
+
+    .nav-links a {
+      color: var(--text-white);
+      text-decoration: none;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 500;
+      font-size: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-links a::before {
+      content: '';
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-links a:hover::before {
+      left: 100%;
+    }
+
+    .nav-links a:hover {
+      background: var(--sidebar-hover);
+      transform: translateX(4px);
+      color: var(--primary-light);
+    }
+
+    .nav-links a i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      color: #94a3b8;
+      transition: color 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .nav-links a:hover i,
+    .nav-links li.active a i {
+      color: var(--primary-light);
+    }
+
+    /* User Info Section - FIXED AT BOTTOM */
+    .user-info {
+      position: sticky;
+      bottom: 0;
+      padding: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-background);
+      background: rgba(0, 0, 0, 0.2);
+      z-index: 1001;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .user-info img {
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 280px;
+      padding: 32px 40px;
+      width: calc(100% - 280px);
+      min-height: 100vh;
+      background: var(--background-primary);
+    }
+
+    /* Page Header */
+    .page-header {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-title i {
+      color: var(--primary-color);
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .success-message {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      color: var(--success-color);
+      padding: 16px 20px;
+      border-radius: 12px;
+      border-left: 4px solid var(--success-color);
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Enhanced Form Container */
+    .planning-form-container {
+      background: var(--card-background);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+      max-width: none;
+      margin: 0;
+      left: 0;
+    }
+
+    .planning-form-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .planning-form-container h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 32px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .planning-form-container h2 i {
+      color: var(--primary-color);
+    }
+
+    /* Form Layout */
+    .planning-form {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    /* Form Groups */
+    .form-group {
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 14px;
+      letter-spacing: 0.025em;
+      position: relative;
+    }
+
+    .form-group label.required::after {
+      content: " *";
+      color: var(--error-color);
+      font-weight: 700;
+    }
+
+    /* Enhanced Form Inputs */
+    .form-group input[type="text"],
+    .form-group input[type="date"],
+    .form-group input[type="number"],
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--card-background);
+      color: var(--text-primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .form-group input:hover,
+    .form-group select:hover,
+    .form-group textarea:hover {
+      border-color: var(--primary-light);
+    }
+
+    .form-group input[required] {
+      border-left: 3px solid var(--warning-color);
+    }
+
+    .form-group input[required]:valid {
+      border-left-color: var(--success-color);
+    }
+
+    /* Full Width Elements */
+    .full-width {
+      grid-column: span 2;
+    }
+
+    .full-width textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    /* Enhanced Button Group */
+    .submit-buttons {
+      grid-column: span 2;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-light);
+      flex-wrap: wrap;
+    }
+
+    /* Button Styles */
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      min-width: 140px;
+      justify-content: center;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .submit-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #1e3a8a 100%);
+      box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+    }
+
+    .draft-btn {
+      background: linear-gradient(135deg, var(--text-secondary) 0%, #4b5563 100%);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .draft-btn:hover {
+      background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+      box-shadow: 0 8px 25px rgba(75, 85, 99, 0.3);
+    }
+
+    .download-btn {
+      background: var(--gradient-success);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .download-btn:hover {
+      background: linear-gradient(135deg, var(--success-color) 0%, #047857 100%);
+      box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);
+    }
+
+    /* Form Section Headers */
+    .form-section {
+      margin-bottom: 32px;
+    }
+
+    .form-section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-section-title i {
+      color: var(--primary-color);
+    }
+
+    /* Sidebar Toggle for Mobile */
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .planning-form {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .full-width {
+        grid-column: span 1;
+      }
+      
+      .submit-buttons {
+        grid-column: span 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-toggle {
+        display: block;
+      }
+      
+      .sidebar {
+        width: 70px;
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+        width: 280px;
+      }
+      
+      .sidebar:not(.active) .sidebar-header {
+        padding: 20px 10px;
+      }
+      
+      .sidebar:not(.active) .sidebar h2 span {
+        display: none;
+      }
+      
+      .sidebar:not(.active) .nav-links a span {
+        display: none;
+      }
+      
+      .sidebar:not(.active) .nav-links a {
+        justify-content: center;
+        padding: 12px 10px;
+      }
+      
+      .sidebar:not(.active) .nav-links a i {
+        margin-right: 0;
+        font-size: 18px;
+      }
+      
+      .sidebar:not(.active) .user-info {
+        padding: 15px 10px;
+      }
+      
+      .sidebar:not(.active) .user-info img {
+        max-width: 40px;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 80px 16px 20px 16px;
+      }
+      
+      .planning-form-container {
+        padding: 24px 20px;
+      }
+      
+      .planning-form {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .submit-buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .page-title {
+        font-size: 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 70px 12px 16px 12px;
+      }
+      
+      .planning-form-container {
+        padding: 20px 16px;
+      }
+      
+      .page-title {
+        font-size: 20px;
+      }
+    }
+
+    /* Loading States */
+    .btn.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .btn.loading::after {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Form Validation Styles */
+    .form-group input:invalid:not(:focus):not(:placeholder-shown) {
+      border-color: var(--error-color);
+      background-color: rgba(220, 38, 38, 0.05);
+    }
+
+    .form-group input:valid:not(:focus):not(:placeholder-shown) {
+      border-color: var(--success-color);
+      background-color: rgba(5, 150, 105, 0.05);
+    }
+
+    /* Accessibility Improvements */
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus,
+    .btn:focus {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      :root {
+        --primary-color: #000080;
+        --text-primary: #000000;
+        --border-color: #000000;
+      }
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      .sidebar,
+      .sidebar-toggle,
+      .submit-buttons {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .planning-form-container {
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+    }
+
+    /* Animation for form elements */
+    .form-group {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .form-group:nth-child(4) { animation-delay: 0.4s; }
+    .form-group:nth-child(5) { animation-delay: 0.5s; }
+    .form-group:nth-child(6) { animation-delay: 0.6s; }
+    .form-group:nth-child(7) { animation-delay: 0.7s; }
+    .form-group:nth-child(8) { animation-delay: 0.8s; }
+    .form-group:nth-child(9) { animation-delay: 0.9s; }
+    .form-group:nth-child(10) { animation-delay: 1.0s; }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Tooltip Styles */
+    .tooltip {
+      position: relative;
+      cursor: help;
+    }
+
+    .tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--text-primary);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 1000;
+    }
+
+    .tooltip:hover::after {
+      opacity: 1;
+    }
+
+    /* Status indicators */
+    .status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-active { background-color: var(--success-color); }
+    .status-warning { background-color: var(--warning-color); }
+    .status-error { background-color: var(--error-color); }
+    .status-info { background-color: var(--info-color); }
+
+    /* Enhanced scrollbar for main content */
+    .main-content::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .main-content::-webkit-scrollbar-track {
+      background: var(--background-secondary);
+    }
+
+    .main-content::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    .main-content::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
+
+    /* Notification styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      z-index: 1001;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-lg);
+      max-width: 300px;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification-success { background-color: var(--success-color); }
+    .notification-error { background-color: var(--error-color); }
+    .notification-warning { background-color: var(--warning-color); }
+    .notification-info { background-color: var(--info-color); }
+
+    /* Form progress indicator */
+    .form-progress {
+      position: fixed;
+      top: 0;
+      left: 280px;
+      right: 0;
+      height: 4px;
+      background: rgba(30, 64, 175, 0.1);
+      z-index: 999;
+      transition: all 0.3s ease;
+    }
+
+    .form-progress-fill {
+      height: 100%;
+      background: var(--gradient-primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+      .form-progress {
+        left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Toggle Button for Mobile -->
+  <button class="sidebar-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <div class="container">
+    <!-- Enhanced Sidebar Navigation - EXACT SAME AS MIXING.HTML -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>
+          <i class="fas fa-industry"></i>
+          <span>ManufacturePro</span>
+        </h2>
+      </div>
+      
+      <div class="sidebar-body">
+        <div class="nav-container">
+          <ul class="nav-links">
+            <li><a href="/"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i><span>Overview</span></a></li>
+            <li><a href="/reports"><i class="fas fa-chart-bar"></i><span>Reports</span></a></li>
+            <li><a href="/search"><i class="fas fa-search"></i><span>Search</span></a></li>
+            <li><a href="/order"><i class="fas fa-clipboard-list"></i><span>Order Log</span></a></li>
+            <li><a href="/mixing"><i class="fas fa-blender"></i><span>Mixing</span></a></li>
+            <li><a href="/production"><i class="fas fa-cogs"></i><span>Production</span></a></li>
+            <li><a href="/extrusion"><i class="fas fa-industry"></i><span>Extrusion</span></a></li>
+            <li><a href="/coating"><i class="fas fa-brush"></i><span>Coating</span></a></li>
+            <li><a href="/jointing"><i class="fas fa-link"></i><span>Jointing</span></a></li>
+            <li><a href="/moulding"><i class="fas fa-cube"></i><span>Moulding</span></a></li>
+            <li><a href="/sheeting"><i class="fas fa-layer-group"></i><span>Sheeting</span></a></li>
+            <li><a href="/qc"><i class="fas fa-user-shield"></i><span>QC Supervisor</span></a></li>
+            <li class="active"><a href="/planning"><i class="fas fa-calendar-alt"></i><span>Planning</span></a></li>
+            <li><a href="/inspection"><i class="fas fa-clipboard-check"></i><span>Inspection</span></a></li>
+            <li><a href="/finalinspection"><i class="fas fa-check-double"></i><span>Final Inspection</span></a></li>
+            <li><a href="/dispatch-note"><i class="fas fa-file-signature"></i><span>Dispatch Approval</span></a></li>
+            <li><a href="/packing"><i class="fas fa-box"></i><span>Packing</span></a></li>
+            <li><a href="/dispatch"><i class="fas fa-truck"></i><span>Dispatch</span></a></li>
+          </ul>
+        </div>
+        
+        <div class="user-info">
+          <img src="armol-removebg-preview.png" alt="ManufacturePro Logo">
+        </div>
+      </div>
+    </nav>
+
+    <!-- Enhanced Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">
+          <i class="fas fa-calendar-alt"></i>
+          Planning Department
+        </h1>
+        <p class="page-subtitle">Manage production planning and scheduling with precision tracking</p>
+        
+        <!-- Success Message -->
+        <div class="success-message" th:if="${message}" th:text="${message}"></div>
+      </div>
+
+      <!-- Enhanced Form Container -->
+      <div class="planning-form-container">
+        <h2>
+          <i class="fas fa-clipboard-list"></i>
+          Production Planning Management
+        </h2>
+
+        <!-- Main Planning Form -->
+        <form class="planning-form" action="/planning" method="post" id="planningForm">
+          
+          <!-- Section 1: Basic Planning Information -->
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <i class="fas fa-info-circle"></i>
+              Planning Details
+            </h3>
+            
+            <div class="form-group">
+              <label for="date" class="required tooltip" data-tooltip="Select the planning date">DATE</label>
+              <input 
+                type="date" 
+                id="date" 
+                name="date"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="plannedQty" class="required tooltip" data-tooltip="Enter the planned quantity for production">PLANNED QTY.</label>
+              <input 
+                type="text" 
+                id="plannedQty" 
+                name="plannedQty" 
+                placeholder="Enter Planned Quantity"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="routeCardNo" class="tooltip" data-tooltip="Route card number for tracking">ROUTE CARD NO.</label>
+              <input 
+                type="text" 
+                id="routeCardNo" 
+                name="routeCardNo" 
+                placeholder="Enter Route Card Number"
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="processedQty" class="required tooltip" data-tooltip="Actual quantity processed">PROCESSED QTY</label>
+              <input 
+                type="text" 
+                id="processedQty" 
+                name="processedQty" 
+                placeholder="Enter Processed Quantity"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="size" class="required tooltip" data-tooltip="Product size specifications">SIZE</label>
+              <input 
+                type="text" 
+                id="size" 
+                name="size" 
+                placeholder="Enter Size Specifications"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="okQty" class="required tooltip" data-tooltip="Quantity that passed quality check">OK QTY.</label>
+              <input 
+                type="text" 
+                id="okQty" 
+                name="okQty" 
+                placeholder="Enter OK Quantity"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="notOkQty" class="required tooltip" data-tooltip="Quantity that failed quality check">NOT OK QTY.</label>
+              <input 
+                type="text" 
+                id="notOkQty" 
+                name="notOkQty" 
+                placeholder="Enter Not OK Quantity"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="processedBy" class="required tooltip" data-tooltip="Name of the person who processed">PROCESSED BY</label>
+              <input 
+                type="text" 
+                id="processedBy" 
+                name="processedBy" 
+                placeholder="Enter Processor Name"
+                required
+              >
+            </div>
+
+            <div class="form-group full-width">
+              <label for="remarks" class="tooltip" data-tooltip="Additional notes or comments">REMARKS (IF ANY)</label>
+              <textarea 
+                id="remarks" 
+                name="remarks" 
+                placeholder="Enter any additional remarks or notes..."
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Enhanced Button Group -->
+          <div class="submit-buttons">
+            <button type="button" class="btn draft-btn" id="draftBtn">
+              <i class="fas fa-save"></i>
+              SAVE AS DRAFT
+            </button>
+            
+            <button type="submit" class="btn submit-btn">
+              <i class="fas fa-paper-plane"></i>
+              SUBMIT
+            </button>
+            
+            <a href="/export-planning-report" class="btn download-btn">
+              <i class="fas fa-file-excel"></i>
+              Download Report (Excel)
+            </a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <!-- Enhanced JavaScript -->
+  <script>
+    // Sidebar toggle functionality
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('active');
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.querySelector('.sidebar-toggle');
+      
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(event.target) && 
+          !toggleBtn.contains(event.target) && 
+          sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+      }
+    });
+
+    // Form enhancement and validation
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('planningForm');
+      const inputs = form.querySelectorAll('input[required], textarea[required]');
+      
+      // Set current date as default
+      const dateField = document.getElementById('date');
+      if (dateField && !dateField.value) {
+        dateField.value = new Date().toISOString().split('T')[0];
+      }
+
+      // Real-time validation
+      inputs.forEach(input => {
+        input.addEventListener('blur', validateField);
+        input.addEventListener('input', clearError);
+      });
+
+      // Form submission handling
+      form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        inputs.forEach(input => {
+          if (!validateField.call(input)) {
+            isValid = false;
+          }
+        });
+
+        if (!isValid) {
+          e.preventDefault();
+          showNotification('Please fix all errors before submitting', 'error');
+          return;
+        }
+
+        // Validate quantities
+        if (!validateQuantities()) {
+          e.preventDefault();
+          return;
+        }
+
+        // Add loading state to submit button
+        const submitBtn = document.querySelector('.submit-btn');
+        if (submitBtn) {
+          submitBtn.classList.add('loading');
+          submitBtn.disabled = true;
+          
+          // Reset after 3 seconds (simulate server response)
+          setTimeout(() => {
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+          }, 3000);
+        }
+      });
+
+      // Auto-save functionality
+      let autoSaveTimer;
+      inputs.forEach(input => {
+        input.addEventListener('input', function() {
+          clearTimeout(autoSaveTimer);
+          autoSaveTimer = setTimeout(autoSave, 30000); // Auto-save after 30 seconds
+        });
+      });
+
+      // Focus first empty field
+      const firstEmptyField = Array.from(inputs).find(input => !input.value);
+      if (firstEmptyField) {
+        setTimeout(() => firstEmptyField.focus(), 500);
+      }
+    });
+
+    // Field validation function
+    function validateField() {
+      const field = this;
+      const value = field.value.trim();
+      let isValid = true;
+      let errorMessage = '';
+
+      // Check if required field is empty
+      if (field.hasAttribute('required') && !value) {
+        isValid = false;
+        errorMessage = 'This field is required';
+      }
+      // Validate number fields
+      else if ((field.name.includes('Qty') || field.name === 'size') && value) {
+        const num = parseFloat(value);
+        if (field.name.includes('Qty') && (isNaN(num) || num < 0)) {
+          isValid = false;
+          errorMessage = 'Please enter a valid positive number';
+        }
+      }
+      // Validate date field
+      else if (field.type === 'date' && value) {
+        const selectedDate = new Date(value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (selectedDate > today) {
+          isValid = false;
+          errorMessage = 'Date cannot be in the future';
+        }
+      }
+
+      // Show/hide error state
+      if (!isValid) {
+        field.style.borderColor = 'var(--error-color)';
+        field.style.backgroundColor = 'rgba(220, 38, 38, 0.05)';
+        showFieldError(field, errorMessage);
+      } else {
+        field.style.borderColor = 'var(--success-color)';
+        field.style.backgroundColor = 'rgba(5, 150, 105, 0.05)';
+        hideFieldError(field);
+      }
+
+      return isValid;
+    }
+
+    // Clear error state on input
+    function clearError() {
+      this.style.borderColor = '';
+      this.style.backgroundColor = '';
+      hideFieldError(this);
+    }
+
+    // Show field error
+    function showFieldError(field, message) {
+      hideFieldError(field); // Remove existing error
+      
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'field-error';
+      errorDiv.style.cssText = `
+        color: var(--error-color);
+        font-size: 12px;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      `;
+      errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i>${message}`;
+      
+      field.parentNode.appendChild(errorDiv);
+    }
+
+    // Hide field error
+    function hideFieldError(field) {
+      const existingError = field.parentNode.querySelector('.field-error');
+      if (existingError) {
+        existingError.remove();
+      }
+    }
+
+    // Validate quantities logic
+    function validateQuantities() {
+      const processedQty = parseFloat(document.getElementById('processedQty').value) || 0;
+      const okQty = parseFloat(document.getElementById('okQty').value) || 0;
+      const notOkQty = parseFloat(document.getElementById('notOkQty').value) || 0;
+      const plannedQty = parseFloat(document.getElementById('plannedQty').value) || 0;
+
+      // Check if OK + Not OK = Processed
+      if (processedQty > 0 && Math.abs((okQty + notOkQty) - processedQty) > 0.01) {
+        showNotification('OK Qty + Not OK Qty should equal Processed Qty', 'error');
+        return false;
+      }
+
+      // Check if processed doesn't exceed planned significantly
+      if (plannedQty > 0 && processedQty > (plannedQty * 1.1)) {
+        showNotification('Processed quantity significantly exceeds planned quantity', 'warning');
+      }
+
+      return true;
+    }
+
+    // Auto-save functionality
+    function autoSave() {
+      const form = document.getElementById('planningForm');
+      const formData = new FormData(form);
+      
+      // Only auto-save if there's meaningful data
+      let hasData = false;
+      for (let [key, value] of formData.entries()) {
+        if (value && value.toString().trim()) {
+          hasData = true;
+          break;
+        }
+      }
+
+      if (hasData) {
+        // Simulate auto-save (replace with actual endpoint)
+        console.log('Auto-saving planning data...');
+        showNotification('Draft saved automatically', 'success');
+      }
+    }
+
+    // Notification system
+    function showNotification(message, type = 'info') {
+      // Remove existing notifications
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      
+      const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+      };
+
+      notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fas ${icons[type] || icons.info}"></i>
+          <span>${message}</span>
+        </div>
+      `;
+
+      document.body.appendChild(notification);
+
+      // Animate in
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 100);
+
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }, 5000);
+    }
+
+    // Form data persistence (localStorage backup)
+    function saveFormData() {
+      const form = document.getElementById('planningForm');
+      const formData = new FormData(form);
+      const data = {};
+      
+      for (let [key, value] of formData.entries()) {
+        if (value && typeof value === 'string') {
+          data[key] = value;
+        }
+      }
+      
+      localStorage.setItem('planningFormData', JSON.stringify(data));
+    }
+
+    function loadFormData() {
+      const savedData = localStorage.getItem('planningFormData');
+      if (savedData) {
+        try {
+          const data = JSON.parse(savedData);
+          const form = document.getElementById('planningForm');
+          
+          Object.keys(data).forEach(key => {
+            const field = form.querySelector(`[name="${key}"]`);
+            if (field && !field.readOnly) {
+              field.value = data[key];
+            }
+          });
+        } catch (error) {
+          console.error('Error loading saved form data:', error);
+        }
+      }
+    }
+
+    // Clear saved data on successful submission
+    function clearSavedData() {
+      localStorage.removeItem('planningFormData');
+    }
+
+    // Initialize form data persistence
+    document.addEventListener('DOMContentLoaded', function() {
+      loadFormData();
+      
+      // Save form data on input
+      const form = document.getElementById('planningForm');
+      const inputs = form.querySelectorAll('input, select, textarea');
+      
+      inputs.forEach(input => {
+        input.addEventListener('input', debounce(saveFormData, 1000));
+      });
+      
+      // Clear saved data on successful form submission
+      form.addEventListener('submit', function(e) {
+        setTimeout(clearSavedData, 1000);
+      });
+    });
+
+    // Debounce utility function
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Enhanced draft button functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const draftBtn = document.getElementById('draftBtn');
+      if (draftBtn) {
+        draftBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Save current form data
+          saveFormData();
+          showNotification('Form saved as draft successfully', 'success');
+          
+          // Add visual feedback
+          this.classList.add('loading');
+          this.disabled = true;
+          
+          setTimeout(() => {
+            this.classList.remove('loading');
+            this.disabled = false;
+          }, 1500);
+        });
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(event) {
+      // Ctrl/Cmd + S to save
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault();
+        const submitBtn = document.querySelector('.submit-btn');
+        if (submitBtn) {
+          submitBtn.click();
+        }
+      }
+      
+      // Ctrl/Cmd + D to save as draft
+      if ((event.ctrlKey || event.metaKey) && event.key === 'd') {
+        event.preventDefault();
+        const draftBtn = document.getElementById('draftBtn');
+        if (draftBtn) {
+          draftBtn.click();
+        }
+      }
+      
+      // Escape to close sidebar on mobile
+      if (event.key === 'Escape') {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+        }
+      }
+    });
+
+    // Responsive handling
+    function handleResize() {
+      const sidebar = document.getElementById('sidebar');
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('active');
+      }
+    }
+
+    window.addEventListener('resize', handleResize);
+
+    // Enhanced form reset with confirmation
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('planningForm');
+      
+      // Add reset functionality to form
+      form.addEventListener('reset', function(e) {
+        e.preventDefault();
+        
+        if (confirm('Are you sure you want to reset all form data? This action cannot be undone.')) {
+          form.reset();
+          clearSavedData();
+          showNotification('Form has been reset', 'info');
+          
+          // Clear all field errors and styles
+          const inputs = document.querySelectorAll('#planningForm input, #planningForm textarea');
+          inputs.forEach(input => {
+            input.style.borderColor = '';
+            input.style.backgroundColor = '';
+            hideFieldError(input);
+          });
+          
+          // Set current date again
+          const dateField = document.getElementById('date');
+          if (dateField) {
+            dateField.value = new Date().toISOString().split('T')[0];
+          }
+        }
+      });
+    });
+
+    // Connection status monitoring
+    function updateConnectionStatus() {
+      const isOnline = navigator.onLine;
+      
+      if (!isOnline) {
+        showNotification('You are offline. Form data will be saved locally.', 'warning');
+      }
+    }
+
+    window.addEventListener('online', function() {
+      showNotification('Connection restored', 'success');
+    });
+    
+    window.addEventListener('offline', updateConnectionStatus);
+
+    // Initialize connection status
+    document.addEventListener('DOMContentLoaded', updateConnectionStatus);
+
+    // Print functionality
+    function printForm() {
+      window.print();
+    }
+
+    // Accessibility enhancements
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add ARIA labels and descriptions
+      const requiredFields = document.querySelectorAll('input[required], textarea[required]');
+      requiredFields.forEach(field => {
+        field.setAttribute('aria-required', 'true');
+        
+        const label = document.querySelector(`label[for="${field.id}"]`);
+        if (label) {
+          field.setAttribute('aria-labelledby', field.id + '-label');
+          label.id = field.id + '-label';
+        }
+      });
+
+      // Keyboard navigation improvements
+      const form = document.getElementById('planningForm');
+      const inputs = form.querySelectorAll('input, select, textarea, button');
+      
+      inputs.forEach((input, index) => {
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && input.type !== 'textarea') {
+            e.preventDefault();
+            const nextInput = inputs[index + 1];
+            if (nextInput) {
+              nextInput.focus();
+            } else {
+              // If last field, focus submit button
+              const submitBtn = document.querySelector('.submit-btn');
+              if (submitBtn) {
+                submitBtn.focus();
+              }
+            }
+          }
+        });
+      });
+    });
+
+    // Enhanced mobile sidebar handling
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.getElementById('sidebar');
+      const sidebarToggle = document.querySelector('.sidebar-toggle');
+      
+      // Touch events for mobile
+      let touchStartX = 0;
+      let touchEndX = 0;
+      
+      document.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+      });
+      
+      document.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      });
+      
+      function handleSwipe() {
+        const swipeThreshold = 50;
+        const swipeDistance = touchEndX - touchStartX;
+        
+        if (window.innerWidth <= 768) {
+          // Swipe right to open sidebar
+          if (swipeDistance > swipeThreshold && touchStartX < 50) {
+            sidebar.classList.add('active');
+          }
+          // Swipe left to close sidebar
+          else if (swipeDistance < -swipeThreshold && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+          }
+        }
+      }
+      
+      // Prevent body scroll when sidebar is open on mobile
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            if (sidebar.classList.contains('active') && window.innerWidth <= 768) {
+              document.body.style.overflow = 'hidden';
+            } else {
+              document.body.style.overflow = '';
+            }
+          }
+        });
+      });
+      
+      observer.observe(sidebar, { attributes: true });
+    });
+
+    // Form progress tracking
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('planningForm');
+      const requiredFields = form.querySelectorAll('input[required], textarea[required]');
+      const progressBar = document.createElement('div');
+      progressBar.className = 'form-progress';
+      progressBar.innerHTML = '<div class="form-progress-fill"></div>';
+      document.body.appendChild(progressBar);
+      
+      function updateProgress() {
+        const filledFields = Array.from(requiredFields).filter(field => field.value.trim() !== '');
+        const progress = (filledFields.length / requiredFields.length) * 100;
+        const progressFill = progressBar.querySelector('.form-progress-fill');
+        progressFill.style.width = progress + '%';
+      }
+      
+      requiredFields.forEach(field => {
+        field.addEventListener('input', updateProgress);
+      });
+      
+      // Initial progress calculation
+      updateProgress();
+    });
+
+    // Performance optimization
+    document.addEventListener('DOMContentLoaded', function() {
+      // Lazy load non-critical features
+      const lazyFeatures = [
+        () => console.log('Planning form initialized'),
+        () => updateConnectionStatus(),
+        () => loadFormData()
+      ];
+      
+      // Load features with delay to improve initial page load
+      lazyFeatures.forEach((feature, index) => {
+        setTimeout(feature, index * 100);
+      });
+    });
+
+    // Error handling
+    window.addEventListener('error', function(event) {
+      console.error('Application error:', event.error);
+      showNotification('An unexpected error occurred. Please try again.', 'error');
+    });
+
+    // Service worker registration for offline support (if available)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function(error) {
+        console.log('Service Worker registration failed:', error);
+      });
+    }
+
+    // Auto-calculate efficiency metrics
+    document.addEventListener('DOMContentLoaded', function() {
+      const plannedQtyField = document.getElementById('plannedQty');
+      const processedQtyField = document.getElementById('processedQty');
+      const okQtyField = document.getElementById('okQty');
+      
+      function calculateEfficiency() {
+        const planned = parseFloat(plannedQtyField.value) || 0;
+        const processed = parseFloat(processedQtyField.value) || 0;
+        const ok = parseFloat(okQtyField.value) || 0;
+        
+        if (planned > 0 && processed > 0) {
+          const efficiency = ((processed / planned) * 100).toFixed(1);
+          const quality = ok > 0 ? ((ok / processed) * 100).toFixed(1) : 0;
+          
+          // Show efficiency metrics as notification
+          if (efficiency < 80) {
+            showNotification(`Production efficiency: ${efficiency}% (Below target)`, 'warning');
+          } else if (efficiency > 110) {
+            showNotification(`Production efficiency: ${efficiency}% (Above planned)`, 'info');
+          }
+          
+          if (quality < 95 && ok > 0) {
+            showNotification(`Quality rate: ${quality}% (Below target)`, 'warning');
+          }
+        }
+      }
+      
+      [plannedQtyField, processedQtyField, okQtyField].forEach(field => {
+        if (field) {
+          field.addEventListener('blur', calculateEfficiency);
+        }
+      });
+    });
+
+    // Final initialization
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add loading animation to page
+      document.body.style.opacity = '0';
+      document.body.style.transition = 'opacity 0.5s ease';
+      
+      setTimeout(() => {
+        document.body.style.opacity = '1';
+      }, 100);
+
+      // Initialize tooltips for mobile
+      if (window.innerWidth <= 768) {
+        document.querySelectorAll('.tooltip').forEach(el => {
+          el.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tooltip = this.getAttribute('data-tooltip');
+            if (tooltip) {
+              showNotification(tooltip, 'info');
+            }
+          });
+        });
+      }
+      
+      console.log('Planning Department System initialized successfully');
+    });
+
+    // Smart form completion suggestions
+    document.addEventListener('DOMContentLoaded', function() {
+      const routeCardField = document.getElementById('routeCardNo');
+      const processedByField = document.getElementById('processedBy');
+      
+      // Auto-suggest based on previous entries (simulate with localStorage)
+      if (routeCardField) {
+        routeCardField.addEventListener('input', function() {
+          const value = this.value;
+          if (value.length >= 3) {
+            // Simulate auto-suggestion
+            const suggestions = JSON.parse(localStorage.getItem('routeCardSuggestions') || '[]');
+            const matches = suggestions.filter(s => s.toLowerCase().includes(value.toLowerCase()));
+            
+            if (matches.length > 0) {
+              // Could implement dropdown here
+              console.log('Route card suggestions:', matches);
+            }
+          }
+        });
+      }
+      
+      // Save successful entries for future suggestions
+      const form = document.getElementById('planningForm');
+      form.addEventListener('submit', function() {
+        const routeCard = routeCardField.value;
+        const processedBy = processedByField.value;
+        
+        if (routeCard) {
+          const suggestions = JSON.parse(localStorage.getItem('routeCardSuggestions') || '[]');
+          if (!suggestions.includes(routeCard)) {
+            suggestions.push(routeCard);
+            localStorage.setItem('routeCardSuggestions', JSON.stringify(suggestions.slice(-10))); // Keep last 10
+          }
+        }
+        
+        if (processedBy) {
+          const operators = JSON.parse(localStorage.getItem('operatorSuggestions') || '[]');
+          if (!operators.includes(processedBy)) {
+            operators.push(processedBy);
+            localStorage.setItem('operatorSuggestions', JSON.stringify(operators.slice(-10))); // Keep last 10
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
+

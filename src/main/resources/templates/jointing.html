@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jointing Form</title>
+  <style>
+    body {
+      background-color: #4b9cd3;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .form-wrapper {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 1200px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #ccc;
+      font-size: 20px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      background-color: #f5f5f5;
+    }
+
+    .full-width {
+      grid-column: span 4;
+    }
+
+    .buttons {
+      grid-column: span 4;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-weight: bold;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1a252f;
+    }
+
+    a.button-link {
+      text-decoration: none;
+      background-color: #2c3e50;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    a.button-link:hover {
+      background-color: #1a252f;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-wrapper">
+  <form action="/fetch-by-route-jointing">
+						<label>Route Card No.</label> <input type="text" id="routeCardNo"
+							name="routeCardNo" th:value="${order?.routeCardNo}" placeholder="Enter Route Card No" required="required">
+						<button type="submit">Fetch</button>
+					</form>
+  
+   <form action="/jointing" method="post">
+  <h1 style="color: black; position: relative; left: 550px;">JOINTING</h1>
+  <h1 style="color: green; text-align: center;" th:text="${message}"></h1>
+
+  <h2 class="full-width">MIXING DETAILS</h2>
+ <label>Batch No.</label>
+<input type="text" name="batchNo" th:value="${production?.batchNo}" />
+
+<label>Batch Weight</label>
+<input type="text" name="batchWeight" th:value="${production?.batchWeight}" />
+
+<label>Route Card No</label>
+<input type="text" name="routeCardNo" th:value="${production?.routeCardNo}" />
+
+<label>Balance Weight <span class="required">*</span></label>
+<input type="text" name="balanceWeight" th:value="${production?.balanceWeight}" />
+
+  <h2 class="full-width">SETUP PARAMETERS</h2>
+ <label>Production Per Hour</label>
+<input type="text" name="productionPerHour" th:value="${production?.productionPerHour}" />
+
+<label>Weight per Piece</label>
+<input type="text" name="weightPerMeter" th:value="${production?.weightPerMeter}"/>
+
+<label>Tool / Die No.</label>
+<input type="text" name="toolDieNo" th:value="${production?.toolDieNo}" />
+
+<label>No. of Cavity</label>
+<input type="text" name="noOfCavity" th:value="${production?.noOfCavity}" />
+
+<label>Setup Time</label>
+<input type="text" name="setupTime" th:value="${production?.Time}" />
+
+<label>Clamp Pressure</label>
+<input type="text" name="clampPressure" th:value="${production?.clampPressure}" />
+
+<label>Cycle Time</label>
+<input type="text" name="cycleTime" th:value="${production?.cycleTime}" />
+
+<label>Curing Temp.</label>
+<input type="text" name="curingTemp" th:value="${production?.curingTemp}" />
+
+  <div class="form-group">
+    <label>Drawing / Image</label>
+
+    <!-- ✅ Show View Button only if imageUrl is available -->
+    <div th:if="${order.imageUrl != null}">
+        <a th:href="${order.imageUrl}" target="_blank">
+            <button type="button" class="btn btn-primary">VIEW IMAGE</button>
+        </a>
+    </div>
+
+    <!-- ❌ If image is not present, show message -->
+    <div th:if="${order.imageUrl == null}">
+        <p class="text-danger">No image available for this Route Card</p>
+    </div>
+</div>
+
+  <h2 class="full-width">JOINTING</h2>
+  <label>Date</label><input type="date" name="date" />
+  <label>Start Time <span style="color: red">*</span></label><input type="time" name="joiningStartTime" />
+  <label>End Time <span style="color: red">*</span></label><input type="time" name="joiningEndTime" />
+  <label>Planned Qty.</label><input type="text" name="plannedQuantity" />
+  <label>Processed Qty. <span style="color: red">*</span></label><input type="text" name="processedQuantity" />
+  <label>OK Qty. <span style="color: red">*</span></label><input type="text" name="okQuantity" />
+  <label>Not OK Qty. <span style="color: red">*</span></label><input type="text" name="notOkQuantity" />
+  <label>Operator Name <span style="color: red">*</span></label><input type="text" name="operatorName" />
+  <label class="full-width">Remark (if any)</label><input class="full-width" type="text" name="joiningRemarks" />
+
+  <h2 class="full-width">POST-CURING</h2>
+  <label>Received Qty</label>
+<input type="text" name="receivedQty" th:value="${extrusion?.receivedQty}" />
+
+<label>Processed Qty.</label>
+<input type="text" name="postProcessedQty" th:value="${extrusion?.postProcessedQty}" />
+
+<label>Temperature <span class="required">*</span></label>
+<input type="text" name="temperature" th:value="${extrusion?.temperature}" />
+
+<label>Start Time <span class="required">*</span></label>
+<input type="text" name="postStartTime" th:value="${extrusion?.postStartTime}" />
+
+<label>End Time <span class="required">*</span></label>
+<input type="text" name="postEndTime" th:value="${extrusion?.postEndTime}" />
+
+<label>Duration <span class="required">*</span></label>
+<input type="text" name="duration" th:value="${extrusion?.duration}" />
+
+<label class="full-width">Remarks (if any)</label>
+<input class="full-width" type="text" name="postRemarks" th:value="${extrusion?.postRemarks}" />
+
+  <div class="buttons">
+    <button type="button" name="saveDraft">Save as Draft</button>
+    <button type="submit" name="submit">Submit</button>
+    <a href="/export-jointing-report" class="button-link">Download Report (Excel)</a>
+    <a href="/production"><button type="button">HOME</button></a>
+  </div>
+</form>
+   
+  </div>
+</body>
+</html>

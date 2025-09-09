@@ -1,0 +1,2099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ManufacturePro CRM - Packing Department</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Manufacturing CRM Color Palette - Consistent with mixing.html */
+      --primary-color: rgb(255, 0, 0);
+      --primary-dark: #1e3a8a;
+       --primary-light: rgb(0, 0, 0);
+      --secondary-color: #f59e0b;
+      --accent-color: #10b981;
+      --success-color: #059669;
+      --warning-color: #d97706;
+      --error-color: #dc2626;
+      --info-color: #0284c7;
+      
+      /* Background & Surface Colors */
+      --background-primary: #f8fafc;
+      --background-secondary: #f1f5f9;
+      --card-background: #ffffff;
+     --sidebar-background: rgb(128, 0, 0);
+      --sidebar-hover: #F3CE14;
+      
+      /* Text Colors */
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --text-light: #9ca3af;
+      --text-white: #ffffff;
+      
+      /* Border & Shadow */
+      --border-color: #e5e7eb;
+      --border-light: #f3f4f6;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      
+      /* Gradients */
+      --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      --gradient-secondary: linear-gradient(135deg, var(--secondary-color) 0%, #ea580c 100%);
+      --gradient-success: linear-gradient(135deg, var(--accent-color) 0%, var(--success-color) 100%);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Container Layout */
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Enhanced Sidebar - SAME AS MIXING.HTML */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar-background);
+      color: var(--text-white);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      box-shadow: var(--shadow-xl);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Sidebar Header - FIXED POSITION */
+    .sidebar-header {
+      position: sticky;
+      top: 0;
+      padding: 24px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-background);
+      background: linear-gradient(135deg, rgb(255, 128, 0) 0%, rgba(30, 58, 138, 0.1) 100%);
+      z-index: 1001;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .sidebar h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+    }
+
+    .sidebar h2 i {
+      font-size: 24px;
+      color: var(--primary-light);
+    }
+
+    /* Sidebar Body - SCROLLABLE AREA */
+    .sidebar-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Navigation Links Container - SCROLLABLE */
+    .nav-container {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 0;
+    }
+
+    /* Custom Scrollbar for Sidebar */
+    .nav-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .nav-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    .nav-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Navigation Links */
+    .nav-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-links li {
+      margin: 0;
+      position: relative;
+    }
+
+    .nav-links li.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: var(--primary-light);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .nav-links li.active {
+      background: var(--sidebar-hover);
+    }
+
+    .nav-links a {
+      color: var(--text-white);
+      text-decoration: none;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 500;
+      font-size: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-links a::before {
+      content: '';
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-links a:hover::before {
+      left: 100%;
+    }
+
+    .nav-links a:hover {
+      background: var(--sidebar-hover);
+      transform: translateX(4px);
+      color: var(--primary-light);
+    }
+
+    .nav-links a i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      color: #94a3b8;
+      transition: color 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .nav-links a:hover i,
+    .nav-links li.active a i {
+      color: var(--primary-light);
+    }
+
+    /* User Info Section - FIXED AT BOTTOM */
+    .user-info {
+      position: sticky;
+      bottom: 0;
+      padding: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-background);
+      background: rgba(0, 0, 0, 0.2);
+      z-index: 1001;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .user-info img {
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 280px;
+      padding: 32px 40px;
+      width: calc(100% - 280px);
+      min-height: 100vh;
+      background: var(--background-primary);
+    }
+
+    /* Page Header */
+    .page-header {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-title i {
+      color: var(--primary-color);
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .success-message {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      color: var(--success-color);
+      padding: 16px 20px;
+      border-radius: 12px;
+      border-left: 4px solid var(--success-color);
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Enhanced Form Container */
+    .packing-form-container {
+      background: var(--card-background);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+      max-width: none;
+      margin: 0;
+      left: 0;
+    }
+
+    .packing-form-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .packing-form-container h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 32px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .packing-form-container h2 i {
+      color: var(--primary-color);
+    }
+
+    /* Form Layout */
+    .packing-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    /* Form Groups */
+    .form-group {
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 14px;
+      letter-spacing: 0.025em;
+      position: relative;
+    }
+
+    .form-group label.required::after {
+      content: " *";
+      color: var(--error-color);
+      font-weight: 700;
+    }
+
+    /* Enhanced Form Inputs */
+    .form-group input[type="text"],
+    .form-group input[type="date"],
+    .form-group input[type="number"],
+    .form-group select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--card-background);
+      color: var(--text-primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .form-group input:hover,
+    .form-group select:hover {
+      border-color: var(--primary-light);
+    }
+
+    .form-group input[required] {
+      border-left: 3px solid var(--warning-color);
+    }
+
+    .form-group input[required]:valid {
+      border-left-color: var(--success-color);
+    }
+
+    /* Full Width Fields */
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Form Section Headers */
+    .form-section {
+      margin-bottom: 32px;
+    }
+
+    .form-section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-section-title i {
+      color: var(--primary-color);
+    }
+
+    /* Enhanced Button Group */
+    .button-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-light);
+      flex-wrap: wrap;
+    }
+
+    /* Button Styles */
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      min-width: 140px;
+      justify-content: center;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .submit-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #1e3a8a 100%);
+      box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+    }
+
+    .draft-btn {
+      background: linear-gradient(135deg, var(--text-secondary) 0%, #4b5563 100%);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .draft-btn:hover {
+      background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+      box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3);
+    }
+
+    .home-btn {
+      background: var(--gradient-secondary);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .home-btn:hover {
+      background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+      box-shadow: 0 8px 25px rgba(234, 88, 12, 0.3);
+    }
+
+    /* Sidebar Toggle for Mobile */
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .packing-form {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-toggle {
+        display: block;
+      }
+      
+      .sidebar {
+        width: 70px;
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+        width: 280px;
+      }
+      
+      .sidebar:not(.active) .sidebar-header {
+        padding: 20px 10px;
+      }
+      
+      .sidebar:not(.active) .sidebar h2 span {
+        display: none;
+      }
+      
+      .sidebar:not(.active) .nav-links a span {
+        display: none;
+      }
+      
+      .sidebar:not(.active) .nav-links a {
+        justify-content: center;
+        padding: 12px 10px;
+      }
+      
+      .sidebar:not(.active) .nav-links a i {
+        margin-right: 0;
+        font-size: 18px;
+      }
+      
+      .sidebar:not(.active) .user-info {
+        padding: 15px 10px;
+      }
+      
+      .sidebar:not(.active) .user-info img {
+        max-width: 40px;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 80px 16px 20px 16px;
+      }
+      
+      .packing-form-container {
+        padding: 24px 20px;
+      }
+      
+      .packing-form {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .button-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .page-title {
+        font-size: 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 70px 12px 16px 12px;
+      }
+      
+      .packing-form-container {
+        padding: 20px 16px;
+      }
+      
+      .page-title {
+        font-size: 20px;
+      }
+    }
+
+    /* Loading States */
+    .btn.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .btn.loading::after {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Form Validation Styles */
+    .form-group input:invalid:not(:focus):not(:placeholder-shown) {
+      border-color: var(--error-color);
+      background-color: rgba(220, 38, 38, 0.05);
+    }
+
+    .form-group input:valid:not(:focus):not(:placeholder-shown) {
+      border-color: var(--success-color);
+      background-color: rgba(5, 150, 105, 0.05);
+    }
+
+    /* Accessibility Improvements */
+    .form-group input:focus,
+    .form-group select:focus,
+    .btn:focus {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    /* Animation for form elements */
+    .form-group {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .form-group:nth-child(4) { animation-delay: 0.4s; }
+    .form-group:nth-child(5) { animation-delay: 0.5s; }
+    .form-group:nth-child(6) { animation-delay: 0.6s; }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Notification styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      z-index: 1001;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-lg);
+      max-width: 300px;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification-success { background-color: var(--success-color); }
+    .notification-error { background-color: var(--error-color); }
+    .notification-warning { background-color: var(--warning-color); }
+    .notification-info { background-color: var(--info-color); }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      :root {
+        --primary-color: #000080;
+        --text-primary: #000000;
+        --border-color: #000000;
+      }
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      .sidebar,
+      .sidebar-toggle,
+      .button-group {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .packing-form-container {
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+    }
+
+    /* Enhanced scrollbar for main content */
+    .main-content::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .main-content::-webkit-scrollbar-track {
+      background: var(--background-secondary);
+    }
+
+    .main-content::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    .main-content::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Toggle Button for Mobile -->
+  <button class="sidebar-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <div class="container">
+    <!-- Enhanced Sidebar Navigation - SAME AS MIXING.HTML -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>
+          <i class="fas fa-industry"></i>
+          <span>ManufacturePro</span>
+        </h2>
+      </div>
+      
+      <div class="sidebar-body">
+        <div class="nav-container">
+          <ul class="nav-links">
+            <li><a href="/"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i><span>Overview</span></a></li>
+            <li><a href="/reports"><i class="fas fa-chart-bar"></i><span>Reports</span></a></li>
+            <li><a href="/search"><i class="fas fa-search"></i><span>Search</span></a></li>
+            <li><a href="/order"><i class="fas fa-clipboard-list"></i><span>Order Log</span></a></li>
+            <li><a href="/mixing"><i class="fas fa-blender"></i><span>Mixing</span></a></li>
+            <li><a href="/production"><i class="fas fa-cogs"></i><span>Production</span></a></li>
+            <li><a href="/extrusion"><i class="fas fa-industry"></i><span>Extrusion</span></a></li>
+            <li><a href="/coating"><i class="fas fa-brush"></i><span>Coating</span></a></li>
+            <li><a href="/jointing"><i class="fas fa-link"></i><span>Jointing</span></a></li>
+            <li><a href="/moulding"><i class="fas fa-cube"></i><span>Moulding</span></a></li>
+            <li><a href="/sheeting"><i class="fas fa-layer-group"></i><span>Sheeting</span></a></li>
+            <li><a href="/qc"><i class="fas fa-user-shield"></i><span>QC Supervisor</span></a></li>
+            <li><a href="/planning"><i class="fas fa-calendar-alt"></i><span>Planning</span></a></li>
+            <li><a href="/inspection"><i class="fas fa-clipboard-check"></i><span>Inspection</span></a></li>
+            <li><a href="/finalinspection"><i class="fas fa-check-double"></i><span>Final Inspection</span></a></li>
+            <li><a href="/dispatch-note"><i class="fas fa-file-signature"></i><span>Dispatch Approval</span></a></li>
+            <li class="active"><a href="/packing"><i class="fas fa-box"></i><span>Packing</span></a></li>
+            <li><a href="/dispatch"><i class="fas fa-truck"></i><span>Dispatch</span></a></li>
+          </ul>
+        </div>
+        
+        <div class="user-info">
+          <img src="armol-removebg-preview.png" alt="ManufacturePro Logo">
+        </div>
+      </div>
+    </nav>
+
+    <!-- Enhanced Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">
+          <i class="fas fa-box"></i>
+          Packing Department
+        </h1>
+        <p class="page-subtitle">Manage packing operations and quality control with precision tracking</p>
+        
+        <!-- Success Message -->
+        <div class="success-message" th:if="${message}" th:text="${message}"></div>
+      </div>
+
+      <!-- Enhanced Form Container -->
+      <div class="packing-form-container">
+        <h2>
+          <i class="fas fa-boxes"></i>
+          Packing Details Management
+        </h2>
+
+        <!-- Main Packing Form -->
+        <form class="packing-form" action="/packing" method="post" id="packingForm">
+          
+          <!-- Section 1: Basic Information -->
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <i class="fas fa-info-circle"></i>
+              Basic Information
+            </h3>
+            
+            <div class="form-group">
+              <label for="routeCardNo">Route Card No.</label>
+              <input 
+                type="text" 
+                id="routeCardNo" 
+                name="routeCardNo" 
+                placeholder="Enter Route Card Number"
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="date">Date</label>
+              <input 
+                type="date" 
+                id="date" 
+                name="date"
+              >
+            </div>
+          </div>
+
+          <!-- Section 2: Quantity Information -->
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <i class="fas fa-calculator"></i>
+              Quantity Information
+            </h3>
+
+            <div class="form-group">
+              <label for="packedQty" class="required">Packed Qty.</label>
+              <input 
+                type="text" 
+                id="packedQty" 
+                name="packedQty" 
+                placeholder="Enter Packed Quantity"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="packNo" class="required">Pack No.</label>
+              <input 
+                type="text" 
+                id="packNo" 
+                name="packNo" 
+                placeholder="Enter Pack Number"
+                required
+              >
+            </div>
+          </div>
+
+          <!-- Section 3: Personnel & Additional Information -->
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <i class="fas fa-user-check"></i>
+              Personnel & Additional Information
+            </h3>
+
+            <div class="form-group">
+              <label for="packedBy">Packed By</label>
+              <input 
+                type="text" 
+                id="packedBy" 
+                name="packedBy" 
+                placeholder="Enter Operator Name"
+              >
+            </div>
+<!-- <div class="form-group">
+              <label for="packedBy">No of rolls</label>
+              <input 
+                type="text" 
+                id="noOfRolls" 
+                name="noOfRolls" 
+                placeholder="Enter 
+              >
+            </div>
+
+<div class="form-group">
+              <label for="packedBy">No of Box</label>
+              <input 
+                type="text" 
+                id="noOfBox" 
+                name="noOfBox" 
+                placeholder="Enter "
+              >
+            </div> -->
+
+            <div class="form-group full-width">
+              <label for="remarks">Remarks (If Any)</label>
+              <input 
+                type="text" 
+                id="remarks" 
+                name="remarks" 
+                class="full-width"
+                placeholder="Enter any additional remarks or notes"
+              >
+            </div>
+          </div>
+        </form>
+
+        <!-- Enhanced Button Group -->
+        <div class="button-group">
+          <button type="button" class="btn draft-btn" onclick="saveAsDraft()">
+            <i class="fas fa-save"></i>
+            Save as Draft
+          </button>
+          
+          <button type="submit" form="packingForm" class="btn submit-btn">
+            <i class="fas fa-check"></i>
+            Submit
+          </button>
+          
+          <a href="/production" class="btn home-btn">
+            <i class="fas fa-home"></i>
+            Home
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Enhanced JavaScript -->
+  <script>
+    // Sidebar toggle functionality
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('active');
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.querySelector('.sidebar-toggle');
+      
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(event.target) && 
+          !toggleBtn.contains(event.target) && 
+          sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+      }
+    });
+
+    // Form enhancement and validation
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('packingForm');
+      const inputs = form.querySelectorAll('input[required]');
+      
+      // Set current date as default
+      const dateField = document.getElementById('date');
+      if (dateField && !dateField.value) {
+        dateField.value = new Date().toISOString().split('T')[0];
+      }
+
+      // Real-time validation
+      inputs.forEach(input => {
+        input.addEventListener('blur', validateField);
+        input.addEventListener('input', clearError);
+      });
+
+      // Form submission handling
+      form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        inputs.forEach(input => {
+          if (!validateField.call(input)) {
+            isValid = false;
+          }
+        });
+
+        if (!isValid) {
+          e.preventDefault();
+          showNotification('Please fix all errors before submitting', 'error');
+          return;
+        }
+
+        // Add loading state to submit button
+        const submitBtn = document.querySelector('.submit-btn');
+        if (submitBtn) {
+          submitBtn.classList.add('loading');
+          submitBtn.disabled = true;
+          
+          // Reset after 3 seconds (simulate server response)
+          setTimeout(() => {
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+          }, 3000);
+        }
+
+        showNotification('Packing data submitted successfully', 'success');
+      });
+
+      // Auto-save functionality
+      let autoSaveTimer;
+      const allInputs = form.querySelectorAll('input, select, textarea');
+      allInputs.forEach(input => {
+        input.addEventListener('input', function() {
+          clearTimeout(autoSaveTimer);
+          autoSaveTimer = setTimeout(autoSave, 30000); // Auto-save after 30 seconds
+        });
+      });
+
+      // Focus first empty field
+      const firstEmptyField = Array.from(inputs).find(input => !input.value);
+      if (firstEmptyField) {
+        setTimeout(() => firstEmptyField.focus(), 500);
+      }
+    });
+
+    // Field validation function
+    function validateField() {
+      const field = this;
+      const value = field.value.trim();
+      let isValid = true;
+      let errorMessage = '';
+
+      // Check if required field is empty
+      if (field.hasAttribute('required') && !value) {
+        isValid = false;
+        errorMessage = 'This field is required';
+      }
+      // Validate route card number format
+      else if (field.name === 'routeCardNo' && value) {
+        if (!/^[0-9]{4,}$/i.test(value)) {
+          isValid = false;
+          errorMessage = 'Route Card number should start with "RC" followed by at least 4 digits';
+        }
+      }
+      // Validate packed quantity (should be numeric)
+      else if (field.name === 'packedQty' && value) {
+        if (!/^\d+(\.\d+)?$/.test(value)) {
+          isValid = false;
+          errorMessage = 'Packed quantity should be a valid number';
+        } else if (parseFloat(value) <= 0) {
+          isValid = false;
+          errorMessage = 'Packed quantity should be greater than 0';
+        }
+      }
+      // Validate pack number format
+      else if (field.name === 'packNo' && value) {
+        if (!/^[0-9]{3,}$/i.test(value)) {
+          isValid = false;
+          errorMessage = 'Pack number should start with "P" followed by at least 3 digits';
+        }
+      }
+      // Validate date fields
+      else if (field.type === 'date' && value) {
+        const selectedDate = new Date(value);
+        const today = new Date();
+        const maxDate = new Date();
+        maxDate.setDate(today.getDate() + 7);
+        
+        if (selectedDate > maxDate) {
+          isValid = false;
+          errorMessage = 'Date cannot be more than 7 days in the future';
+        }
+      }
+
+      // Show/hide error state
+      if (!isValid) {
+        field.style.borderColor = 'var(--error-color)';
+        field.style.backgroundColor = 'rgba(220, 38, 38, 0.05)';
+        showFieldError(field, errorMessage);
+      } else {
+        field.style.borderColor = 'var(--success-color)';
+        field.style.backgroundColor = 'rgba(5, 150, 105, 0.05)';
+        hideFieldError(field);
+      }
+
+      return isValid;
+    }
+
+    // Clear error state on input
+    function clearError() {
+      this.style.borderColor = '';
+      this.style.backgroundColor = '';
+      hideFieldError(this);
+    }
+
+    // Show field error
+    function showFieldError(field, message) {
+      hideFieldError(field); // Remove existing error
+      
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'field-error';
+      errorDiv.style.cssText = `
+        color: var(--error-color);
+        font-size: 12px;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      `;
+      errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i>${message}`;
+      
+      field.parentNode.appendChild(errorDiv);
+    }
+
+    // Hide field error
+    function hideFieldError(field) {
+      const existingError = field.parentNode.querySelector('.field-error');
+      if (existingError) {
+        existingError.remove();
+      }
+    }
+
+    // Save as draft functionality
+    function saveAsDraft() {
+      const form = document.getElementById('packingForm');
+      const formData = new FormData(form);
+      
+      // Check if there's any data to save
+      let hasData = false;
+      for (let [key, value] of formData.entries()) {
+        if (value && value.toString().trim()) {
+          hasData = true;
+          break;
+        }
+      }
+
+      if (!hasData) {
+        showNotification('No data to save as draft', 'warning');
+        return;
+      }
+
+      // Save to localStorage
+      const data = {};
+      for (let [key, value] of formData.entries()) {
+        if (value && typeof value === 'string') {
+          data[key] = value;
+        }
+      }
+      
+      localStorage.setItem('packingFormDraft', JSON.stringify(data));
+      showNotification('Draft saved successfully', 'success');
+
+      // Add loading state to draft button
+      const draftBtn = document.querySelector('.draft-btn');
+      if (draftBtn) {
+        draftBtn.classList.add('loading');
+        draftBtn.disabled = true;
+        
+        setTimeout(() => {
+          draftBtn.classList.remove('loading');
+          draftBtn.disabled = false;
+        }, 1500);
+      }
+    }
+
+    // Auto-save functionality
+    function autoSave() {
+      const form = document.getElementById('packingForm');
+      const formData = new FormData(form);
+      
+      // Only auto-save if there's meaningful data
+      let hasData = false;
+      for (let [key, value] of formData.entries()) {
+        if (value && value.toString().trim()) {
+          hasData = true;
+          break;
+        }
+      }
+
+      if (hasData) {
+        // Save to localStorage
+        const data = {};
+        for (let [key, value] of formData.entries()) {
+          if (value && typeof value === 'string') {
+            data[key] = value;
+          }
+        }
+        localStorage.setItem('packingFormData', JSON.stringify(data));
+        console.log('Auto-saving packing data...');
+        showNotification('Draft saved automatically', 'success');
+      }
+    }
+
+    // Load saved form data
+    function loadFormData() {
+      const savedData = localStorage.getItem('packingFormData') || localStorage.getItem('packingFormDraft');
+      if (savedData) {
+        try {
+          const data = JSON.parse(savedData);
+          const form = document.getElementById('packingForm');
+          
+          Object.keys(data).forEach(key => {
+            const field = form.querySelector(`[name="${key}"]`);
+            if (field && !field.readOnly) {
+              field.value = data[key];
+            }
+          });
+          
+          showNotification('Previous draft loaded', 'info');
+        } catch (error) {
+          console.error('Error loading saved form data:', error);
+        }
+      }
+    }
+
+    // Clear saved data
+    function clearSavedData() {
+      localStorage.removeItem('packingFormData');
+      localStorage.removeItem('packingFormDraft');
+    }
+
+    // Notification system
+    function showNotification(message, type = 'info') {
+      // Remove existing notifications
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      
+      const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+      };
+
+      notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fas ${icons[type] || icons.info}"></i>
+          <span>${message}</span>
+        </div>
+      `;
+
+      document.body.appendChild(notification);
+
+      // Animate in
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 100);
+
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }, 5000);
+    }
+
+    // Form data persistence (localStorage backup)
+    function saveFormData() {
+      const form = document.getElementById('packingForm');
+      const formData = new FormData(form);
+      const data = {};
+      
+      for (let [key, value] of formData.entries()) {
+        if (value && typeof value === 'string') {
+          data[key] = value;
+        }
+      }
+      
+      localStorage.setItem('packingFormData', JSON.stringify(data));
+    }
+
+    // Debounce utility function
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Initialize form data persistence
+    document.addEventListener('DOMContentLoaded', function() {
+      loadFormData();
+      
+      // Save form data on input
+      const form = document.getElementById('packingForm');
+      const inputs = form.querySelectorAll('input, select, textarea');
+      
+      inputs.forEach(input => {
+        input.addEventListener('input', debounce(saveFormData, 1000));
+      });
+      
+      // Clear saved data on successful form submission
+      form.addEventListener('submit', function(e) {
+        setTimeout(clearSavedData, 1000);
+      });
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(event) {
+      // Ctrl/Cmd + S to save as draft
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault();
+        saveAsDraft();
+      }
+      
+      // Ctrl/Cmd + Enter to submit
+      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+        event.preventDefault();
+        const submitBtn = document.querySelector('.submit-btn');
+        if (submitBtn) {
+          submitBtn.click();
+        }
+      }
+      
+      // Escape to close sidebar on mobile
+      if (event.key === 'Escape') {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+        }
+      }
+    });
+
+    // Responsive handling
+    function handleResize() {
+      const sidebar = document.getElementById('sidebar');
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('active');
+      }
+    }
+
+    window.addEventListener('resize', handleResize);
+
+    // Connection status monitoring
+    function updateConnectionStatus() {
+      const isOnline = navigator.onLine;
+      
+      if (!isOnline) {
+        showNotification('You are offline. Form data will be saved locally.', 'warning');
+      }
+    }
+
+    window.addEventListener('online', function() {
+      showNotification('Connection restored', 'success');
+    });
+    
+    window.addEventListener('offline', updateConnectionStatus);
+
+    // Accessibility enhancements
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add ARIA labels and descriptions
+      const requiredFields = document.querySelectorAll('input[required]');
+      requiredFields.forEach(field => {
+        field.setAttribute('aria-required', 'true');
+        
+        const label = document.querySelector(`label[for="${field.id}"]`);
+        if (label) {
+          field.setAttribute('aria-labelledby', field.id + '-label');
+          label.id = field.id + '-label';
+        }
+      });
+
+      // Keyboard navigation improvements
+      const form = document.getElementById('packingForm');
+      const inputs = form.querySelectorAll('input, select, textarea, button');
+      
+      inputs.forEach((input, index) => {
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && input.type !== 'textarea') {
+            e.preventDefault();
+            const nextInput = inputs[index + 1];
+            if (nextInput) {
+              nextInput.focus();
+            } else {
+              // If last field, focus submit button
+              const submitBtn = document.querySelector('.submit-btn');
+              if (submitBtn) {
+                submitBtn.focus();
+              }
+            }
+          }
+        });
+      });
+    });
+
+    // Enhanced mobile sidebar handling
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.getElementById('sidebar');
+      const sidebarToggle = document.querySelector('.sidebar-toggle');
+      
+      // Touch events for mobile
+      let touchStartX = 0;
+      let touchEndX = 0;
+      
+      document.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+      });
+      
+      document.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      });
+      
+      function handleSwipe() {
+        const swipeThreshold = 50;
+        const swipeDistance = touchEndX - touchStartX;
+        
+        if (window.innerWidth <= 768) {
+          // Swipe right to open sidebar
+          if (swipeDistance > swipeThreshold && touchStartX < 50) {
+            sidebar.classList.add('active');
+          }
+          // Swipe left to close sidebar
+          else if (swipeDistance < -swipeThreshold && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+          }
+        }
+      }
+      
+      // Prevent body scroll when sidebar is open on mobile
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            if (sidebar.classList.contains('active') && window.innerWidth <= 768) {
+              document.body.style.overflow = 'hidden';
+            } else {
+              document.body.style.overflow = '';
+            }
+          }
+        });
+      });
+      
+      observer.observe(sidebar, { attributes: true });
+    });
+
+    // Auto-generate pack number functionality
+    function generatePackNumber() {
+      const packField = document.getElementById('packNo');
+      const routeCardField = document.getElementById('routeCardNo');
+      
+      if (packField && !packField.value) {
+        const today = new Date();
+        const year = today.getFullYear().toString().slice(-2);
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const time = String(today.getHours()).padStart(2, '0') + String(today.getMinutes()).padStart(2, '0');
+        
+        let packNumber = `P${year}${month}${day}${time}`;
+        
+        // If route card is available, incorporate it
+        if (routeCardField && routeCardField.value) {
+          const routeCardSuffix = routeCardField.value.replace(/\D/g, '').slice(-3);
+          if (routeCardSuffix) {
+            packNumber = `P${routeCardSuffix}${day}${time}`;
+          }
+        }
+        
+        packField.value = packNumber;
+        showNotification('Pack number auto-generated', 'info');
+      }
+    }
+
+    // Add auto-generate button for pack number
+    document.addEventListener('DOMContentLoaded', function() {
+      const packField = document.getElementById('packNo');
+      if (packField) {
+        const generateBtn = document.createElement('button');
+        generateBtn.type = 'button';
+        generateBtn.innerHTML = '<i class="fas fa-magic"></i>';
+        generateBtn.title = 'Auto-generate Pack number';
+        generateBtn.style.cssText = `
+          position: absolute;
+          right: 8px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: var(--primary-color);
+          color: white;
+          border: none;
+          border-radius: 4px;
+          padding: 6px 8px;
+          cursor: pointer;
+          font-size: 12px;
+          z-index: 10;
+        `;
+        
+        generateBtn.addEventListener('click', generatePackNumber);
+        
+        packField.parentNode.style.position = 'relative';
+        packField.style.paddingRight = '40px';
+        packField.parentNode.appendChild(generateBtn);
+      }
+    });
+
+    // Form completion progress tracking
+    function updateFormProgress() {
+      const form = document.getElementById('packingForm');
+      const allFields = form.querySelectorAll('input, select, textarea');
+      const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
+      
+      const filledRequired = Array.from(requiredFields).filter(field => {
+        return field.value && field.value.trim();
+      });
+      
+      const progress = Math.round((filledRequired.length / requiredFields.length) * 100);
+      
+      // Update progress indicator (if you want to add one)
+      console.log(`Form completion: ${progress}%`);
+      
+      if (progress === 100) {
+        showNotification('All required fields completed! Ready to submit.', 'success');
+      }
+    }
+
+    // Monitor form completion
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('packingForm');
+      const inputs = form.querySelectorAll('input, select, textarea');
+      
+      inputs.forEach(input => {
+        input.addEventListener('input', debounce(updateFormProgress, 500));
+        input.addEventListener('change', debounce(updateFormProgress, 500));
+      });
+    });
+
+    // Enhanced form reset functionality
+    function resetForm() {
+      if (confirm('Are you sure you want to reset all form data? This action cannot be undone.')) {
+        document.getElementById('packingForm').reset();
+        clearSavedData();
+        showNotification('Form has been reset', 'info');
+        
+        // Clear all field errors and styles
+        const inputs = document.querySelectorAll('#packingForm input');
+        inputs.forEach(input => {
+          input.style.borderColor = '';
+          input.style.backgroundColor = '';
+          hideFieldError(input);
+        });
+        
+        // Set current date again
+        const dateField = document.getElementById('date');
+        if (dateField) {
+          dateField.value = new Date().toISOString().split('T')[0];
+        }
+      }
+    }
+
+    // Print functionality
+    function printForm() {
+      const printWindow = window.open('', '_blank');
+      const formContent = document.querySelector('.packing-form-container').cloneNode(true);
+      
+      // Remove buttons from print preview
+      const buttons = formContent.querySelector('.button-group');
+      if (buttons) {
+        buttons.remove();
+      }
+      
+      // Create print preview document
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Packing Form - Print Preview</title>
+          <style>
+            body { 
+              font-family: Arial, sans-serif; 
+              margin: 20px; 
+              color: #333;
+            }
+            .packing-form-container { 
+              margin: 0; 
+              box-shadow: none;
+              border: 1px solid #ccc;
+            }
+            .form-group { margin-bottom: 15px; }
+            .form-group label { 
+              font-weight: bold; 
+              display: block; 
+              margin-bottom: 5px;
+            }
+            .form-group input { 
+              border: 1px solid #ccc; 
+              padding: 8px; 
+              width: 100%;
+              box-sizing: border-box;
+            }
+            .form-section-title {
+              border-bottom: 2px solid #1e40af;
+              padding-bottom: 5px;
+              margin-bottom: 15px;
+              color: #1e40af;
+            }
+            @media print {
+              body { margin: 0; }
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Packing Department - Form Data</h1>
+          <p><strong>Generated on:</strong> ${new Date().toLocaleString()}</p>
+          ${formContent.outerHTML}
+          <div class="no-print" style="text-align: center; margin-top: 20px;">
+            <button onclick="window.print()" style="padding: 10px 20px; background: #1e40af; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">Print</button>
+            <button onclick="window.close()" style="padding: 10px 20px; background: #dc2626; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+          </div>
+        </body>
+        </html>
+      `);
+      
+      printWindow.document.close();
+    }
+
+    // Error handling
+    window.addEventListener('error', function(event) {
+      console.error('Application error:', event.error);
+      showNotification('An unexpected error occurred. Please try again.', 'error');
+    });
+
+    // Service worker registration for offline support (if available)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function(error) {
+        console.log('Service Worker registration failed:', error);
+      });
+    }
+
+    // Initialize connection status
+    document.addEventListener('DOMContentLoaded', function() {
+      updateConnectionStatus();
+      
+      // Add loading animation to page
+      document.body.style.opacity = '0';
+      document.body.style.transition = 'opacity 0.5s ease';
+      
+      setTimeout(() => {
+        document.body.style.opacity = '1';
+      }, 100);
+
+      // Initialize tooltips for mobile
+      if (window.innerWidth <= 768) {
+        document.querySelectorAll('[data-tooltip]').forEach(el => {
+          el.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tooltip = this.getAttribute('data-tooltip');
+            if (tooltip) {
+              showNotification(tooltip, 'info');
+            }
+          });
+        });
+      }
+      
+      console.log('Packing Department System initialized successfully');
+    });
+
+    // Performance optimization
+    document.addEventListener('DOMContentLoaded', function() {
+      // Lazy load non-critical features
+      const lazyFeatures = [
+        () => console.log('Packing form initialized'),
+        () => updateConnectionStatus(),
+        () => loadFormData(),
+        () => updateFormProgress()
+      ];
+      
+      // Load features with delay to improve initial page load
+      lazyFeatures.forEach((feature, index) => {
+        setTimeout(feature, index * 100);
+      });
+      
+      // Cleanup on page unload
+      window.addEventListener('beforeunload', function() {
+        // Save current form state
+        saveFormData();
+      });
+    });
+
+    // Add context menu for additional options
+    document.addEventListener('contextmenu', function(e) {
+      if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
+        e.preventDefault();
+        
+        // Create custom context menu
+        const contextMenu = document.createElement('div');
+        contextMenu.style.cssText = `
+          position: fixed;
+          top: ${e.clientY}px;
+          left: ${e.clientX}px;
+          background: white;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          padding: 8px 0;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          z-index: 1000;
+          min-width: 120px;
+        `;
+        
+        const menuItems = [
+          { text: 'Clear Field', action: () => { e.target.value = ''; e.target.focus(); } },
+          { text: 'Copy Value', action: () => { navigator.clipboard.writeText(e.target.value); } },
+          { text: 'Validate Field', action: () => { validateField.call(e.target); } }
+        ];
+        
+        menuItems.forEach(item => {
+          const menuItem = document.createElement('div');
+          menuItem.textContent = item.text;
+          menuItem.style.cssText = `
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+          `;
+          menuItem.addEventListener('mouseenter', () => {
+            menuItem.style.backgroundColor = '#f0f0f0';
+          });
+          menuItem.addEventListener('mouseleave', () => {
+            menuItem.style.backgroundColor = '';
+          });
+          menuItem.addEventListener('click', () => {
+            item.action();
+            document.body.removeChild(contextMenu);
+          });
+          contextMenu.appendChild(menuItem);
+        });
+        
+        document.body.appendChild(contextMenu);
+        
+        // Remove context menu when clicking elsewhere
+        setTimeout(() => {
+          document.addEventListener('click', function removeMenu() {
+            if (document.body.contains(contextMenu)) {
+              document.body.removeChild(contextMenu);
+            }
+            document.removeEventListener('click', removeMenu);
+          });
+        }, 100);
+      }
+    });
+
+    // Final initialization and cleanup
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add custom styles for better UX
+      const style = document.createElement('style');
+      style.textContent = `
+        .field-error {
+          animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+        
+        .form-group input:focus {
+          box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+        
+        .btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      `;
+      document.head.appendChild(style);
+      
+      // Initialize form with current timestamp
+      console.log(`Packing form loaded at: ${new Date().toISOString()}`);
+      
+      // Add form validation summary
+      const form = document.getElementById('packingForm');
+      form.addEventListener('submit', function(e)
+{
+        const requiredFields = form.querySelectorAll('input[required]');
+        const emptyFields = Array.from(requiredFields).filter(field => !field.value.trim());
+        
+        if (emptyFields.length > 0) {
+          e.preventDefault();
+          const fieldNames = emptyFields.map(field => {
+            const label = document.querySelector(`label[for="${field.id}"]`);
+            return label ? label.textContent.replace('*', '').trim() : field.name;
+          });
+          
+          showNotification(`Please fill in the following required fields: ${fieldNames.join(', ')}`, 'error');
+          
+          // Focus on first empty field
+          emptyFields[0].focus();
+          emptyFields[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+    });
+
+    // Add data export functionality
+    function exportFormData() {
+      const form = document.getElementById('packingForm');
+      const formData = new FormData(form);
+      const data = {};
+      
+      for (let [key, value] of formData.entries()) {
+        data[key] = value;
+      }
+      
+      // Add metadata
+      data.exportDate = new Date().toISOString();
+      data.formType = 'Packing Form';
+      data.version = '1.0';
+      
+      // Create downloadable JSON file
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `packing-form-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showNotification('Form data exported successfully', 'success');
+    }
+
+    // Add import functionality
+    function importFormData() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            try {
+              const data = JSON.parse(e.target.result);
+              const form = document.getElementById('packingForm');
+              
+              // Populate form fields
+              Object.keys(data).forEach(key => {
+                const field = form.querySelector(`[name="${key}"]`);
+                if (field && data[key]) {
+                  field.value = data[key];
+                }
+              });
+              
+              showNotification('Form data imported successfully', 'success');
+            } catch (error) {
+              showNotification('Error importing form data. Please check the file format.', 'error');
+            }
+          };
+          reader.readAsText(file);
+        }
+      });
+      input.click();
+    }
+
+    // Add keyboard shortcut help
+    function showKeyboardShortcuts() {
+      const shortcuts = [
+        { key: 'Ctrl/Cmd + S', action: 'Save as Draft' },
+        { key: 'Ctrl/Cmd + Enter', action: 'Submit Form' },
+        { key: 'Tab', action: 'Navigate between fields' },
+        { key: 'Escape', action: 'Close sidebar (mobile)' },
+        { key: 'F1', action: 'Show this help' }
+      ];
+      
+      let helpText = 'Keyboard Shortcuts:\n\n';
+      shortcuts.forEach(shortcut => {
+        helpText += `${shortcut.key}: ${shortcut.action}\n`;
+      });
+      
+      alert(helpText);
+    }
+
+    // Add F1 help shortcut
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'F1') {
+        event.preventDefault();
+        showKeyboardShortcuts();
+      }
+    });
+
+    // Add form field auto-completion suggestions
+    const fieldSuggestions = {
+      packedBy: ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Wilson'],
+      remarks: ['Quality checked', 'Standard packaging', 'Handle with care', 'Fragile items']
+    };
+
+    function addAutoComplete(fieldName, suggestions) {
+      const field = document.getElementById(fieldName);
+      if (!field) return;
+      
+      const datalistId = `${fieldName}-suggestions`;
+      let datalist = document.getElementById(datalistId);
+      
+      if (!datalist) {
+        datalist = document.createElement('datalist');
+        datalist.id = datalistId;
+        document.body.appendChild(datalist);
+        field.setAttribute('list', datalistId);
+      }
+      
+      // Clear existing options
+      datalist.innerHTML = '';
+      
+      // Add suggestions
+      suggestions.forEach(suggestion => {
+        const option = document.createElement('option');
+        option.value = suggestion;
+        datalist.appendChild(option);
+      });
+    }
+
+    // Initialize auto-complete
+    document.addEventListener('DOMContentLoaded', function() {
+      Object.keys(fieldSuggestions).forEach(fieldName => {
+        addAutoComplete(fieldName, fieldSuggestions[fieldName]);
+      });
+    });
+
+    // Add form analytics (optional - for tracking form usage)
+    function trackFormInteraction(action, field = null) {
+      const analytics = {
+        timestamp: new Date().toISOString(),
+        action: action,
+        field: field,
+        userAgent: navigator.userAgent,
+        url: window.location.href
+      };
+      
+      // Store in localStorage for now (in production, send to analytics service)
+      const existingAnalytics = JSON.parse(localStorage.getItem('packingFormAnalytics') || '[]');
+      existingAnalytics.push(analytics);
+      
+      // Keep only last 100 entries
+      if (existingAnalytics.length > 100) {
+        existingAnalytics.splice(0, existingAnalytics.length - 100);
+      }
+      
+      localStorage.setItem('packingFormAnalytics', JSON.stringify(existingAnalytics));
+    }
+
+    // Track form interactions
+    document.addEventListener('DOMContentLoaded', function() {
+      trackFormInteraction('form_loaded');
+      
+      const form = document.getElementById('packingForm');
+      const inputs = form.querySelectorAll('input, select, textarea');
+      
+      inputs.forEach(input => {
+        input.addEventListener('focus', () => trackFormInteraction('field_focus', input.name));
+        input.addEventListener('blur', () => trackFormInteraction('field_blur', input.name));
+      });
+      
+      form.addEventListener('submit', () => trackFormInteraction('form_submit'));
+    });
+
+    // Add form completion time tracking
+    let formStartTime = null;
+    let fieldInteractionTimes = {};
+
+    document.addEventListener('DOMContentLoaded', function() {
+      formStartTime = Date.now();
+      
+      const inputs = document.querySelectorAll('#packingForm input, #packingForm select, #packingForm textarea');
+      inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+          fieldInteractionTimes[this.name] = { start: Date.now() };
+        });
+        
+        input.addEventListener('blur', function() {
+          if (fieldInteractionTimes[this.name]) {
+            fieldInteractionTimes[this.name].duration = Date.now() - fieldInteractionTimes[this.name].start;
+          }
+        });
+      });
+    });
+
+    // Calculate and display form completion stats
+    function showFormStats() {
+      if (!formStartTime) return;
+      
+      const totalTime = Date.now() - formStartTime;
+      const minutes = Math.floor(totalTime / 60000);
+      const seconds = Math.floor((totalTime % 60000) / 1000);
+      
+      const stats = `
+        Form Completion Statistics:
+        
+        Total Time: ${minutes}m ${seconds}s
+        Fields Interacted: ${Object.keys(fieldInteractionTimes).length}
+        
+        Field Interaction Times:
+        ${Object.entries(fieldInteractionTimes)
+          .map(([field, data]) => `${field}: ${Math.round(data.duration / 1000)}s`)
+          .join('\n')}
+      `;
+      
+      console.log(stats);
+    }
+
+    // Show stats on form submission
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('packingForm');
+      form.addEventListener('submit', function() {
+        setTimeout(showFormStats, 100);
+      });
+    });
+
+    // Add final cleanup and optimization
+    window.addEventListener('beforeunload', function() {
+      // Save current form state
+      saveFormData();
+      
+      // Track form abandonment if not submitted
+      const form = document.getElementById('packingForm');
+      const hasData = Array.from(form.querySelectorAll('input, select, textarea'))
+        .some(field => field.value && field.value.trim());
+      
+      if (hasData) {
+        trackFormInteraction('form_abandoned');
+      }
+    });
+
+    // Initialize all systems
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🚀 Packing Department System fully initialized');
+      console.log('📊 All features loaded successfully');
+      console.log('✅ Ready for production use');
+      
+      // Final system check
+      const criticalElements = [
+        'sidebar',
+        'packingForm',
+        'routeCardNo',
+        'packedQty',
+        'packNo'
+      ];
+      
+      const missingElements = criticalElements.filter(id => !document.getElementById(id));
+      
+      if (missingElements.length > 0) {
+        console.error('❌ Missing critical elements:', missingElements);
+        showNotification('System initialization incomplete. Please refresh the page.', 'error');
+      } else {
+        console.log('✅ All critical elements present and functional');
+      }
+    });
+  </script>
+</body>
+</html>
+
+

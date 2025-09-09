@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CRM - Report Form</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom right, #e3f2fd, #90caf9);
+    }
+
+    .container {
+      display: flex;
+    }
+
+    .sidebar {
+      width: 260px;
+      background: rgba(44, 62, 80, 0.85);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 30px 20px;
+      height: 95vh;
+      position: fixed;
+      overflow-y: auto;
+      box-shadow: 4px 0 12px rgba(0, 0, 0, 0.2);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar h2 {
+      margin-bottom: 30px;
+      font-size: 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-links li {
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .nav-links li.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 5px;
+      background: #42a5f5;
+      border-radius: 10px;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      padding: 10px 15px 10px 20px;
+      display: flex;
+      align-items: center;
+      border-radius: 6px;
+      transition: all 0.3s;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateX(5px);
+    }
+
+    .nav-links a i {
+      margin-right: 12px;
+      font-size: 16px;
+      color: #90caf9;
+    }
+
+    .user-info {
+      margin-top: 30px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .user-info img {
+     width: 250px;
+      
+    }
+
+    .main-content {
+      margin-left: 270px;
+      padding: 40px;
+      width: calc(100% - 270px);
+    }
+
+    .form-wrapper {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .form-wrapper h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #2c3e50;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="date"] {
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #1976d2;
+    }
+
+    .form-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .form-buttons button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .form-buttons button:hover {
+      transform: scale(1.05);
+    }
+
+    .btn-draft {
+      background-color: #90a4ae;
+      color: white;
+    }
+
+    .btn-generate {
+      background-color: #1976d2;
+      color: white;
+    }
+
+    .btn-reset {
+      background-color: #ef5350;
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="sidebar">
+      <h2>CRM System</h2>
+      <ul class="nav-links">
+        <li><a href="/"><i class="fas fa-home"></i>Home</a></li>
+        <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
+        <li class="active"><a href="/reports"><i class="fas fa-chart-bar"></i>Reports</a></li>
+        <li><a href="/search"><i class="fas fa-search"></i>Search</a></li>
+        <li><a href="/order"><i class="fas fa-clipboard-list"></i>Order Log</a></li>
+        <li><a href="/mixing"><i class="fas fa-blender"></i>Mixing</a></li>
+        <li><a href="/production"><i class="fas fa-user-tie"></i>Production</a></li>
+        <li><a href="/extrusion"><i class="fas fa-industry"></i>Extrusion</a></li>
+        <li><a href="/coating"><i class="fas fa-brush"></i>Coating</a></li>
+        <li><a href="/jointing"><i class="fas fa-link"></i>Jointing</a></li>
+        <li><a href="/moulding"><i class="fas fa-cube"></i>Moulding</a></li>
+        <li><a href="/sheeting"><i class="fas fa-layer-group"></i>Sheeting</a></li>
+        <li><a href="/qc"><i class="fas fa-user-shield"></i>QC Supervisor</a></li>
+        <li><a href="/planning"><i class="fas fa-calendar"></i>Planning</a></li>
+        <li><a href="/inspection"><i class="fas fa-clipboard"></i>Inspection</a></li>
+           <li><a href="/finalinspection"><i class="fas fa-truck"></i>Final Inspection</a></li>
+          <li><a href="/dispatch-note"><i class="fas fa-truck"></i>Dispatch Approval</a></li>
+        <li><a href="/packing"><i class="fas fa-box"></i>Packing</a></li>
+        <li><a href="/dispatch"><i class="fas fa-truck"></i>Dispatch</a></li>
+      </ul>
+     <div class="user-info">
+        <img src="armol-removebg-preview.png"  alt="User Avatar">
+        
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="form-wrapper">
+        <h2>Generate Report</h2>
+        <h1 style="color:green; text-align:center;" th:text="${message}"></h1>
+  <form>
+  <div class="form-grid">
+    <div class="form-group">
+      <label for="startDate">Start Date</label>
+      <input type="date" id="startDate" name="startDate">
+    </div>
+
+    <div class="form-group">
+      <label for="endDate">End Date</label>
+      <input type="date" id="endDate" name="endDate">
+    </div>
+
+    <div class="form-group">
+      <label for="customerName">Customer Name</label>
+      <input type="text" id="customerName" name="customerName" placeholder="Enter customer name">
+    </div>
+
+    <div class="form-group">
+      <label for="customerNo">Customer Number</label>
+      <input type="text" id="customerNo" name="customerNo" placeholder="Enter customer number">
+    </div>
+
+    <div class="form-group">
+      <label for="componentName">Component Name</label>
+      <input type="text" id="componentName" name="componentName" placeholder="Enter component name">
+    </div>
+
+    <div class="form-group">
+      <label for="responsiblePerson">Responsible Person</label>
+      <input type="text" id="responsiblePerson" name="responsiblePerson" placeholder="Enter responsible person">
+    </div>
+
+    <div class="form-group">
+      <label for="toolMaker">Tool Maker</label>
+      <input type="text" id="toolMaker" name="toolMaker" placeholder="Enter tool maker">
+    </div>
+  </div>
+
+  <div class="form-buttons">
+    <button type="submit" formaction="/reports-draft" formmethod="post" class="btn-draft">Save as Draft</button>
+    <button type="submit" formaction="/reports" formmethod="post" class="btn-generate">Generate Report</button>
+    <button type="reset" class="btn-reset">Reset</button>
+  </div>
+</form>
+  
+      </div>
+    </main>
+  </div>
+</body>
+</html>

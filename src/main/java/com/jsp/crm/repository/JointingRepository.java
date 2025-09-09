@@ -1,0 +1,18 @@
+ package com.jsp.crm.repository;
+
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+
+import com.jsp.crm.model.Jointing;
+
+public interface JointingRepository extends JpaRepository<Jointing, Long>{
+
+	List<Jointing> findByDate(LocalDate now);
+
+	Jointing findByRouteCardNo(String routeCardNo);
+}

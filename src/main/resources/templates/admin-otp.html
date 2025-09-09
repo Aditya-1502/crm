@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin OTP Verification - ManufacturePro CRM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    :root {
+        /* Manufacturing CRM Color Palette - Consistent with index.html */
+        --primary-color: #1e40af;
+        --primary-dark: #1e3a8a;
+        --secondary-color: #f59e0b;
+        --accent-color: #10b981;
+        --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-background: #ffffff;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --text-light: #9ca3af;
+        --border-color: #e5e7eb;
+        --success-color: #059669;
+        --error-color: #dc2626;
+        --warning-color: #d97706;
+        --info-color: #0284c7;
+        --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--background-gradient);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    /* Animated Background Elements */
+    body::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
+        animation: backgroundShift 20s ease-in-out infinite;
+        z-index: -1;
+    }
+
+    @keyframes backgroundShift {
+        0%, 100% { transform: translateX(0) translateY(0); }
+        25% { transform: translateX(-10px) translateY(-10px); }
+        50% { transform: translateX(10px) translateY(10px); }
+        75% { transform: translateX(-5px) translateY(5px); }
+    }
+
+    /* Navigation Bar */
+    .navbar {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: var(--shadow-medium);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        position: relative;
+        z-index: 100;
+    }
+
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-brand:hover {
+        color: var(--primary-dark);
+        transform: translateY(-1px);
+    }
+
+    .navbar-brand i {
+        font-size: 1.8rem;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .production-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, var(--accent-color) 0%, #059669 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--shadow-medium);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .production-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-large);
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    }
+
+    /* Main Container */
+    .main-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 20px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .login-box {
+        background: var(--card-background);
+        padding: 48px 40px;
+        border-radius: 24px;
+        box-shadow: var(--shadow-large);
+        width: 100%;
+        max-width: 480px;
+        position: relative;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .login-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
+        border-radius: 24px 24px 0 0;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Header */
+    .login-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .security-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        box-shadow: var(--shadow-medium);
+        animation: pulse 2s infinite;
+    }
+
+    .security-icon i {
+        font-size: 36px;
+        color: white;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    .login-header h2 {
+        color: var(--text-primary);
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        letter-spacing: -0.025em;
+    }
+
+    .login-header p {
+        color: var(--text-secondary);
+        font-size: 16px;
+        font-weight: 400;
+    }
+
+    /* Messages */
+    .message {
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        text-align: center;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .message i {
+        font-size: 18px;
+    }
+
+    .success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .error {
+        background: rgba(220, 38, 38, 0.1);
+        color: var(--error-color);
+        border: 1px solid rgba(220, 38, 38, 0.2);
+    }
+
+    .info {
+        background: rgba(2, 132, 199, 0.1);
+        color: var(--info-color);
+        border: 1px solid rgba(2, 132, 199, 0.2);
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Email Display */
+    .email-display {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        padding: 20px;
+        border-radius: 16px;
+        margin-bottom: 32px;
+        text-align: center;
+        font-size: 14px;
+        color: var(--text-secondary);
+        border-left: 4px solid var(--primary-color);
+        box-shadow: var(--shadow-light);
+        position: relative;
+    }
+
+    .email-display::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(30, 64, 175, 0.05) 0%, rgba(30, 64, 175, 0.02) 100%);
+        border-radius: 16px;
+        pointer-events: none;
+    }
+
+    .email-display i {
+        color: var(--primary-color);
+        margin-right: 8px;
+        font-size: 16px;
+    }
+
+    .email-display strong {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    /* Form Elements */
+    .form-group {
+        margin-bottom: 32px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 12px;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 16px;
+    }
+
+    /* OTP Input */
+    .otp-input {
+        width: 100%;
+        height: 70px;
+        text-align: center;
+        border: 2px solid var(--border-color);
+        border-radius: 16px;
+        font-size: 28px;
+        font-weight: 700;
+        outline: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        letter-spacing: 12px;
+        padding: 0 24px;
+        color: var(--text-primary);
+        position: relative;
+    }
+
+    .otp-input:focus {
+        border-color: var(--primary-color);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .otp-input:valid {
+        border-color: var(--success-color);
+        background: rgba(16, 185, 129, 0.05);
+    }
+
+    .otp-input::placeholder {
+        color: var(--text-light);
+        font-size: 24px;
+        letter-spacing: 8px;
+        font-weight: 400;
+    }
+
+    /* Buttons */
+    .btn {
+        width: 100%;
+        padding: 16px 24px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        box-shadow: var(--shadow-medium);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-large);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-link {
+        background: none;
+        border: none;
+        color: var(--primary-color);
+        text-decoration: none;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        width: auto;
+        padding: 12px 16px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+                gap: 6px;
+    }
+
+    .btn-link:hover {
+        color: var(--primary-dark);
+        background: rgba(30, 64, 175, 0.1);
+        transform: translateY(-1px);
+    }
+
+    /* Timer */
+    .timer {
+        text-align: center;
+        margin: 20px 0;
+        padding: 16px 20px;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 1px solid #f59e0b;
+        border-radius: 12px;
+        color: var(--warning-color);
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: var(--shadow-light);
+        animation: timerPulse 2s infinite;
+    }
+
+    @keyframes timerPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+    }
+
+    .timer i {
+        margin-right: 8px;
+        font-size: 16px;
+    }
+
+    .timer.expired {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        border-color: var(--error-color);
+        color: var(--error-color);
+        animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    /* Back Links */
+    .back-link {
+        text-align: center;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .separator {
+        color: var(--text-light);
+        font-weight: 300;
+        font-size: 18px;
+    }
+
+    /* Loading Animation */
+    .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Progress Indicator */
+    .progress-indicator {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+
+    .progress-step {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+    .progress-step.active {
+        background: var(--primary-color);
+        transform: scale(1.2);
+    }
+
+    .progress-step.completed {
+        background: var(--success-color);
+    }
+
+    /* Footer */
+    .login-footer {
+        text-align: center;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .login-footer p {
+        color: var(--text-light);
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .navbar {
+            padding: 15px 20px;
+        }
+
+        .navbar-brand {
+            font-size: 1.2rem;
+        }
+
+        .navbar-brand i {
+            font-size: 1.4rem;
+        }
+
+        .production-btn {
+            padding: 10px 16px;
+            font-size: 12px;
+        }
+
+        .production-btn span {
+            display: none;
+        }
+
+        .main-container {
+            padding: 20px 16px;
+        }
+
+        .login-box {
+            padding: 32px 24px;
+            border-radius: 16px;
+        }
+
+        .login-header h2 {
+            font-size: 24px;
+        }
+
+        .security-icon {
+            width: 64px;
+            height: 64px;
+        }
+
+        .security-icon i {
+            font-size: 28px;
+        }
+
+        .otp-input {
+            height: 60px;
+            font-size: 24px;
+            letter-spacing: 8px;
+        }
+
+        .back-link {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .separator {
+            display: none;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .login-box {
+            padding: 24px 20px;
+        }
+
+        .otp-input {
+            height: 55px;
+            font-size: 20px;
+            letter-spacing: 6px;
+            padding: 0 16px;
+        }
+
+        .otp-input::placeholder {
+            font-size: 18px;
+            letter-spacing: 4px;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            font-size: 14px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+    }
+
+    /* Accessibility Improvements */
+    .otp-input:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+
+    .btn:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+        :root {
+            --primary-color: #000080;
+            --text-primary: #000000;
+            --border-color: #000000;
+        }
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --card-background: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-light: #9ca3af;
+            --border-color: #374151;
+            --background-gradient: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        }
+
+        .navbar {
+            background: rgba(31, 41, 55, 0.95);
+        }
+
+        .otp-input {
+            background: #374151;
+            color: #f9fafb;
+        }
+
+        .otp-input:focus {
+            background: #4b5563;
+        }
+
+        .email-display {
+            background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+        }
+    }
+
+    /* Print Styles */
+    @media print {
+        body {
+            background: white;
+        }
+
+        .navbar,
+        .production-btn {
+            display: none;
+        }
+
+        .login-box {
+            box-shadow: none;
+            border: 1px solid #ccc;
+        }
+    }
+</style>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <i class="fas fa-industry"></i>
+            <span>ManufacturePro CRM</span>
+        </a>
+        <a href="/emp/prodlogin" class="production-btn">
+            <i class="fas fa-hard-hat"></i>
+            <span>Production Login</span>
+        </a>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="login-box">
+            <!-- Progress Indicator -->
+            <div class="progress-indicator">
+                <div class="progress-step completed"></div>
+                <div class="progress-step active"></div>
+                <div class="progress-step"></div>
+            </div>
+
+            <!-- OTP Verification Header -->
+            <div class="login-header">
+                <div class="security-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h2>Security Verification</h2>
+                <p>Enter the 6-digit authentication code</p>
+            </div>
+
+            <!-- Messages -->
+            <div th:if="${session.pass}" class="message success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${session.pass}"></span>
+            </div>
+            
+            <div th:if="${session.fail}" class="message error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span th:text="${session.fail}"></span>
+            </div>
+            
+            <div th:if="${info}" class="message info">
+                <i class="fas fa-info-circle"></i>
+                <span th:text="${info}"></span>
+            </div>
+
+            <!-- Clear session messages -->
+            <th:block th:text="${@extraLogic.removeMessage()}"></th:block>
+
+            <!-- Email Display -->
+            <div class="email-display">
+                <i class="fas fa-envelope"></i>
+                Verification code sent to: <strong>admin@manufacturepro.com</strong>
+            </div>
+
+            <!-- OTP Form -->
+            <form action="/admin/verify-otp" method="post" id="otpForm">
+                <div class="form-group">
+                    <label for="otp">
+                        <i class="fas fa-key"></i>
+                        Enter 6-Digit Verification Code
+                    </label>
+                    <input type="text" 
+                           class="otp-input" 
+                           name="otp" 
+                           id="otp" 
+                           maxlength="6" 
+                           placeholder="000000"
+                           pattern="[0-9]{6}" 
+                           title="Please enter exactly 6 digits" 
+                           required
+                           autocomplete="one-time-code"
+                           aria-label="6-digit verification code">
+                </div>
+
+                <div class="timer" id="timer" style="display: none;">
+                    <i class="fas fa-clock"></i> 
+                    Code expires in: <span id="countdown">5:00</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="verifyBtn">
+                    <i class="fas fa-check-circle"></i>
+                    <span class="btn-text">Verify & Access Dashboard</span>
+                </button>
+            </form>
+
+            <div class="back-link">
+                <form action="/admin/resend-otp" method="post" style="display: inline;">
+                    <button type="submit" class="btn-link" id="resendBtn">
+                        <i class="fas fa-redo"></i>
+                        Resend Code
+                    </button>
+                </form>
+
+                <span class="separator">|</span>
+
+                <a href="/admin/login" class="btn-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Login
+                </a>
+            </div>
+
+            <div class="login-footer">
+                <p>&copy; 2024 ManufacturePro CRM. All rights reserved.</p>
+                <p>Secure two-factor authentication system</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced JavaScript -->
+    <script>
+        // Enhanced OTP input handling
+        document.addEventListener('DOMContentLoaded', function () {
+            const otpInput = document.getElementById('otp');
+            const otpForm = document.getElementById('otpForm');
+            const verifyBtn = document.getElementById('verifyBtn');
+            const resendBtn = document.getElementById('resendBtn');
+            const timer = document.getElementById('timer');
+            const countdown = document.getElementById('countdown');
+
+            // Focus input on load
+            otpInput.focus();
+
+            // Enhanced input handling
+            otpInput.addEventListener('input', function (e) {
+                // Only allow numbers
+                this.value = this.value.replace(/[^0-9]/g, '');
+
+                // Add visual feedback
+                if (this.value.length === 6) {
+                    this.style.borderColor = 'var(--success-color)';
+                    this.style.background = 'rgba(16, 185, 129, 0.05)';
+                } else {
+                    this.style.borderColor = 'var(--border-color)';
+                    this.style.background = 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)';
+                }
+
+                // Auto-submit when 6 digits are entered (optional)
+                if (this.value.length === 6) {
+                    setTimeout(() => {
+                        // Uncomment for auto-submit
+                        // otpForm.submit();
+                    }, 500);
+                }
+            });
+
+            // Handle paste
+            otpInput.addEventListener('paste', function (e) {
+                e.preventDefault();
+                const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '');
+
+                if (pastedData.length <= 6) {
+                    this.value = pastedData;
+                    this.dispatchEvent(new Event('input'));
+                }
+            });
+
+            // Enhanced form validation
+            otpForm.addEventListener('submit', function (e) {
+                const otp = otpInput.value;
+                if (otp.length !== 6) {
+                    e.preventDefault();
+                    showError('Please enter complete 6-digit verification code');
+                    otpInput.focus();
+                    return;
+                }
+
+                // Show loading state
+                verifyBtn.innerHTML = '<div class="loading"></div> Verifying...';
+                verifyBtn.disabled = true;
+            });
+
+            // Resend button handling
+            resendBtn.addEventListener('click', function() {
+                this.innerHTML = '<div class="loading"></div> Sending...';
+                this.disabled = true;
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && document.activeElement === otpInput) {
+                    if (otpInput.value.length === 6) {
+                        otpForm.submit();
+                    }
+                }
+                
+                // Clear input with Escape
+                if (e.key === 'Escape') {
+                    otpInput.value = '';
+                    otpInput.focus();
+                }
+            });
+
+            // Auto-hide messages after 5 seconds
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(message => {
+                setTimeout(() => {
+                    message.style.opacity = '0';
+                    message.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        message.style.display = 'none';
+                    }, 300);
+                }, 5000);
+            });
+
+            // Enhanced timer functionality
+            function startTimer(duration) {
+                             timer.style.display = 'block';
+                let timeLeft = duration;
+                
+                const interval = setInterval(() => {
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    countdown.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                    // Change color when time is running out
+                    if (timeLeft <= 60) {
+                        timer.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
+                        timer.style.borderColor = 'var(--error-color)';
+                        timer.style.color = 'var(--error-color)';
+                    }
+
+                    if (timeLeft <= 0) {
+                        clearInterval(interval);
+                        countdown.textContent = 'Expired';
+                        timer.classList.add('expired');
+                        
+                        // Disable form
+                        otpInput.disabled = true;
+                        verifyBtn.disabled = true;
+                        verifyBtn.innerHTML = '<i class="fas fa-times"></i> Code Expired';
+                        
+                        showError('Verification code has expired. Please request a new one.');
+                    }
+                    timeLeft--;
+                }, 1000);
+            }
+
+            // Start 5-minute timer
+            startTimer(300);
+
+            // Utility functions
+            function showError(message) {
+                const existingError = document.querySelector('.message.error');
+                if (existingError) {
+                    existingError.remove();
+                }
+
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'message error';
+                errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i><span>${message}</span>`;
+                
+                const form = document.getElementById('otpForm');
+                form.parentNode.insertBefore(errorDiv, form);
+
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    errorDiv.style.opacity = '0';
+                    errorDiv.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        errorDiv.remove();
+                    }, 300);
+                }, 5000);
+            }
+
+            // Add input animation effects
+            otpInput.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            });
+
+            otpInput.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+
+            // Progress indicator animation
+            const progressSteps = document.querySelectorAll('.progress-step');
+            progressSteps.forEach((step, index) => {
+                setTimeout(() => {
+                    step.style.opacity = '1';
+                    step.style.transform = 'scale(1)';
+                }, index * 200);
+            });
+
+            // Security features
+            let attemptCount = 0;
+            const maxAttempts = 3;
+
+            otpForm.addEventListener('submit', function(e) {
+                attemptCount++;
+                if (attemptCount >= maxAttempts) {
+                    setTimeout(() => {
+                        showError('Too many failed attempts. Please try again later.');
+                        otpInput.disabled = true;
+                        verifyBtn.disabled = true;
+                    }, 1000);
+                }
+            });
+
+            // Prevent right-click and dev tools
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                    e.preventDefault();
+                }
+            });
+
+            // Session activity tracking
+            let lastActivity = Date.now();
+            
+            function trackActivity() {
+                lastActivity = Date.now();
+            }
+
+            document.addEventListener('mousemove', trackActivity);
+            document.addEventListener('keypress', trackActivity);
+            document.addEventListener('click', trackActivity);
+
+            // Check for inactivity every minute
+            setInterval(() => {
+                const inactiveTime = Date.now() - lastActivity;
+                const fiveMinutes = 5 * 60 * 1000;
+                
+                if (inactiveTime > fiveMinutes) {
+                    showError('Session expired due to inactivity. Redirecting to login...');
+                    setTimeout(() => {
+                        window.location.href = '/admin/login';
+                    }, 3000);
+                }
+            }, 60000);
+
+            // Add visual feedback for button interactions
+            const buttons = document.querySelectorAll('.btn, .btn-link');
+            buttons.forEach(button => {
+                button.addEventListener('mousedown', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+
+                button.addEventListener('mouseup', function() {
+                    this.style.transform = '';
+                });
+
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                });
+            });
+
+            // Add ripple effect to primary button
+            verifyBtn.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    pointer-events: none;
+                `;
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+
+            // Add CSS for ripple animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    to {
+                        transform: scale(4);
+                        opacity: 0;
+                    }
+                }
+                
+                .btn {
+                    position: relative;
+                    overflow: hidden;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+
+        // Additional utility functions
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        function validateOTP(otp) {
+            return /^[0-9]{6}$/.test(otp);
+        }
+
+        // Performance optimization
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Optimized input handler
+        const debouncedInputHandler = debounce(function(e) {
+            const input = e.target;
+            if (input.value.length === 6 && validateOTP(input.value)) {
+                input.style.borderColor = 'var(--success-color)';
+                input.style.background = 'rgba(16, 185, 129, 0.05)';
+            }
+        }, 300);
+
+        // Add to input event listener
+        document.getElementById('otp').addEventListener('input', debouncedInputHandler);
+    </script>
+
+    <!-- Additional CSS for enhanced animations -->
+    <style>
+        /* Enhanced button states */
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn:disabled:hover {
+            transform: none !important;
+            box-shadow: var(--shadow-medium) !important;
+        }
+
+        /* Enhanced form group animations */
+        .form-group {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Enhanced progress indicator */
+        .progress-step {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Enhanced message animations */
+        .message {
+            transform: translateY(-10px);
+            opacity: 0;
+            animation: messageSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes messageSlideIn {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Enhanced timer warning states */
+        .timer.warning {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-color: var(--warning-color);
+            color: var(--warning-color);
+        }
+
+        .timer.critical {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-color: var(--error-color);
+            color: var(--error-color);
+            animation: criticalPulse 1s infinite;
+        }
+
+        @keyframes criticalPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Enhanced accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            .timer,
+            .security-icon,
+            .progress-step {
+                animation: none !important;
+            }
+        }
+
+        /* Enhanced focus indicators */
+        .otp-input:focus-visible {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .btn:focus-visible {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+    </style>
+</body>
+
+</html>
+   
+

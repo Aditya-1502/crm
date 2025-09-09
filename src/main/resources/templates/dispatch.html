@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dispatch Form</title>
+  <style>
+    body {
+      background-color: #5AA6DB;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px 30px;
+      max-width: 960px;
+      margin: auto;
+    }
+
+    label {
+      color: black;
+      font-weight: bold;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      padding: 5px;
+      height: 25px;
+      background-color: white;
+      border: none;
+    }
+
+    .required {
+      color: red;
+    }
+
+    .full-width {
+      grid-column: span 2;
+    }
+
+    .submit-buttons {
+      grid-column: span 2;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .submit-buttons button {
+      padding: 10px 20px;
+      font-weight: bold;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .submit-buttons .draft {
+      background-color: #c0c0c0;
+    }
+
+    .submit-buttons .submit {
+      background-color: #a0a0a0;
+    }
+  </style>
+</head>
+<body>
+<h1 style="color:green; text-align:center;" th:text="${message}"></h1>
+<form action="/dispatch" method="post">
+
+<label for="routeCardNo">Route card no.<span class="required">*</span></label>
+  <input type="text" name="routeCardNo" id="routeCardNo">
+
+  <label for="date">DATE<span class="required">*</span></label>
+  <input type="date" name="date" id="date">
+
+  <label for="bill_type">BILL TYPE<span class="required">*</span></label>
+  <select name="bill_type" id="bill_type">
+    <option value="">-- Select --</option>
+    <option value="invoice">Invoice</option>
+    <option value="dc">Delivery Challan (DC)</option>
+  </select>
+
+  <label for="dispatched_by">DISPATCHED BY</label>
+  <input type="text" name="dispatched_by" id="dispatched_by">
+
+  <label for="transport_mode">TRANSPORT MODE<span class="required">*</span></label>
+  <select name="transport_mode" id="transport_mode">
+    <option value="">-- Select --</option>
+    <option value="by_hand">By Hand</option>
+    <option value="courier">Courier</option>
+    <option value="delivery_app">Online Delivery App</option>
+  </select>
+
+  <label for="person_info">PERSON NAME / DOCKET NO / ORDER ID<span class="required">*</span></label>
+  <input type="text" name="person_info" id="person_info" placeholder="Shown based on transport mode">
+
+  <div class="submit-buttons">
+    <button type="button" class="draft">SAVE AS DRAFT</button>
+    <button type="submit" class="submit">SUBMIT</button>
+   <a href="/dashboard">
+    <button type="button">HOME</button>
+</a>
+  </div>
+</form>
+
+</body>
+</html>

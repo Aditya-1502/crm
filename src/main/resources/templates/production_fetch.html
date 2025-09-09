@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+ <a href="/vproduction"><button type="reset" class="btn-reset">view report</button></a>
+ 
+	<div align="center">
+		<h1>Mixing Details</h1>
+<h1 style="color:green ; justify-content: center;" th:text="${message}"></h1>
+		<table border="1">
+
+			<tr>
+				<<th>Route Card No.</th>
+<th>Date</th>
+<th>Component Name</th>
+<th>Customer No.</th>
+<th>Method</th>
+<th>Enquiry No.</th>
+<th>Material</th>
+<th>Quotation No.</th>
+<th>Tool / Die No.</th>
+<th>Batch No.</th>
+<th>Batch Weight</th>
+<th>Extruder RPM</th>
+<th>DC Oven Temp.</th>
+<th>Weight per Meter</th>
+<th>Production per Hour</th>
+<th>Conveyor RPM</th>
+<th>Tool / Die No.</th>
+<th>No. of Cavity</th>
+<th>Time</th>
+<th>Clamp Pressure</th>
+<th>Cycle Time</th>
+<th>Curing Temp.</th>
+<th>Machine</th>
+				
+			</tr>
+			
+
+			<tr th:each="mixing:${list}">
+				<td th:text="${mixing.routeCardNo}"></td>
+<td th:text="${mixing.date}"></td>
+<td th:text="${mixing.componentName}"></td>
+<td th:text="${mixing.customerNo}"></td>
+<td th:text="${mixing.method}"></td>
+<td th:text="${mixing.enquiryNo}"></td>
+<td th:text="${mixing.material}"></td>
+<td th:text="${mixing.quotationNo}"></td>
+<td th:text="${mixing.toolDieNo}"></td>
+<td th:text="${mixing.batchNo}"></td>
+<td th:text="${mixing.batchWeight}"></td>
+<td th:text="${mixing.extruderRPM}"></td>
+<td th:text="${mixing.dcOvenTemp}"></td>
+<td th:text="${mixing.weightPerMeter}"></td>
+<td th:text="${mixing.productionPerHour}"></td>
+<td th:text="${mixing.conveyorRPM}"></td>
+<td th:text="${mixing.setupToolDieNo}"></td>
+<td th:text="${mixing.noOfCavity}"></td>
+<td th:text="${mixing.time}"></td>
+<td th:text="${mixing.clampPressure}"></td>
+<td th:text="${mixing.cycleTime}"></td>
+<td th:text="${mixing.curingTemp}"></td>
+<td th:text="${mixing.machine}"></td>
+				
+				<td>
+				<a th:href="'/delete?id='+${mixing.id}"><button>Delete</button> </a>
+				
+					
+				</td>
+			</tr>
+
+		</table>
+
+		<br> <a href="/"><button>Back</button></a>
+	</div>
+</body>
+</html>

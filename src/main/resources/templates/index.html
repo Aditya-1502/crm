@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ManufacturePro CRM - Admin Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    :root {
+        /* Manufacturing CRM Color Palette */
+        --primary-color: #1e40af;
+        --primary-dark: #1e3a8a;
+        --secondary-color: #f59e0b;
+        --accent-color: #10b981;
+        --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-background: #ffffff;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --text-light: #9ca3af;
+        --border-color: #e5e7eb;
+        --success-color: #059669;
+        --error-color: #dc2626;
+        --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--background-gradient);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    /* Animated Background Elements */
+    body::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image:
+            radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
+        animation: backgroundShift 20s ease-in-out infinite;
+        z-index: -1;
+    }
+
+    @keyframes backgroundShift {
+
+        0%,
+        100% {
+            transform: translateX(0) translateY(0);
+        }
+
+        25% {
+            transform: translateX(-10px) translateY(-10px);
+        }
+
+        50% {
+            transform: translateX(10px) translateY(10px);
+        }
+
+        75% {
+            transform: translateX(-5px) translateY(5px);
+        }
+    }
+
+    /* Production Department Button */
+    .production-btn-container {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        z-index: 1000;
+    }
+
+    .production-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, var(--accent-color) 0%, #059669 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: var(--shadow-medium);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .production-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-large);
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    }
+
+    .production-btn i {
+        font-size: 16px;
+    }
+
+    /* Main Container */
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        width: 100%;
+    }
+
+    /* Login Container */
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        max-width: 1200px;
+    }
+
+    /* Login Box */
+    .login-box {
+        background: var(--card-background);
+        padding: 48px 40px;
+        border-radius: 24px;
+        box-shadow: var(--shadow-large);
+        width: 100%;
+        max-width: 480px;
+        position: relative;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .login-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
+        border-radius: 24px 24px 0 0;
+    }
+
+    /* Header Styling */
+    .login-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .company-logo {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        box-shadow: var(--shadow-medium);
+    }
+
+    .company-logo i {
+        font-size: 36px;
+        color: white;
+    }
+
+    .login-header h2 {
+        color: var(--text-primary);
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        letter-spacing: -0.025em;
+    }
+
+    .login-header p {
+        color: var(--text-secondary);
+        font-size: 16px;
+        font-weight: 400;
+    }
+
+    /* Message Styling */
+    .message {
+        margin-bottom: 24px;
+        padding: 16px;
+        border-radius: 12px;
+        font-weight: 500;
+        text-align: center;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .message.success {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .message.error {
+        background-color: rgba(220, 38, 38, 0.1);
+        color: var(--error-color);
+        border: 1px solid rgba(220, 38, 38, 0.2);
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Form Styling */
+    .login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .form-group {
+        position: relative;
+    }
+
+    .form-group label {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-light);
+        font-size: 18px;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 16px 16px 16px 50px;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 400;
+        background-color: #fafafa;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        outline: none;
+    }
+
+    .form-group input:focus {
+        border-color: var(--primary-color);
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    .form-group input:focus+label,
+    .form-group input:not(:placeholder-shown)+label {
+        color: var(--primary-color);
+    }
+
+    .form-group input::placeholder {
+        color: var(--text-light);
+        font-weight: 400;
+    }
+
+    /* Remember Me Checkbox */
+    .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin: -8px 0;
+    }
+
+    .remember-me input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-color);
+        cursor: pointer;
+    }
+
+    /* Login Button */
+    .login-btn {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--shadow-medium);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-large);
+    }
+
+    .login-btn:active {
+        transform: translateY(0);
+    }
+
+    .login-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .login-btn:hover::before {
+        left: 100%;
+    }
+
+    /* Forgot Password */
+    .forgot-password {
+        text-align: center;
+        margin-top: 24px;
+    }
+
+    .forgot-password a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .forgot-password a:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }
+
+    /* Footer */
+    .login-footer {
+        text-align: center;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .login-footer p {
+        color: var(--text-light);
+        font-size: 12px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .production-btn-container {
+            top: 20px;
+            right: 20px;
+        }
+
+        .production-btn {
+            padding: 10px 16px;
+            font-size: 12px;
+        }
+
+        .production-btn span {
+            display: none;
+        }
+
+        .container {
+            padding: 16px;
+        }
+
+        .login-box {
+            padding: 32px 24px;
+            border-radius: 16px;
+        }
+
+        .login-header h2 {
+            font-size: 24px;
+        }
+
+        .company-logo {
+            width: 64px;
+            height: 64px;
+        }
+
+        .company-logo i {
+            font-size: 28px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .login-box {
+            padding: 24px 20px;
+        }
+
+        .form-group input {
+            padding: 14px 14px 14px 45px;
+            font-size: 14px;
+        }
+
+        .form-group label {
+            left: 14px;
+            font-size: 16px;
+        }
+
+        .login-btn {
+            padding: 14px;
+            font-size: 14px;
+        }
+    }
+
+    /* Loading Animation */
+    .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Accessibility Improvements */
+    .form-group input:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+
+    .login-btn:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+
+    /* Print Styles */
+    @media print {
+        body {
+            background: white;
+        }
+
+        .production-btn-container {
+            display: none;
+        }
+    }
+</style>
+
+<body>
+    <div class="production-btn-container">
+        <a href="/emp/prodlogin" class="production-btn">
+            <i class="fas fa-industry"></i>
+            <span>Production Department</span>
+        </a>
+    </div>
+
+    <div class="container">
+        <main class="content">
+
+            <div class="login-container">
+                <div class="login-box">
+                    <div class="login-header">
+                        <div class="company-logo">
+                            <i class="fas fa-industry"></i>
+                        </div>
+                        <h2>ManufacturePro CRM</h2>
+                        <p>Admin Dashboard Access</p>
+                    </div>
+
+                    <!-- Success/Error Messages -->
+                    <div th:if="${pass}" class="message success">
+                        <i class="fas fa-check-circle"></i>
+                        <span th:text="${pass}"></span>
+                    </div>
+
+                    <div th:if="${fail}" class="message error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:text="${fail}"></span>
+                    </div>
+
+                    <form class="login-form" action="/" method="post">
+                        <div class="form-group">
+                            <input type="text" id="username" name="username" placeholder="Enter your username" required
+                                autocomplete="username" aria-label="Username">
+                            <label for="username">
+                                <i class="fas fa-user"></i>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="password" id="password" name="password" placeholder="Enter your password"
+                                required autocomplete="current-password" aria-label="Password">
+                            <label for="password">
+                                <i class="fas fa-lock"></i>
+                            </label>
+                        </div>
+
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember" name="remember">
+                            <label for="remember">Remember me for 30 days</label>
+                        </div>
+
+                        <button type="submit" class="login-btn" id="loginBtn">
+                            <span class="btn-text">Sign In to Dashboard</span>
+                        </button>
+
+                        <div class="forgot-password">
+                            <a href="#" onclick="showForgotPassword()">
+                                <i class="fas fa-key"></i>
+                                Forgot your password?
+                            </a>
+                        </div>
+                    </form>
+
+                    <div class="login-footer">
+                        <p>&copy; 2024 ManufacturePro CRM. All rights reserved.</p>
+                        <p>Secure manufacturing management system</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Enhanced JavaScript for better UX -->
+    <script>
+        // Enhanced form handling
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('.login-form');
+            const loginBtn = document.getElementById('loginBtn');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+
+            // Add loading state to button
+            form.addEventListener('submit', function (e) {
+                loginBtn.innerHTML = '<div class="loading"></div> Signing in...';
+                loginBtn.disabled = true;
+            });
+
+            // Input validation and styling
+            function validateInput(input) {
+                const value = input.value.trim();
+                const formGroup = input.parentElement;
+
+                if (value.length === 0) {
+                    formGroup.classList.add('error');
+                    return false;
+                } else {
+                    formGroup.classList.remove('error');
+                    return true;
+                }
+            }
+
+            // Real-time validation
+            usernameInput.addEventListener('blur', function () {
+                validateInput(this);
+            });
+
+            passwordInput.addEventListener('blur', function () {
+                validateInput(this);
+            });
+
+            // Enhanced keyboard navigation
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+                    const inputs = Array.from(document.querySelectorAll('input[type="text"], input[type="password"]'));
+                    const currentIndex = inputs.indexOf(e.target);
+
+                    if (currentIndex < inputs.length - 1) {
+                        e.preventDefault();
+                        inputs[currentIndex + 1].focus();
+                    } else if (currentIndex === inputs.length - 1) {
+                        e.preventDefault();
+                        loginBtn.click();
+                    }
+                }
+            });
+
+            // Auto-hide messages after 5 seconds
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(message => {
+                setTimeout(() => {
+                    message.style.opacity = '0';
+                    message.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        message.style.display = 'none';
+                    }, 300);
+                }, 5000);
+            });
+
+            // Focus first input on load
+            usernameInput.focus();
+        });
+
+        // Forgot password functionality
+        function showForgotPassword() {
+            alert('Please contact your system administrator for password reset.\n\nEmail: admin@manufacturepro.com\nPhone: +1 (555) 123-4567');
+        }
+
+        // Add some security features
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault();
+            }
+        });
+
+        // Session timeout warning
+        let sessionTimeout;
+        function resetSessionTimeout() {
+            clearTimeout(sessionTimeout);
+            sessionTimeout = setTimeout(() => {
+                alert('Session will expire in 2 minutes due to inactivity.');
+            }, 28 * 60 * 1000); // 28 minutes
+        }
+
+        document.addEventListener('mousemove', resetSessionTimeout);
+        document.addEventListener('keypress', resetSessionTimeout);
+        resetSessionTimeout();
+
+        // Add smooth animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        document.querySelectorAll('.login-box').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+            observer.observe(el);
+        });
+    </script>
+
+    <!-- Additional CSS for error states -->
+    <style>
+        .form-group.error input {
+            border-color: var(--error-color);
+            background-color: rgba(220, 38, 38, 0.05);
+        }
+
+        .form-group.error label {
+            color: var(--error-color);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-btn:disabled:hover {
+            transform: none;
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Additional responsive improvements */
+        @media (max-width: 360px) {
+            .login-header h2 {
+                font-size: 20px;
+            }
+
+            .login-header p {
+                font-size: 14px;
+            }
+
+            .company-logo {
+                width: 56px;
+                height: 56px;
+            }
+
+            .company-logo i {
+                font-size: 24px;
+            }
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            :root {
+                --primary-color: #000080;
+                --text-primary: #000000;
+                --border-color: #000000;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --card-background: #1f2937;
+                --text-primary: #f9fafb;
+                --text-secondary: #d1d5db;
+                --border-color: #374151;
+                --background-gradient: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            }
+
+            .form-group input {
+                background-color: #374151;
+                color: #f9fafb;
+            }
+
+            .form-group input:focus {
+                background-color: #4b5563;
+            }
+        }
+    </style>
+</body>
+
+</html>

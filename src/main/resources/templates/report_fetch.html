@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+ <a href="/vreports"><button type="reset" class="btn-reset">view report</button></a>
+	<div align="center">
+		<h1>Report</h1>
+<h1 style="color:green ; justify-content: center;" th:text="${message}"></h1>
+		<table border="1">
+			<tr>
+				<th>Start Date</th>
+				<th>End Date</th>
+				<th>Customer Name</th>
+				<th>Customer Number</th>
+				<th>Component name</th>
+				<th>Responsible person</th>
+				<th>Tool maker</th>
+			</tr>
+			
+
+			<tr th:each="reports:${list}">
+				<td th:text="${reports.sdate}"></td>
+				<td th:src="${reports.edate}"></td>
+				<td th:text="${reports.cname}"></td>
+				<td th:text="${reports.cno}"></td>
+				<td th:text="${reports.compname}"></td>
+				<td th:text="${reports.resperson}"></td>
+				<td th:text="${reports.tmaker}"></td>
+				<td>
+				<a th:href="'/delete?id='+${reports.id}"><button>Delete</button> </a>
+					<a th:href="'/edit?id='+${reports.id}"><button>Edit</button> </a>
+					
+				</td>
+			</tr>
+
+		</table>
+<a href="/download-excel">
+    <button type="button">Download Report (Excel)</button>
+</a>
+
+		<br> <a href="/"><button>Back</button></a>
+	</div>
+</body>
+</html>

@@ -1,0 +1,2201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ManufacturePro CRM - Dispatch Approval Note (DAN)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Manufacturing CRM Color Palette - Consistent with other pages */
+      --primary-color: rgb(255, 0, 0);
+      --primary-dark: #1e3a8a;
+      --primary-light: rgb(0, 0, 0);
+      --secondary-color: #f59e0b;
+      --accent-color: #10b981;
+      --success-color: #059669;
+      --warning-color: #d97706;
+      --error-color: #dc2626;
+      --info-color: #0284c7;
+      
+      /* Background & Surface Colors */
+      --background-primary: #f8fafc;
+      --background-secondary: #f1f5f9;
+      --card-background: #ffffff;
+      --sidebar-background: rgb(128, 0, 0);
+      --sidebar-hover: #F3CE14;
+      
+      /* Text Colors */
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --text-light: #9ca3af;
+      --text-white: #ffffff;
+      
+      /* Border & Shadow */
+      --border-color: #e5e7eb;
+      --border-light: #f3f4f6;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      
+      /* Gradients */
+      --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      --gradient-secondary: linear-gradient(135deg, var(--secondary-color) 0%, #ea580c 100%);
+      --gradient-success: linear-gradient(135deg, var(--accent-color) 0%, var(--success-color) 100%);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Container Layout */
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Enhanced Sidebar - SAME AS OTHER PAGES */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar-background);
+      color: var(--text-white);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      box-shadow: var(--shadow-xl);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Sidebar Header */
+    .sidebar-header {
+      position: sticky;
+      top: 0;
+      padding: 24px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-background);
+           background: linear-gradient(135deg, rgb(255, 128, 0) 0%, rgba(30, 58, 138, 0.1) 100%);
+
+      z-index: 1001;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .sidebar h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+    }
+
+    .sidebar h2 i {
+      font-size: 24px;
+      color: var(--primary-light);
+    }
+
+    /* Sidebar Body */
+    .sidebar-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Navigation Links Container */
+    .nav-container {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 0;
+    }
+
+    /* Custom Scrollbar for Sidebar */
+    .nav-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .nav-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    .nav-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Navigation Links */
+    .nav-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-links li {
+      margin: 0;
+      position: relative;
+    }
+
+    .nav-links li.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: var(--primary-light);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .nav-links li.active {
+      background: var(--sidebar-hover);
+    }
+
+    .nav-links a {
+      color: var(--text-white);
+      text-decoration: none;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 500;
+      font-size: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-links a::before {
+      content: '';
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-links a:hover::before {
+      left: 100%;
+    }
+
+    .nav-links a:hover {
+      background: var(--sidebar-hover);
+      transform: translateX(4px);
+      color: var(--primary-light);
+    }
+
+    .nav-links a i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      color: #94a3b8;
+      transition: color 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .nav-links a:hover i,
+    .nav-links li.active a i {
+      color: var(--primary-light);
+    }
+
+    /* User Info Section */
+    .user-info {
+      position: sticky;
+      bottom: 0;
+      padding: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-background);
+      background: rgba(0, 0, 0, 0.2);
+      z-index: 1001;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .user-info img {
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 280px;
+      padding: 32px 40px;
+      width: calc(100% - 280px);
+      min-height: 100vh;
+      background: var(--background-primary);
+    }
+
+    /* Page Header */
+    .page-header {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-title i {
+      color: var(--primary-color);
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    /* Enhanced Form Container */
+    .dispatch-form-container {
+      background: var(--card-background);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+      max-width: none;
+      margin: 0;
+    }
+
+    .dispatch-form-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    /* Company Header */
+    .company-header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .company-header h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .company-header h2 i {
+      color: var(--primary-color);
+    }
+
+    .company-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* Form Sections */
+    .form-section {
+      margin-bottom: 32px;
+      padding: 24px;
+      background: var(--background-secondary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .form-section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .form-section-title i {
+      color: var(--primary-color);
+      font-size: 20px;
+    }
+
+    /* Form Layout */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    /* Form Groups */
+    .form-group {
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 14px;
+      letter-spacing: 0.025em;
+    }
+
+    .form-group label.required::after {
+      content: " *";
+      color: var(--error-color);
+      font-weight: 700;
+    }
+
+    /* Enhanced Form Inputs */
+    .form-group input[type="text"],
+    .form-group input[type="date"],
+    .form-group input[type="number"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--card-background);
+      color: var(--text-primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .form-group input:hover {
+      border-color: var(--primary-light);
+    }
+
+    .form-group input[required] {
+      border-left: 3px solid var(--warning-color);
+    }
+
+    .form-group input[required]:valid {
+      border-left-color: var(--success-color);
+    }
+
+    /* Checkbox Section */
+    .checkbox-section {
+      background: var(--card-background);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 24px;
+    }
+
+        .checkboxes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--background-secondary);
+      border-radius: 8px;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .checkbox-item:hover {
+      background: rgba(30, 64, 175, 0.05);
+      border-color: var(--primary-light);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary-color);
+      cursor: pointer;
+    }
+
+    .checkbox-item label {
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      margin: 0;
+      flex: 1;
+    }
+
+    .checkbox-item input[type="checkbox"]:checked + label {
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    /* Radio Group */
+    .radio-group {
+      display: flex;
+      gap: 24px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: var(--background-secondary);
+      border-radius: 8px;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      min-width: 140px;
+    }
+
+    .radio-item:hover {
+      background: rgba(30, 64, 175, 0.05);
+      border-color: var(--primary-light);
+    }
+
+    .radio-item input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary-color);
+      cursor: pointer;
+    }
+
+    .radio-item label {
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .radio-item input[type="radio"]:checked + label {
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    /* Signature Section */
+    .signature-section {
+      background: var(--card-background);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 24px;
+    }
+
+    .signature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .signature-field {
+      position: relative;
+    }
+
+    .signature-field input {
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--border-color);
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    .signature-field input:focus {
+      border-bottom-color: var(--primary-color);
+      box-shadow: none;
+      transform: none;
+    }
+
+    .signature-placeholder {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      border-bottom: 2px solid var(--border-color);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      color: var(--text-light);
+      font-size: 12px;
+      font-style: italic;
+      padding-bottom: 4px;
+    }
+
+    /* Enhanced Button Group */
+    .button-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 2px solid var(--border-light);
+      flex-wrap: wrap;
+    }
+
+    /* Button Styles */
+    .btn {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      min-width: 160px;
+      justify-content: center;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .submit-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #1e3a8a 100%);
+      box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+    }
+
+    .print-btn {
+      background: var(--gradient-success);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .print-btn:hover {
+      background: linear-gradient(135deg, var(--success-color) 0%, #047857 100%);
+      box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);
+    }
+
+    .reset-btn {
+      background: linear-gradient(135deg, var(--error-color) 0%, #b91c1c 100%);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .reset-btn:hover {
+      background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+      box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
+    }
+
+    .home-btn {
+      background: var(--gradient-secondary);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .home-btn:hover {
+      background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+      box-shadow: 0 8px 25px rgba(234, 88, 12, 0.3);
+    }
+
+    /* Sidebar Toggle for Mobile */
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+
+    /* Print Styles */
+    @media print {
+      .sidebar,
+      .sidebar-toggle,
+      .button-group,
+      .page-header {
+        display: none !important;
+      }
+      
+      .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 0 !important;
+      }
+      
+      .dispatch-form-container {
+        box-shadow: none !important;
+        border: 2px solid #000 !important;
+        border-radius: 0 !important;
+        padding: 20px !important;
+        margin: 0 !important;
+      }
+      
+      .dispatch-form-container::before {
+        display: none !important;
+      }
+      
+      .company-header {
+        border-bottom: 2px solid #000 !important;
+        margin-bottom: 20px !important;
+      }
+      
+      .form-section {
+        background: white !important;
+        border: 1px solid #000 !important;
+        margin-bottom: 15px !important;
+        padding: 15px !important;
+        page-break-inside: avoid;
+      }
+      
+      .form-section-title {
+        border-bottom: 1px solid #000 !important;
+        font-weight: bold !important;
+      }
+      
+      .checkbox-section,
+      .signature-section {
+        background: white !important;
+        border: 1px solid #000 !important;
+        page-break-inside: avoid;
+      }
+      
+      .form-group input {
+        border: none !important;
+        border-bottom: 1px solid #000 !important;
+        background: transparent !important;
+        padding: 5px 0 !important;
+        font-weight: 600 !important;
+      }
+      
+      .checkbox-item,
+      .radio-item {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        margin-bottom: 5px !important;
+      }
+      
+      .signature-field input {
+        border-bottom: 2px solid #000 !important;
+        min-height: 40px !important;
+      }
+      
+      .signature-placeholder {
+        border-bottom: 2px solid #000 !important;
+        min-height: 40px !important;
+        background: white !important;
+      }
+      
+      /* Print timestamp */
+      .print-timestamp {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        font-size: 10px;
+        color: #666;
+      }
+      
+      /* Page breaks */
+      .form-section:nth-child(4) {
+        page-break-before: always;
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .form-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-toggle {
+        display: block;
+      }
+      
+      .sidebar {
+        width: 70px;
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+        width: 280px;
+      }
+      
+      .sidebar:not(.active) .sidebar-header {
+        padding: 20px 10px;
+      }
+      
+      .sidebar:not(.active) .sidebar h2 span {
+        display: none;
+      }
+      
+      .sidebar:not(.active) .nav-links a span {
+        display: none;
+      }
+      
+      .sidebar:not(.active) .nav-links a {
+        justify-content: center;
+        padding: 12px 10px;
+      }
+      
+      .sidebar:not(.active) .nav-links a i {
+        margin-right: 0;
+        font-size: 18px;
+      }
+      
+      .sidebar:not(.active) .user-info {
+        padding: 15px 10px;
+      }
+      
+      .sidebar:not(.active) .user-info img {
+        max-width: 40px;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 80px 16px 20px 16px;
+      }
+      
+      .dispatch-form-container {
+        padding: 24px 20px;
+      }
+      
+      .form-grid,
+      .form-grid-2,
+      .form-grid-3 {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      .checkboxes {
+        grid-template-columns: 1fr;
+      }
+      
+      .radio-group {
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .button-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .page-title {
+        font-size: 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 70px 12px 16px 12px;
+      }
+      
+      .dispatch-form-container {
+        padding: 20px 16px;
+      }
+      
+      .page-title {
+        font-size: 20px;
+      }
+      
+      .form-section {
+        padding: 20px 16px;
+      }
+      
+      .checkbox-section,
+      .signature-section {
+        padding: 20px 16px;
+      }
+    }
+
+    /* Loading States */
+    .btn.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .btn.loading::after {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Form Validation Styles */
+    .form-group input:invalid:not(:focus):not(:placeholder-shown) {
+      border-color: var(--error-color);
+      background-color: rgba(220, 38, 38, 0.05);
+    }
+
+    .form-group input:valid:not(:focus):not(:placeholder-shown) {
+      border-color: var(--success-color);
+      background-color: rgba(5, 150, 105, 0.05);
+    }
+
+    /* Accessibility Improvements */
+    .form-group input:focus,
+    .btn:focus,
+    .checkbox-item:focus-within,
+    .radio-item:focus-within {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      :root {
+        --primary-color: #000080;
+        --text-primary: #000000;
+        --border-color: #000000;
+      }
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Notification styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      z-index: 1001;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-lg);
+      max-width: 300px;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification-success { background-color: var(--success-color); }
+    .notification-error { background-color: var(--error-color); }
+    .notification-warning { background-color: var(--warning-color); }
+    .notification-info { background-color: var(--info-color); }
+
+    /* Animation for form elements */
+    .form-section {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .form-section:nth-child(1) { animation-delay: 0.1s; }
+    .form-section:nth-child(2) { animation-delay: 0.2s; }
+    .form-section:nth-child(3) { animation-delay: 0.3s; }
+    .form-section:nth-child(4) { animation-delay: 0.4s; }
+    .form-section:nth-child(5) { animation-delay: 0.5s; }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Status indicators */
+    .status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-active { background-color: var(--success-color); }
+    .status-warning { background-color: var(--warning-color); }
+    .status-error { background-color: var(--error-color); }
+    .status-info { background-color: var(--info-color); }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Toggle Button for Mobile -->
+  <button class="sidebar-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <div class="container">
+    <!-- Enhanced Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>
+          <i class="fas fa-industry"></i>
+          <span>ManufacturePro</span>
+        </h2>
+      </div>
+      
+      <div class="sidebar-body">
+        <div class="nav-container">
+          <ul class="nav-links">
+            <li><a href="/"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i><span>Overview</span></a></li>
+            <li><a href="/reports"><i class="fas fa-chart-bar"></i><span>Reports</span></a></li>
+            <li><a href="/search"><i class="fas fa-search"></i><span>Search</span></a></li>
+            <li><a href="/order"><i class="fas fa-clipboard-list"></i><span>Order Log</span></a></li>
+            <li><a href="/mixing"><i class="fas fa-blender"></i><span>Mixing</span></a></li>
+            <li><a href="/production"><i class="fas fa-cogs"></i><span>Production</span></a></li>
+            <li><a href="/extrusion"><i class="fas fa-industry"></i><span>Extrusion</span></a></li>
+            <li><a href="/coating"><i class="fas fa-brush"></i><span>Coating</span></a></li>
+            <li><a href="/jointing"><i class="fas fa-link"></i><span>Jointing</span></a></li>
+            <li><a href="/moulding"><i class="fas fa-cube"></i><span>Moulding</span></a></li>
+            <li><a href="/sheeting"><i class="fas fa-layer-group"></i><span>Sheeting</span></a></li>
+            <li><a href="/qc"><i class="fas fa-user-shield"></i><span>QC Supervisor</span></a></li>
+            <li><a href="/planning"><i class="fas fa-calendar-alt"></i><span>Planning</span></a></li>
+            <li><a href="/inspection"><i class="fas fa-clipboard-check"></i><span>Inspection</span></a></li>
+            <li><a href="/finalinspection"><i class="fas fa-check-double"></i><span>Final Inspection</span></a></li>
+            <li class="active"><a href="/dispatch-note"><i class="fas fa-file-signature"></i><span>Dispatch Approval</span></a></li>
+            <li><a href="/packing"><i class="fas fa-box"></i><span>Packing</span></a></li>
+            <li><a href="/dispatch"><i class="fas fa-truck"></i><span>Dispatch</span></a></li>
+          </ul>
+        </div>
+        
+        <div class="user-info">
+          <img src="armol-removebg-preview.png" alt="ManufacturePro Logo">
+        </div>
+      </div>
+    </nav>
+
+    <!-- Enhanced Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">
+          <i class="fas fa-file-signature"></i>
+          Dispatch Approval Note (DAN)
+        </h1>
+        <p class="page-subtitle">Quality control and dispatch approval documentation system</p>
+      </div>
+
+      <!-- Enhanced Form Container -->
+      <div class="dispatch-form-container">
+        <!-- Company Header -->
+        <div class="company-header">
+          <h2>
+            <i class="fas fa-industry"></i>
+            ARMOL POLYMERS PRIVATE LIMITED
+          </h2>
+          <h3>Dispatch Approval Note (DAN)</h3>
+        </div>
+
+        <!-- Main Form -->
+        <form action="/dispatch-note" method="post" id="dispatchForm">
+          
+          <!-- Section 1: Basic Information -->
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <i class="fas fa-info-circle"></i>
+              Basic Information
+            </h3>
+            
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="danNo" class="required">DAN No.</label>
+                <input type="text" id="danNo" name="danNo" placeholder="Enter DAN Number" required>
+              </div>
+
+              <div class="form-group">
+                <label for="dateOfInspection" class="required">Date of Inspection</label>
+                <input type="date" id="dateOfInspection" name="dateOfInspection" required>
+              </div>
+
+              <div class="form-group">
+                <label for="routeCardNo" class="required">Route Card No.</label>
+                <input type="text" id="routeCardNo" name="routeCardNo" placeholder="Enter Route Card Number" required>
+              </div>
+
+              <div class="form-group">
+                <label for="finalInspectionReportNo">Final Inspection Report No.</label>
+                <input type="text" id="finalInspectionReportNo" name="finalInspectionReportNo" placeholder="Enter Report Number">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Material Details -->
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <i class="fas fa-boxes"></i>
+              Material Details
+            </h3>
+            
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label for="srNo">Sr No.</label>
+                <input type="text" id="srNo" name="srNo" placeholder="Serial Number">
+              </div>
+
+              <div class="form-group">
+                <label for="productCode">Product Code / Part Number</label>
+                <input type="text" id="productCode" name="productCode" placeholder="Product Code">
+              </div>
+
+              <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="text" id="quantity" name="quantity" placeholder="Enter Quantity">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: QC Inspection Details -->
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <i class="fas fa-search"></i>
+              QC Inspection Details
+            </h3>
+            
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="inspectedQty">Inspected Qty</label>
+                <input type="text" id="inspectedQty" name="inspectedQty" placeholder="Inspected Quantity">
+              </div>
+
+              <div class="form-group">
+                <label for="okQty">OK Qty</label>
+                <input type="text" id="okQty" name="okQty" placeholder="Approved Quantity">
+              </div>
+
+              <div class="form-group">
+                <label for="rejectedQty">Rejected Qty</label>
+                <input type="text" id="rejectedQty" name="rejectedQty" placeholder="Rejected Quantity">
+              </div>
+
+              <div class="form-group">
+                <label for="inspectedBy">Inspected By</label>
+                <input type="text" id="inspectedBy" name="inspectedBy" placeholder="Inspector Name">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Rejection Checklist -->
+          <div class="checkbox-section">
+            <h3 class="form-section-title">
+              <i class="fas fa-exclamation-triangle"></i>
+              Rejection Checklist (If not approved)
+            </h3>
+            
+            <div class="checkboxes">
+              <div class="checkbox-item">
+                <input type="checkbox" id="dimensionVariation" name="dimensionVariation" value="true">
+                <label for="dimensionVariation">Dimension variation</label>
+              </div>
+
+              <div class="checkbox-item">
+                <input type="checkbox" id="colourMismatch" name="colourMismatch" value="true">
+                <label for="colourMismatch">Colour mismatch</label>
+              </div>
+
+              <div class="checkbox-item">
+                <input type="checkbox" id="physicalDamage" name="physicalDamage" value="true">
+                <label for="physicalDamage">Physical damage</label>
+              </div>
+
+              <div class="checkbox-item">
+                <input type="checkbox" id="stainsDust" name="stainsDust" value="true">
+                <label for="stainsDust">Stains / Black Particles / Dust</label>
+              </div>
+
+              <div class="checkbox-item">
+                <input type="checkbox" id="structuralDamage" name="structuralDamage" value="true">
+                <label for="structuralDamage">Structural Damage</label>
+              </div>
+
+              <div class="checkbox-item">
+                <input type="checkbox" id="curingProblem" name="curingProblem" value="true">
+                <label for="curingProblem">Curing problem under/over cured</label>
+              </div>
+
+              <div class="checkbox-item">
+                <input type="checkbox" id="sizeDeformation" name="sizeDeformation" value="true">
+                <label for="sizeDeformation">Size deformation</label>
+              </div>
+
+              <div class="checkbox-item">
+                <input type="checkbox" id="twistKink" name="twistKink" value="true">
+                <label for="twistKink">Twist / Kink / Curled / Warped</label>
+              </div>
+
+              <div class="checkbox-item">
+                <input type="checkbox" id="hardnessVariation" name="hardnessVariation" value="true">
+                <label for="hardnessVariation">Hardness variation</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 5: Approval Status -->
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <i class="fas fa-check-circle"></i>
+              Approval Status
+            </h3>
+            
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" id="approved" name="approvalStatus" value="approved">
+                <label for="approved">Approved</label>
+              </div>
+
+              <div class="radio-item">
+                <input type="radio" id="notApproved" name="approvalStatus" value="notApproved">
+                <label for="notApproved">Not Approved</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 6: Signatures and Authorization -->
+          <div class="signature-section">
+            <h3 class="form-section-title">
+              <i class="fas fa-signature"></i>
+              Signatures and Authorization
+            </h3>
+            
+            <div class="signature-grid">
+              <div class="form-group signature-field">
+                <label for="qcSignature">Signature of QC (if approved)</label>
+                <input type="text" id="qcSignature" name="qcSignature" placeholder="">
+                <div class="signature-placeholder">Signature Space</div>
+              </div>
+
+              <div class="form-group signature-field">
+                <label for="reviewedBy">Reviewed By</label>
+                <input type="text" id="reviewedBy" name="reviewedBy" placeholder="">
+                
+              </div>
+
+              <div class="form-group">
+                <label for="reviewDate">Date of Review</label>
+                <input type="date" id="reviewDate" name="reviewDate">
+              </div>
+
+              <div class="form-group signature-field">
+                <label for="responsiblePerson">Responsible Person (if rejected)</label>
+                <input type="text" id="responsiblePerson" name="responsiblePerson" placeholder="">
+                
+              </div>
+
+              <div class="form-group signature-field">
+                <label for="responsibleSignature">Signature (Responsible Person)</label>
+                <input type="text" id="responsibleSignature" name="responsibleSignature" placeholder="">
+                <div class="signature-placeholder">Signature Space</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Enhanced Button Group -->
+          <div class="button-group">
+            <button type="submit" class="btn submit-btn">
+              <i class="fas fa-save"></i>
+              Submit DAN
+            </button>
+            
+            <button type="button" class="btn print-btn" onclick="printForm()">
+              <i class="fas fa-print"></i>
+              Print DAN
+            </button>
+            
+            <button type="reset" class="btn reset-btn">
+              <i class="fas fa-undo"></i>
+              Reset Form
+            </button>
+            
+            <a href="/dispatch" class="btn home-btn">
+              <i class="fas fa-home"></i>
+              Back to Dispatch
+            </a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <!-- Enhanced JavaScript -->
+  <script>
+    // Sidebar toggle functionality
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('active');
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.querySelector('.sidebar-toggle');
+      
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(event.target) && 
+          !toggleBtn.contains(event.target) && 
+          sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+      }
+    });
+
+    // Print functionality
+    function printForm() {
+      // Add print timestamp
+      const printTimestamp = document.createElement('div');
+      printTimestamp.className = 'print-timestamp';
+      printTimestamp.textContent = `Generated on: ${new Date().toLocaleString()}`;
+      document.body.appendChild(printTimestamp);
+
+      // Trigger print
+      window.print();
+
+      // Remove timestamp after print
+      setTimeout(() => {
+        if (printTimestamp.parentNode) {
+          printTimestamp.remove();
+        }
+      }, 1000);
+
+      showNotification('Document prepared for printing', 'success');
+    }
+
+    // Form enhancement and validation
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('dispatchForm');
+      const inputs = form.querySelectorAll('input[required]');
+      
+      // Set current date as default for inspection date
+      const dateField = document.getElementById('dateOfInspection');
+      if (dateField && !dateField.value) {
+        dateField.value = new Date().toISOString().split('T')[0];
+      }
+
+      // Set current date as default for review date
+      const reviewDateField = document.getElementById('reviewDate');
+      if (reviewDateField && !reviewDateField.value) {
+        reviewDateField.value = new Date().toISOString().split('T')[0];
+      }
+
+      // Real-time validation
+      inputs.forEach(input => {
+        input.addEventListener('blur', validateField);
+        input.addEventListener('input', clearError);
+      });
+
+      // Form submission handling
+      form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        inputs.forEach(input => {
+          if (!validateField.call(input)) {
+            isValid = false;
+          }
+        });
+
+        // Validate approval status
+        const approvalStatus = form.querySelector('input[name="approvalStatus"]:checked');
+        if (!approvalStatus) {
+          showNotification('Please select an approval status', 'error');
+          isValid = false;
+        }
+
+        if (!isValid) {
+          e.preventDefault();
+          showNotification('Please fix all errors before submitting', 'error');
+          return;
+        }
+
+        // Add loading state to submit button
+        const submitBtn = document.querySelector('.submit-btn');
+        if (submitBtn) {
+          submitBtn.classList.add('loading');
+          submitBtn.disabled = true;
+          
+          // Reset after 3 seconds (simulate server response)
+          setTimeout(() => {
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+          }, 3000);
+        }
+
+        showNotification('DAN submitted successfully', 'success');
+      });
+
+      // Auto-save functionality
+      let autoSaveTimer;
+      const allInputs = form.querySelectorAll('input, select, textarea');
+      allInputs.forEach(input => {
+        input.addEventListener('input', function() {
+          clearTimeout(autoSaveTimer);
+          autoSaveTimer = setTimeout(autoSave, 30000); // Auto-save after 30 seconds
+        });
+      });
+
+      // Focus first empty field
+      const firstEmptyField = Array.from(inputs).find(input => !input.value);
+      if (firstEmptyField) {
+        setTimeout(() => firstEmptyField.focus(), 500);
+      }
+
+      // Checkbox and radio interactions
+      setupCheckboxInteractions();
+      setupRadioInteractions();
+    });
+
+    // Field validation function
+    function validateField() {
+      const field = this;
+      const value = field.value.trim();
+      let isValid = true;
+      let errorMessage = '';
+
+      // Check if required field is empty
+      if (field.hasAttribute('required') && !value) {
+        isValid = false;
+        errorMessage = 'This field is required';
+      }
+      // Validate DAN number format
+      else if (field.name === 'danNo' && value) {
+        if (!/^[0-9]{4,}$/i.test(value)) {
+          isValid = false;
+          errorMessage = 'DAN number  followed by at least 4 digits';
+        }
+      }
+      // Validate route card number format
+      else if (field.name === 'routeCardNo' && value) {
+        if (!/^[0-9]{4,}$/i.test(value)) {
+          isValid = false;
+          errorMessage = 'Route Card number should start with "RC" followed by at least 4 digits';
+        }
+      }
+      // Validate date fields
+      else if (field.type === 'date' && value) {
+        const selectedDate = new Date(value);
+        const today = new Date();
+        const maxDate = new Date();
+        maxDate.setDate(today.getDate() + 30);
+        
+        if (selectedDate > maxDate) {
+          isValid = false;
+          errorMessage = 'Date cannot be more than 30 days in the future';
+        }
+      }
+
+      // Show/hide error state
+      if (!isValid) {
+        field.style.borderColor = 'var(--error-color)';
+        field.style.backgroundColor = 'rgba(220, 38, 38, 0.05)';
+        showFieldError(field, errorMessage);
+      } else {
+        field.style.borderColor = 'var(--success-color)';
+        field.style.backgroundColor = 'rgba(5, 150, 105, 0.05)';
+        hideFieldError(field);
+      }
+
+      return isValid;
+    }
+
+    // Clear error state on input
+    function clearError() {
+      this.style.borderColor = '';
+      this.style.backgroundColor = '';
+      hideFieldError(this);
+    }
+
+    // Show field error
+    function showFieldError(field, message) {
+      hideFieldError(field); // Remove existing error
+      
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'field-error';
+      errorDiv.style.cssText = `
+        color: var(--error-color);
+        font-size: 12px;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      `;
+      errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i>${message}`;
+      
+      field.parentNode.appendChild(errorDiv);
+    }
+
+    // Hide field error
+    function hideFieldError(field) {
+      const existingError = field.parentNode.querySelector('.field-error');
+      if (existingError) {
+        existingError.remove();
+      }
+    }
+
+    // Setup checkbox interactions
+    function setupCheckboxInteractions() {
+      const checkboxes = document.querySelectorAll('.checkbox-item input[type="checkbox"]');
+      const approvalRadios = document.querySelectorAll('input[name="approvalStatus"]');
+      
+      // When any rejection checkbox is checked, auto-select "Not Approved"
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          if (this.checked) {
+            const notApprovedRadio = document.getElementById('notApproved');
+            if (notApprovedRadio) {
+              notApprovedRadio.checked = true;
+              showNotification('Approval status set to "Not Approved" due to rejection criteria', 'warning');
+            }
+          }
+        });
+      });
+
+      // When "Approved" is selected, uncheck all rejection checkboxes
+      const approvedRadio = document.getElementById('approved');
+      if (approvedRadio) {
+        approvedRadio.addEventListener('change', function() {
+          if (this.checked) {
+            checkboxes.forEach(checkbox => {
+              checkbox.checked = false;
+            });
+            showNotification('All rejection criteria cleared for approved status', 'info');
+          }
+        });
+      }
+    }
+
+    // Setup radio interactions
+    function setupRadioInteractions() {
+      const radioItems = document.querySelectorAll('.radio-item');
+      
+      radioItems.forEach(item => {
+        const radio = item.querySelector('input[type="radio"]');
+        
+        item.addEventListener('click', function() {
+          if (radio && !radio.checked) {
+            radio.checked = true;
+            radio.dispatchEvent(new Event('change'));
+          }
+        });
+      });
+    }
+
+    // Auto-save functionality
+    function autoSave() {
+      const form = document.getElementById('dispatchForm');
+      const formData = new FormData(form);
+      
+      // Only auto-save if there's meaningful data
+      let hasData = false;
+      for (let [key, value] of formData.entries()) {
+        if (value && value.toString().trim()) {
+          hasData = true;
+          break;
+        }
+      }
+
+      if (hasData) {
+        // Save to localStorage
+        const data = {};
+        for (let [key, value] of formData.entries()) {
+          if (value && typeof value === 'string') {
+            data[key] = value;
+          }
+        }
+        localStorage.setItem('dispatchFormData', JSON.stringify(data));
+        console.log('Auto-saving dispatch data...');
+        showNotification('Draft saved automatically', 'success');
+      }
+    }
+
+    // Load saved form data
+    function loadFormData() {
+      const savedData = localStorage.getItem('dispatchFormData');
+      if (savedData) {
+        try {
+          const data = JSON.parse(savedData);
+          const form = document.getElementById('dispatchForm');
+          
+          Object.keys(data).forEach(key => {
+            const field = form.querySelector(`[name="${key}"]`);
+            if (field && !field.readOnly) {
+              if (field.type === 'checkbox' || field.type === 'radio') {
+                field.checked = data[key] === field.value;
+              } else {
+                field.value = data[key];
+              }
+            }
+          });
+          
+          showNotification('Previous draft loaded', 'info');
+        } catch (error) {
+          console.error('Error loading saved form data:', error);
+        }
+      }
+    }
+
+    // Clear saved data
+    function clearSavedData() {
+      localStorage.removeItem('dispatchFormData');
+    }
+
+    // Notification system
+    function showNotification(message, type = 'info') {
+      // Remove existing notifications
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      
+      const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+      };
+
+      notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fas ${icons[type] || icons.info}"></i>
+          <span>${message}</span>
+        </div>
+      `;
+
+      document.body.appendChild(notification);
+
+      // Animate in
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 100);
+
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }, 5000);
+    }
+
+    // Enhanced form reset with confirmation
+    document.addEventListener('DOMContentLoaded', function() {
+      const resetBtn = document.querySelector('.reset-btn');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          if (confirm('Are you sure you want to reset all form data? This action cannot be undone.')) {
+            document.getElementById('dispatchForm').reset();
+            clearSavedData();
+            showNotification('Form has been reset', 'info');
+            
+            // Clear all field errors and styles
+            const inputs = document.querySelectorAll('#dispatchForm input');
+            inputs.forEach(input => {
+              input.style.borderColor = '';
+              input.style.backgroundColor = '';
+              hideFieldError(input);
+            });
+            
+            // Set current dates again
+            const dateField = document.getElementById('dateOfInspection');
+            if (dateField) {
+              dateField.value = new Date().toISOString().split('T')[0];
+            }
+            
+            const reviewDateField = document.getElementById('reviewDate');
+            if (reviewDateField) {
+              reviewDateField.value = new Date().toISOString().split('T')[0];
+            }
+          }
+        });
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(event) {
+      // Ctrl/Cmd + S to save
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault();
+        const submitBtn = document.querySelector('.submit-btn');
+        if (submitBtn) {
+          submitBtn.click();
+        }
+      }
+      
+      // Ctrl/Cmd + P to print
+      if ((event.ctrlKey || event.metaKey) && event.key === 'p') {
+        event.preventDefault();
+        printForm();
+      }
+      
+      // Ctrl/Cmd + R to reset (override browser refresh)
+      if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+        event.preventDefault();
+        const resetBtn = document.querySelector('.reset-btn');
+        if (resetBtn) {
+          resetBtn.click();
+        }
+      }
+      
+      // Escape to close sidebar on mobile
+      if (event.key === 'Escape') {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+        }
+      }
+    });
+
+    // Responsive handling
+    function handleResize() {
+      const sidebar = document.getElementById('sidebar');
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('active');
+      }
+    }
+
+    window.addEventListener('resize', handleResize);
+
+    // Connection status monitoring
+    function updateConnectionStatus() {
+      const isOnline = navigator.onLine;
+      
+      if (!isOnline) {
+        showNotification('You are offline. Form data will be saved locally.', 'warning');
+      }
+    }
+
+    window.addEventListener('online', function() {
+      showNotification('Connection restored', 'success');
+    });
+    
+    window.addEventListener('offline', updateConnectionStatus);
+
+    // Initialize form data persistence
+    document.addEventListener('DOMContentLoaded', function() {
+      loadFormData();
+      
+      // Save form data on input
+      const form = document.getElementById('dispatchForm');
+      const inputs = form.querySelectorAll('input, select, textarea');
+      
+      inputs.forEach(input => {
+        input.addEventListener('input', debounce(saveFormData, 1000));
+        input.addEventListener('change', debounce(saveFormData, 1000));
+      });
+      
+      // Clear saved data on successful form submission
+      form.addEventListener('submit', function(e) {
+        setTimeout(clearSavedData, 1000);
+      });
+    });
+
+    // Save form data to localStorage
+    function saveFormData() {
+      const form = document.getElementById('dispatchForm');
+      const formData = new FormData(form);
+      const data = {};
+      
+      // Handle regular inputs
+      for (let [key, value] of formData.entries()) {
+        if (value && typeof value === 'string') {
+          data[key] = value;
+        }
+      }
+      
+      // Handle checkboxes
+      const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(checkbox => {
+        data[checkbox.name] = checkbox.checked;
+      });
+      
+      // Handle radio buttons
+      const radios = form.querySelectorAll('input[type="radio"]:checked');
+      radios.forEach(radio => {
+        data[radio.name] = radio.value;
+      });
+      
+      localStorage.setItem('dispatchFormData', JSON.stringify(data));
+    }
+
+    // Debounce utility function
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Accessibility enhancements
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add ARIA labels and descriptions
+      const requiredFields = document.querySelectorAll('input[required]');
+      requiredFields.forEach(field => {
+        field.setAttribute('aria-required', 'true');
+        
+        const label = document.querySelector(`label[for="${field.id}"]`);
+        if (label) {
+          field.setAttribute('aria-labelledby', field.id + '-label');
+          label.id = field.id + '-label';
+        }
+      });
+
+      // Keyboard navigation improvements
+      const form = document.getElementById('dispatchForm');
+      const inputs = form.querySelectorAll('input, select, textarea, button');
+      
+      inputs.forEach((input, index) => {
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && input.type !== 'textarea') {
+            e.preventDefault();
+            const nextInput = inputs[index + 1];
+            if (nextInput) {
+              nextInput.focus();
+            } else {
+              // If last field, focus submit button
+              const submitBtn = document.querySelector('.submit-btn');
+              if (submitBtn) {
+                submitBtn.focus();
+              }
+            }
+          }
+        });
+      });
+
+      // Add keyboard support for checkbox and radio items
+      const checkboxItems = document.querySelectorAll('.checkbox-item');
+      checkboxItems.forEach(item => {
+        item.setAttribute('tabindex', '0');
+        item.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+              checkbox.checked = !checkbox.checked;
+              checkbox.dispatchEvent(new Event('change'));
+            }
+          }
+        });
+      });
+
+      const radioItems = document.querySelectorAll('.radio-item');
+      radioItems.forEach(item => {
+        item.setAttribute('tabindex', '0');
+        item.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            const radio = item.querySelector('input[type="radio"]');
+            if (radio) {
+              radio.checked = true;
+              radio.dispatchEvent(new Event('change'));
+            }
+          }
+        });
+      });
+    });
+
+    // Enhanced mobile sidebar handling
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.getElementById('sidebar');
+      const sidebarToggle = document.querySelector('.sidebar-toggle');
+      
+      // Touch events for mobile
+      let touchStartX = 0;
+      let touchEndX = 0;
+      
+      document.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+      });
+      
+      document.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      });
+      
+      function handleSwipe() {
+        const swipeThreshold = 50;
+        const swipeDistance = touchEndX - touchStartX;
+        
+        if (window.innerWidth <= 768) {
+          // Swipe right to open sidebar
+          if (swipeDistance > swipeThreshold && touchStartX < 50) {
+            sidebar.classList.add('active');
+          }
+          // Swipe left to close sidebar
+          else if (swipeDistance < -swipeThreshold && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+          }
+        }
+      }
+      
+      // Prevent body scroll when sidebar is open on mobile
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            if (sidebar.classList.contains('active') && window.innerWidth <= 768) {
+              document.body.style.overflow = 'hidden';
+            } else {
+              document.body.style.overflow = '';
+            }
+          }
+        });
+      });
+      
+      observer.observe(sidebar, { attributes: true });
+    });
+
+    // Form validation summary
+    function validateForm() {
+      const form = document.getElementById('dispatchForm');
+      const errors = [];
+      
+      // Check required fields
+      const requiredFields = form.querySelectorAll('input[required]');
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          errors.push(`${field.labels[0]?.textContent || field.name} is required`);
+        }
+      });
+      
+      // Check approval status
+      const approvalStatus = form.querySelector('input[name="approvalStatus"]:checked');
+      if (!approvalStatus) {
+        errors.push('Approval status must be selected');
+      }
+      
+      // Check if rejection criteria are selected when not approved
+      if (approvalStatus && approvalStatus.value === 'notApproved') {
+        const rejectionCriteria = form.querySelectorAll('input[type="checkbox"]:checked');
+        if (rejectionCriteria.length === 0) {
+          errors.push('At least one rejection criterion must be selected for "Not Approved" status');
+        }
+      }
+      
+      return errors;
+    }
+
+    // Enhanced form submission with validation summary
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('dispatchForm');
+      
+      form.addEventListener('submit', function(e) {
+        const errors = validateForm();
+        
+        if (errors.length > 0) {
+          e.preventDefault();
+          
+          let errorMessage = 'Please fix the following errors:\n\n';
+          errors.forEach((error, index) => {
+            errorMessage += `${index + 1}. ${error}\n`;
+          });
+          
+          alert(errorMessage);
+          showNotification(`${errors.length} validation error(s) found`, 'error');
+          return;
+        }
+        
+        // Form is valid, proceed with submission
+        showNotification('Submitting Dispatch Approval Note...', 'info');
+      });
+    });
+
+    // Print preview functionality
+    function showPrintPreview() {
+      const printWindow = window.open('', '_blank');
+      const formContent = document.querySelector('.dispatch-form-container').cloneNode(true);
+      
+      // Remove buttons from print preview
+      const buttons = formContent.querySelector('.button-group');
+      if (buttons) {
+        buttons.remove();
+      }
+      
+      // Create print preview document
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>DAN Print Preview</title>
+          <style>
+            ${document.querySelector('style').textContent}
+            body { margin: 20px; }
+            .dispatch-form-container { margin: 0; }
+          </style>
+        </head>
+        <body>
+          ${formContent.outerHTML}
+          <div style="text-align: center; margin-top: 20px;">
+            <button onclick="window.print()" style="padding: 10px 20px; background: #1e40af; color: white; border: none; border-radius: 5px; cursor: pointer;">Print</button>
+            <button onclick="window.close()" style="padding: 10px 20px; background: #dc2626; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">Close</button>
+          </div>
+        </body>
+        </html>
+      `);
+      
+      printWindow.document.close();
+    }
+
+    // Error handling
+    window.addEventListener('error', function(event) {
+      console.error('Application error:', event.error);
+      showNotification('An unexpected error occurred. Please try again.', 'error');
+    });
+
+    // Service worker registration for offline support (if available)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function(error) {
+        console.log('Service Worker registration failed:', error);
+      });
+    }
+
+    // Initialize connection status
+    document.addEventListener('DOMContentLoaded', function() {
+      updateConnectionStatus();
+      
+      // Add loading animation to page
+      document.body.style.opacity = '0';
+      document.body.style.transition = 'opacity 0.5s ease';
+      
+      setTimeout(() => {
+        document.body.style.opacity = '1';
+      }, 100);
+
+      // Initialize tooltips for mobile
+      if (window.innerWidth <= 768) {
+        document.querySelectorAll('[data-tooltip]').forEach(el => {
+          el.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tooltip = this.getAttribute('data-tooltip');
+            if (tooltip) {
+              showNotification(tooltip, 'info');
+            }
+          });
+        });
+      }
+      
+      console.log('Dispatch Approval Note System initialized successfully');
+    });
+
+    // Auto-generate DAN number if empty
+    function generateDANNumber() {
+      const danField = document.getElementById('danNo');
+      if (danField && !danField.value) {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const time = String(today.getHours()).padStart(2, '0') + String(today.getMinutes()).padStart(2, '0');
+        
+        danField.value = `DAN${year}${month}${day}${time}`;
+        showNotification('DAN number auto-generated', 'info');
+      }
+    }
+
+    // Add auto-generate button for DAN number
+    document.addEventListener('DOMContentLoaded', function() {
+      const danField = document.getElementById('danNo');
+      if (danField) {
+        const generateBtn = document.createElement('button');
+        generateBtn.type = 'button';
+        generateBtn.innerHTML = '<i class="fas fa-magic"></i>';
+        generateBtn.title = 'Auto-generate DAN number';
+        generateBtn.style.cssText = `
+          position: absolute;
+          right: 8px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: var(--primary-color);
+          color: white;
+          border: none;
+          border-radius: 4px;
+          padding: 6px 8px;
+          cursor: pointer;
+          font-size: 12px;
+        `;
+        
+        generateBtn.addEventListener('click', generateDANNumber);
+        
+        danField.parentNode.style.position = 'relative';
+        danField.style.paddingRight = '40px';
+        danField.parentNode.appendChild(generateBtn);
+      }
+    });
+
+    // Form completion progress
+    function updateFormProgress() {
+      const form = document.getElementById('dispatchForm');
+      const allFields = form.querySelectorAll('input, select, textarea');
+      const filledFields = Array.from(allFields).filter(field => {
+        if (field.type === 'checkbox' || field.type === 'radio') {
+          return field.checked;
+        }
+        return field.value && field.value.trim();
+      });
+      
+      const progress = Math.round((filledFields.length / allFields.length) * 100);
+      
+      // Update progress indicator (if you want to add one)
+      console.log(`Form completion: ${progress}%`);
+      
+      if (progress === 100) {
+        showNotification('Form completed! Ready to submit.', 'success');
+      }
+    }
+
+    // Monitor form completion
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('dispatchForm');
+      const inputs = form.querySelectorAll('input, select, textarea');
+      
+      inputs.forEach(input => {
+        input.addEventListener('input', debounce(updateFormProgress, 500));
+        input.addEventListener('change', debounce(updateFormProgress, 500));
+      });
+    });
+
+    // Final initialization and cleanup
+    document.addEventListener('DOMContentLoaded', function() {
+      // Performance optimization
+      const lazyFeatures = [
+        () => console.log('Dispatch form initialized'),
+        () => updateConnectionStatus(),
+        () => loadFormData(),
+        () => updateFormProgress()
+      ];
+      
+      // Load features with delay to improve initial page load
+      lazyFeatures.forEach((feature, index) => {
+        setTimeout(feature, index * 100);
+      });
+      
+      // Cleanup on page unload
+      window.addEventListener('beforeunload', function() {
+        // Save current form state
+        saveFormData();
+      });
+    });
+  </script>
+</body>
+</html>
+

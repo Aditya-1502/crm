@@ -1,0 +1,2804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ManufacturePro CRM - Search & Analytics</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Manufacturing CRM Color Palette - Consistent with mixing.html */
+      --primary-color: rgb(255, 0, 0);
+      --primary-dark: #1e3a8a;
+      --primary-light: rgb(0, 0, 0);
+      --secondary-color: #f59e0b;
+      --accent-color: #10b981;
+      --success-color: #059669;
+      --warning-color: #d97706;
+      --error-color: #dc2626;
+      --info-color: #0284c7;
+      
+      /* Background & Surface Colors */
+      --background-primary: #f8fafc;
+      --background-secondary: #f1f5f9;
+      --card-background: #ffffff;
+      --sidebar-background: rgb(128, 0, 0);
+      --sidebar-hover: #F3CE14;
+      
+      /* Text Colors */
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --text-light: #9ca3af;
+      --text-white: #ffffff;
+      
+      /* Border & Shadow */
+      --border-color: #e5e7eb;
+      --border-light: #f3f4f6;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      
+      /* Gradients */
+      --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      --gradient-secondary: linear-gradient(135deg, var(--secondary-color) 0%, #ea580c 100%);
+      --gradient-success: linear-gradient(135deg, var(--accent-color) 0%, var(--success-color) 100%);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Container Layout */
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Enhanced Sidebar - SAME AS MIXING.HTML */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar-background);
+      color: var(--text-white);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      box-shadow: var(--shadow-xl);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Sidebar Header - FIXED POSITION */
+    .sidebar-header {
+      position: sticky;
+      top: 0;
+      padding: 24px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-background);
+      background: linear-gradient(135deg, rgb(255, 128, 0) 0%, rgba(30, 58, 138, 0.1) 100%);
+      z-index: 1001;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .sidebar h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+    }
+
+    .sidebar h2 i {
+      font-size: 24px;
+      color: var(--primary-light);
+    }
+
+    /* Sidebar Body - SCROLLABLE AREA */
+    .sidebar-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Navigation Links Container - SCROLLABLE */
+    .nav-container {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 0;
+    }
+
+    /* Custom Scrollbar for Sidebar */
+    .nav-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .nav-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    .nav-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Navigation Links */
+    .nav-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-links li {
+      margin: 0;
+      position: relative;
+    }
+
+    .nav-links li.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: var(--primary-light);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .nav-links li.active {
+      background: var(--sidebar-hover);
+    }
+
+    .nav-links a {
+      color: var(--text-white);
+      text-decoration: none;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 500;
+      font-size: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-links a::before {
+      content: '';
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-links a:hover::before {
+      left: 100%;
+    }
+
+    .nav-links a:hover {
+      background: var(--sidebar-hover);
+      transform: translateX(4px);
+      color: var(--primary-light);
+    }
+
+    .nav-links a i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      color: #94a3b8;
+      transition: color 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .nav-links a:hover i,
+    .nav-links li.active a i {
+      color: var(--primary-light);
+    }
+
+    /* User Info Section - FIXED AT BOTTOM */
+    .user-info {
+      position: sticky;
+      bottom: 0;
+      padding: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-background);
+      background: rgba(0, 0, 0, 0.2);
+      z-index: 1001;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .user-info img {
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 280px;
+      padding: 32px 40px;
+      width: calc(100% - 280px);
+      min-height: 100vh;
+      background: var(--background-primary);
+    }
+
+    /* Page Header */
+    .page-header {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-title i {
+      color: var(--primary-color);
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    /* Search Container */
+    .search-container {
+      background: var(--card-background);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .search-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .search-container h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .search-container h2 i {
+      color: var(--primary-color);
+    }
+
+    /* Search Form */
+    .search-form {
+      display: flex;
+      gap: 16px;
+      align-items: end;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .search-form .form-group {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .search-form label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 14px;
+      letter-spacing: 0.025em;
+    }
+
+    .search-form input[type="text"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--card-background);
+      color: var(--text-primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .search-form input[type="text"]:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .search-form input[type="text"]:hover {
+      border-color: var(--primary-light);
+    }
+
+    .search-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 120px;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .search-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .search-btn:hover::before {
+      left: 100%;
+    }
+
+    .search-btn:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #1e3a8a 100%);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Error Messages */
+    .error-message {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      color: var(--error-color);
+      padding: 12px 16px;
+      border-radius: 8px;
+      border-left: 4px solid var(--error-color);
+      font-weight: 500;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Data Tables Container */
+    .data-section {
+      background: var(--card-background);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .data-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-success);
+    }
+
+    .data-section h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .data-section h2 i {
+      color: var(--primary-color);
+    }
+
+    /* Enhanced Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 14px;
+      background: var(--card-background);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .data-table th {
+      background: var(--gradient-primary);
+      color: var(--text-white);
+      padding: 16px 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 0.025em;
+      text-transform: uppercase;
+      border: none;
+    }
+
+    .data-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-primary);
+      vertical-align: top;
+    }
+
+    .data-table tbody tr {
+      transition: all 0.2s ease;
+    }
+
+    .data-table tbody tr:hover {
+      background: var(--background-secondary);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Table responsive wrapper */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .table-wrapper::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+      background: var(--background-secondary);
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    .status-active {
+      background: rgba(5, 150, 105, 0.1);
+      color: var(--success-color);
+    }
+
+    .status-pending {
+      background: rgba(217, 119, 6, 0.1);
+      color: var(--warning-color);
+    }
+
+    .status-error {
+      background: rgba(220, 38, 38, 0.1);
+      color: var(--error-color);
+    }
+
+    /* Link Styling in Tables */
+    .data-table a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .data-table a:hover {
+      background: rgba(30, 64, 175, 0.1);
+      color: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    /* No Data Message */
+    .no-data-message {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-secondary);
+      font-size: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .no-data-message i {
+      font-size: 48px;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+
+    /* Sidebar Toggle for Mobile */
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+
+    /* Loading States */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: var(--text-secondary);
+      gap: 12px;
+    }
+
+    .loading i {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .search-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-form .form-group {
+        min-width: auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-toggle {
+        display: block;
+      }
+      
+      .sidebar {
+        width: 70px;
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+        width: 280px;
+      }
+      
+      .sidebar:not(.active) .sidebar-header {
+        padding: 20px 10px;
+      }
+      
+      .sidebar:not(.active) .sidebar h2 span {
+        display: none;
+      }
+      
+      .sidebar:not(.active) .nav-links a span {
+        display: none;
+      }
+      
+      .sidebar:not(.active) .nav-links a {
+        justify-content: center;
+        padding: 12px 10px;
+      }
+      
+      .sidebar:not(.active) .nav-links a i {
+        margin-right: 0;
+        font-size: 18px;
+      }
+      
+      .sidebar:not(.active) .user-info {
+        padding: 15px 10px;
+      }
+      
+      .sidebar:not(.active) .user-info img {
+        max-width: 40px;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 80px 16px 20px 16px;
+      }
+      
+      .search-container,
+      .data-section {
+        padding: 24px 20px;
+      }
+      
+      .page-title {
+        font-size: 24px;
+      }
+      
+      .data-table {
+        font-size: 12px;
+      }
+      
+      .data-table th,
+      .data-table td {
+        padding: 8px 6px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 70px 12px 16px 12px;
+      }
+      
+      .search-container,
+      .data-section {
+        padding: 20px 16px;
+      }
+      
+      .page-title {
+        font-size: 20px;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      .sidebar,
+      .sidebar-toggle {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .search-container,
+      .data-section {
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+    }
+
+    /* Animation for data sections */
+    .data-section {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .data-section:nth-child(1) { animation-delay: 0.1s; }
+    .data-section:nth-child(2) { animation-delay: 0.2s; }
+    .data-section:nth-child(3) { animation-delay: 0.3s; }
+    .data-section:nth-child(4) { animation-delay: 0.4s; }
+    .data-section:nth-child(5) { animation-delay: 0.5s; }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Accessibility Improvements */
+    .search-form input:focus,
+    .search-btn:focus {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      :root {
+        --primary-color: #000080;
+        --text-primary: #000000;
+        --border-color: #000000;
+      }
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Enhanced scrollbar for main content */
+    .main-content::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .main-content::-webkit-scrollbar-track {
+      background: var(--background-secondary);
+    }
+
+    .main-content::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    .main-content::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Toggle Button for Mobile -->
+  <button class="sidebar-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <div class="container">
+    <!-- Enhanced Sidebar Navigation - SAME AS MIXING.HTML -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>
+          <i class="fas fa-industry"></i>
+          <span>ManufacturePro</span>
+        </h2>
+      </div>
+      
+      <div class="sidebar-body">
+        <div class="nav-container">
+          <ul class="nav-links">
+            <li><a href="/dashboard"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <!-- <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i><span>Overview</span></a></li> -->
+            <!-- <li><a href="/reports"><i class="fas fa-chart-bar"></i><span>Reports</span></a></li> -->
+            <li class="active"><a href="/search"><i class="fas fa-search"></i><span>Search</span></a></li>
+            <li><a href="/order"><i class="fas fa-clipboard-list"></i><span>Order Log</span></a></li>
+            <li><a href="/mixing"><i class="fas fa-blender"></i><span>Mixing</span></a></li>
+            <li><a href="/production"><i class="fas fa-cogs"></i><span>Production</span></a></li>
+            <li><a href="/extrusion"><i class="fas fa-industry"></i><span>Extrusion</span></a></li>
+            <li><a href="/coating"><i class="fas fa-brush"></i><span>Coating</span></a></li>
+            <li><a href="/jointing"><i class="fas fa-link"></i><span>Jointing</span></a></li>
+            <li><a href="/moulding"><i class="fas fa-cube"></i><span>Moulding</span></a></li>
+            <li><a href="/sheeting"><i class="fas fa-layer-group"></i><span>Sheeting</span></a></li>
+            <li><a href="/qc"><i class="fas fa-user-shield"></i><span>QC Supervisor</span></a></li>
+            <li><a href="/planning"><i class="fas fa-calendar-alt"></i><span>Planning</span></a></li>
+            <li><a href="/inspection"><i class="fas fa-clipboard-check"></i><span>Inspection</span></a></li>
+            <li><a href="/finalinspection"><i class="fas fa-check-double"></i><span>Final Inspection</span></a></li>
+            <li><a href="/dispatch-note"><i class="fas fa-file-signature"></i><span>Dispatch Approval</span></a></li>
+            <li><a href="/packing"><i class="fas fa-box"></i><span>Packing</span></a></li>
+            <li><a href="/dispatch"><i class="fas fa-truck"></i><span>Dispatch</span></a></li>
+          </ul>
+        </div>
+        
+        <div class="user-info">
+          <img src="armol-removebg-preview.png" alt="ManufacturePro Logo">
+        </div>
+      </div>
+    </nav>
+
+    <!-- Enhanced Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">
+          <i class="fas fa-search"></i>
+          Search & Analytics
+        </h1>
+        <p class="page-subtitle">Comprehensive search and data analysis for manufacturing operations</p>
+      </div>
+
+      <!-- Search Container -->
+      <div class="search-container">
+        <h2>
+          <i class="fas fa-filter"></i>
+          Route Card Search
+        </h2>
+        
+        <!-- Error Messages -->
+        <div th:if="${productionError}" class="error-message">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span th:text="${productionError}"></span>
+        </div>
+        <div th:if="${orderError}" class="error-message">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span th:text="${orderError}"></span>
+        </div>
+
+        <!-- Search Form -->
+        <form class="search-form" action="/fetch-by-route-search" method="get">
+          <div class="form-group">
+            <label for="routeCardNo">Route Card Number</label>
+            <input 
+              type="text" 
+              id="routeCardNo" 
+              name="routeCardNo" 
+              th:value="${order?.routeCardNo}" 
+              placeholder="Enter Route Card Number (e.g., RC001234)"
+              required
+            >
+          </div>
+          <button type="submit" class="search-btn">
+            <i class="fas fa-search"></i>
+            Fetch Details
+          </button>
+        </form>
+      </div>
+
+      <!-- Order Details Section -->
+      <div th:if="${order != null}" class="data-section">
+        <h2>
+          <i class="fas fa-clipboard-list"></i>
+          Order Details
+        </h2>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>Date</th>
+                <td th:text="${#dates.format(order?.date, 'yyyy-MM-dd')}"></td>
+                <th>Component Name</th>
+                <td th:text="${order?.componentName}"></td>
+              </tr>
+              <tr>
+                <th>Customer Name</th>
+                <td th:text="${order?.customerName}"></td>
+                <th>Customer No</th>
+                <td th:text="${order?.customerNo}"></td>
+              </tr>
+              <tr>
+                <th>Enquiry No</th>
+                <td th:text="${order?.enquiryNo}"></td>
+                <th>Quotation No</th>
+                <td th:text="${order?.quotationNo}"></td>
+              </tr>
+              <tr>
+                <th>Purchase Order</th>
+                <td th:text="${order?.purchaseOrder}"></td>
+                <th>Formulation No</th>
+                <td th:text="${order?.formulationNo}"></td>
+              </tr>
+              <tr>
+                <th>Method</th>
+                <td th:text="${order?.method}"></td>
+                <th>Material</th>
+                <td th:text="${order?.material}"></td>
+              </tr>
+              <tr>
+                <th>Tool Die No</th>
+                <td th:text="${order?.toolDieNo}"></td>
+                <th>Weight Per Meter</th>
+                <td th:text="${order?.weightPerMeter}"></td>
+              </tr>
+              <tr>
+                <th>Temperature</th>
+                <td th:text="${order?.temperature}"></td>
+                <th>Extruder RPM</th>
+                <td th:text="${order?.extruderRpm}"></td>
+              </tr>
+              <tr>
+                <th>Conveyor RPM</th>
+                <td th:text="${order?.conveyorRpm}"></td>
+                <th>No of Cavity</th>
+                <td th:text="${order?.noOfCavity}"></td>
+              </tr>
+              <tr>
+                <th>Planned Qty</th>
+                <td th:text="${order?.plannedQty}"></td>
+                <th>Work Order No</th>
+                <td th:text="${order?.workOrderNo}"></td>
+              </tr>
+              <tr>
+                <th>Coating</th>
+                <td th:text="${order?.coating}"></td>
+                <th>Tool Status</th>
+                <td th:text="${order?.toolStatus}"></td>
+              </tr>
+              <tr>
+                <th>Responsible Person</th>
+                <td th:text="${order?.responsiblePerson}"></td>
+                <th>Tool Maker</th>
+                <td th:text="${order?.toolMaker}"></td>
+              </tr>
+              <tr>
+                <th>ETA</th>
+                <td th:text="${#dates.format(order?.eta, 'yyyy-MM-dd')}"></td>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Mixing Details Section -->
+      <div th:if="${mixing != null}" class="data-section">
+        <h2>
+          <i class="fas fa-blender"></i>
+          Mixing Details
+        </h2>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>Date</th>
+                <td th:text="${#dates.format(mixing?.date, 'yyyy-MM-dd')}"></td>
+                <th>Batch No</th>
+                <td th:text="${mixing?.batchNo}"></td>
+              </tr>
+              <tr>
+                <th>Hardness</th>
+                <td th:text="${mixing?.hardness}"></td>
+                <th>Sheet Thickness</th>
+                <td th:text="${mixing?.sheetThickness}"></td>
+              </tr>
+              <tr>
+                <th>Lot No</th>
+                <td th:text="${mixing?.lotNo}"></td>
+                <th>Formulation No</th>
+                <td th:text="${mixing?.formulationNo}"></td>
+              </tr>
+              <tr>
+                <th>Batch Weight</th>
+                <td th:text="${mixing?.batchWeight}"></td>
+                <th>Colour</th>
+                <td th:text="${mixing?.colour}"></td>
+              </tr>
+              <tr>
+                <th>Mixing By</th>
+                <td th:text="${mixing?.mixingBy}"></td>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Production Details Section -->
+      <div th:if="${production != null}" class="data-section">
+        <h2>
+          <i class="fas fa-cogs"></i>
+          Production Details
+        </h2>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>Date</th>
+                <td th:text="${#dates.format(production?.date, 'yyyy-MM-dd')}"></td>
+                <th>Component Name</th>
+                <td th:text="${production?.componentName}"></td>
+              </tr>
+              <tr>
+                <th>Customer No</th>
+                <td th:text="${production?.customerNo}"></td>
+                <th>Method</th>
+                <td th:text="${production?.method}"></td>
+              </tr>
+              <tr>
+                <th>Enquiry No</th>
+                <td th:text="${production?.enquiryNo}"></td>
+                <th>Material</th>
+                <td th:text="${production?.material}"></td>
+              </tr>
+              <tr>
+                <th>Quotation No</th>
+                <td th:text="${production?.quotationNo}"></td>
+                <th>Tool Die No</th>
+                <td th:text="${production?.toolDieNo}"></td>
+              </tr>
+              <tr>
+                <th>Batch No</th>
+                <td th:text="${production?.batchNo}"></td>
+                <th>Batch Weight</th>
+                <td th:text="${production?.batchWeight}"></td>
+              </tr>
+              <tr>
+                <th>Extruder RPM</th>
+                <td th:text="${production?.extruderRPM}"></td>
+                <th>DC Oven Temp</th>
+                <td th:text="${production?.dcOvenTemp}"></td>
+              </tr>
+              <tr>
+                <th>Weight Per Meter</th>
+                <td th:text="${production?.weightPerMeter}"></td>
+                <th>Production Per Hour</th>
+                <td th:text="${production?.productionPerHour}"></td>
+              </tr>
+              <tr>
+                <th>Conveyor RPM</th>
+                <td th:text="${production?.conveyorRPM}"></td>
+                <th>Setup Tool Die No</th>
+                <td th:text="${production?.setupToolDieNo}"></td>
+              </tr>
+              <tr>
+                <th>No of Cavity</th>
+                <td th:text="${production?.noOfCavity}"></td>
+                <th>Time</th>
+                <td th:text="${production?.time}"></td>
+              </tr>
+              <tr>
+                <th>Clamp Pressure</th>
+                <td th:text="${production?.clampPressure}"></td>
+                <th>Cycle Time</th>
+                <td th:text="${production?.cycleTime}"></td>
+              </tr>
+              <tr>
+                <th>Curing Temp</th>
+                <td th:text="${production?.curingTemp}"></td>
+                <th>Machine</th>
+                <td th:text="${production?.machine}"></td>
+              </tr>
+              <tr>
+                <th>Purchase Order</th>
+                <td th:text="${production?.purchaseOrder}"></td>
+                <th>Formulation No</th>
+                <td th:text="${production?.formulationNo}"></td>
+              </tr>
+              <tr>
+                <th>Work Order No</th>
+                <td th:text="${production?.workOrderNo}"></td>
+                <th>Balance Weight</th>
+                <td th:text="${production?.balanceWeight}"></td>
+              </tr>
+              <tr>
+                <th>Man</th>
+                <td th:text="${production?.man}"></td>
+                <th>Planned Qty</th>
+                <td th:text="${production?.plannedQty}"></td>
+              </tr>
+              <tr>
+                <th>Colour</th>
+                <td th:text="${production?.colour}"></td>
+                <th>Hardness</th>
+                <td th:text="${production?.hardness}"></td>
+              </tr>
+              <tr>
+                <th>Last Supply</th>
+                <td th:text="${production?.lastSupply}"></td>
+                <th>Item Code</th>
+                <td th:text="${production?.itemCode}"></td>
+              </tr>
+              <tr>
+                <th>Issued By</th>
+                <td th:text="${production?.issuedBy}"></td>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Extrusion Details Section -->
+      <div th:if="${extrusion != null}" class="data-section">
+        <h2>
+          <i class="fas fa-industry"></i>
+          Extrusion Details
+        </h2>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>Date</th>
+                <td th:text="${#dates.format(extrusion?.date, 'yyyy-MM-dd')}"></td>
+                <th>Component Name</th>
+                <td th:text="${extrusion?.componentName}"></td>
+              </tr>
+              <tr>
+                <th>Customer No</th>
+                <td th:text="${extrusion?.customerNo}"></td>
+                <th>Method</th>
+                <td th:text="${extrusion?.method}"></td>
+              </tr>
+              <tr>
+                <th>Enquiry No</th>
+                <td th:text="${extrusion?.enquiryNo}"></td>
+                <th>Material</th>
+                <td th:text="${extrusion?.material}"></td>
+              </tr>
+              <tr>
+                <th>Quotation No</th>
+                <td th:text="${extrusion?.quotationNo}"></td>
+                <th>Tool Die No</th>
+                <td th:text="${extrusion?.toolDieNo}"></td>
+              </tr>
+              <tr>
+                <th>Batch No</th>
+                <td th:text="${extrusion?.batchNo}"></td>
+                <th>Batch Weight</th>
+                <td th:text="${extrusion?.batchWeight}"></td>
+              </tr>
+              <tr>
+                <th>Balance Weight</th>
+                <td th:text="${extrusion?.balanceWeight}"></td>
+                <th>Extruder RPM</th>
+                <td th:text="${extrusion?.extruderRPM}"></td>
+              </tr>
+              <tr>
+                <th>DC Oven Temp</th>
+                <td th:text="${extrusion?.dcOvenTemp}"></td>
+                <th>Weight Per Meter</th>
+                <td th:text="${extrusion?.weightPerMeter}"></td>
+              </tr>
+              <tr>
+                <th>Production Per Hour</th>
+                <td th:text="${extrusion?.productionPerHour}"></td>
+                <th>Conveyor RPM</th>
+                <td th:text="${extrusion?.conveyorRPM}"></td>
+              </tr>
+              <tr>
+                <th>Setup Tool Die No</th>
+                <td th:text="${extrusion?.setupToolDieNo}"></td>
+                <th>No Of Cavity</th>
+                <td th:text="${extrusion?.noOfCavity}"></td>
+              </tr>
+              <tr>
+                <th>Time</th>
+                <td th:text="${extrusion?.time}"></td>
+                <th>Clamp Pressure</th>
+                <td th:text="${extrusion?.clampPressure}"></td>
+              </tr>
+              <tr>
+                <th>Cycle Time</th>
+                <td th:text="${extrusion?.cycleTime}"></td>
+                <th>Curing Temp</th>
+                <td th:text="${extrusion?.curingTemp}"></td>
+              </tr>
+              <tr>
+                <th>Machine</th>
+                <td th:text="${extrusion?.machine}"></td>
+                <th>Extrusion Date</th>
+                <td th:text="${extrusion?.extrusionDate}"></td>
+              </tr>
+              <tr>
+                <th>Start Time</th>
+                <td th:text="${extrusion?.startTime}"></td>
+                <th>End Time</th>
+                <td th:text="${extrusion?.endTime}"></td>
+              </tr>
+              <tr>
+                <th>Planned Qty</th>
+                <td th:text="${extrusion?.plannedQty}"></td>
+                <th>Processed Qty</th>
+                <td th:text="${extrusion?.processedQty}"></td>
+              </tr>
+              <tr>
+                <th>OK Qty</th>
+                <td th:text="${extrusion?.okQty}"></td>
+                <th>Not OK Qty</th>
+                <td th:text="${extrusion?.notOkQty}"></td>
+              </tr>
+              <tr>
+                <th>Operator Name</th>
+                <td th:text="${extrusion?.operatorName}"></td>
+                <th>Jointing</th>
+                <td th:text="${extrusion?.jointing}"></td>
+              </tr>
+              <tr>
+                <th>Remark</th>
+                <td th:text="${extrusion?.remark}"></td>
+                <th>Received Qty</th>
+                <td th:text="${extrusion?.receivedQty}"></td>
+              </tr>
+              <tr>
+                <th>Post Processed Qty</th>
+                <td th:text="${extrusion?.postProcessedQty}"></td>
+                <th>Temperature</th>
+                <td th:text="${extrusion?.temperature}"></td>
+              </tr>
+              <tr>
+                <th>Post Start Time</th>
+                <td th:text="${extrusion?.postStartTime}"></td>
+                <th>Post End Time</th>
+                <td th:text="${extrusion?.postEndTime}"></td>
+              </tr>
+              <tr>
+                <th>Duration</th>
+                <td th:text="${extrusion?.duration}"></td>
+                <th>Post Remarks</th>
+                <td th:text="${extrusion?.postRemarks}"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Coating Details Section -->
+      <div th:if="${coating != null}" class="data-section">
+        <h2>
+          <i class="fas fa-brush"></i>
+          Coating Details
+        </h2>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>Date</th>
+                <td th:text="${#dates.format(coating?.date, 'yyyy-MM-dd')}"></td>
+                <th>Batch No</th>
+                <td th:text="${coating?.batchNo}"></td>
+              </tr>
+              <tr>
+                <th>Batch Weight</th>
+                <td th:text="${coating?.batchWeight}"></td>
+                <th>Route Card No</th>
+                <td th:text="${coating?.routeCardNo}"></td>
+              </tr>
+              <tr>
+                <th>Balance Weight</th>
+                <td th:text="${coating?.balanceWeight}"></td>
+                <th>Production Per Hour</th>
+                <td th:text="${coating?.productionPerHour}"></td>
+              </tr>
+              <tr>
+                <th>Weight Per Meter</th>
+                <td th:text="${coating?.weightPerMeter}"></td>
+                <th>Tool Die No</th>
+                <td th:text="${coating?.toolDieNo}"></td>
+              </tr>
+              <tr>
+                <th>No Of Cavity</th>
+                <td th:text="${coating?.noOfCavity}"></td>
+                <th>Setup Time</th>
+                <td th:text="${coating?.setupTime}"></td>
+              </tr>
+              <tr>
+                <th>Clamp Pressure</th>
+                <td th:text="${coating?.clampPressure}"></td>
+                <th>Cycle Time</th>
+                <td th:text="${coating?.cycleTime}"></td>
+              </tr>
+              <tr>
+                <th>Curing Temp</th>
+                <td th:text="${coating?.curingTemp}"></td>
+                <th>View Drawing</th>
+                <td>
+                  <a th:href="@{${coating?.viewDrawing}}" th:if="${coating?.viewDrawing}" target="_blank">
+                    <i class="fas fa-external-link-alt"></i>
+                    View Image
+                  </a>
+                  <span th:if="${coating?.viewDrawing == null}" class="status-badge status-error">N/A</span>
+                </td>
+              </tr>
+              <tr>
+                <th>Coating Start Time</th>
+                <td th:text="${coating?.coatingStartTime}"></td>
+                <th>Coating End Time</th>
+                <td th:text="${coating?.coatingEndTime}"></td>
+              </tr>
+              <tr>
+                <th>Planned Qty</th>
+                <td th:text="${coating?.planned_qty}"></td>
+                <th>Processed Qty</th>
+                <td th:text="${coating?.processed_qty}"></td>
+              </tr>
+              <tr>
+                <th>OK Qty</th>
+                <td th:text="${coating?.ok_qty}"></td>
+                <th>Not OK Qty</th>
+                <td th:text="${coating?.not_ok_qty}"></td>
+              </tr>
+              <tr>
+                <th>Operator Name</th>
+                <td th:text="${coating?.operator_name}"></td>
+                <th>Remarks</th>
+                <td th:text="${coating?.coating_remarks}"></td>
+              </tr>
+              <tr>
+                <th>Received Qty</th>
+                <td th:text="${coating?.receivedQty}"></td>
+                <th>Post Processed Qty</th>
+                <td th:text="${coating?.postProcessedQty}"></td>
+              </tr>
+              <tr>
+                <th>Temperature</th>
+                <td th:text="${coating?.temperature}"></td>
+                <th>Post Start Time</th>
+                <td th:text="${coating?.postStartTime}"></td>
+              </tr>
+              <tr>
+                <th>Post End Time</th>
+                <td th:text="${coating?.postEndTime}"></td>
+                <th>Duration</th>
+                <td th:text="${coating?.duration}"></td>
+              </tr>
+              <tr>
+                <th>Post Remarks</th>
+                <td th:text="${coating?.postRemarks}"></td>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Jointing Details Section -->
+      <div th:if="${jointing != null}" class="data-section">
+        <h2>
+          <i class="fas fa-link"></i>
+          Jointing Details
+        </h2>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>Date</th>
+                <td th:text="${#dates.format(jointing?.date, 'yyyy-MM-dd')}"></td>
+                <th>Batch No</th>
+                <td th:text="${jointing?.batchNo}"></td>
+              </tr>
+              <tr>
+                <th>Batch Weight</th>
+                <td th:text="${jointing?.batchWeight}"></td>
+                <th>Route Card No</th>
+                <td th:text="${jointing?.routeCardNo}"></td>
+              </tr>
+              <tr>
+                <th>Balance Weight</th>
+                <td th:text="${jointing?.balanceWeight}"></td>
+                <th>Production Per Hour</th>
+                <td th:text="${jointing?.productionPerHour}"></td>
+              </tr>
+              <tr>
+                <th>Weight Per Meter</th>
+                <td th:text="${jointing?.weightPerMeter}"></td>
+                <th>Tool Die No</th>
+                <td th:text="${jointing?.toolDieNo}"></td>
+              </tr>
+              <tr>
+                <th>No Of Cavity</th>
+                <td th:text="${jointing?.noOfCavity}"></td>
+                <th>Setup Time</th>
+                <td th:text="${jointing?.setupTime}"></td>
+              </tr>
+              <tr>
+                <th>Clamp Pressure</th>
+                <td th:text="${jointing?.clampPressure}"></td>
+                <th>Cycle Time</th>
+                <td th:text="${jointing?.cycleTime}"></td>
+              </tr>
+              <tr>
+                <th>Curing Temp</th>
+                <td th:text="${jointing?.curingTemp}"></td>
+                <td colspan="2"></td>
+              </tr>
+              <tr>
+                <th>Joining Start Time</th>
+                <td th:text="${jointing?.joiningStartTime}"></td>
+                <th>Joining End Time</th>
+                <td th:text="${jointing?.joiningEndTime}"></td>
+              </tr>
+              <tr>
+                <th>Planned Quantity</th>
+                <td th:text="${jointing?.plannedQuantity}"></td>
+                <th>Processed Quantity</th>
+                <td th:text="${jointing?.processedQuantity}"></td>
+              </tr>
+              <tr>
+                <th>OK Quantity</th>
+                <td th:text="${jointing?.okQuantity}"></td>
+                <th>Not OK Quantity</th>
+                <td th:text="${jointing?.notOkQuantity}"></td>
+              </tr>
+              <tr>
+                <th>Operator Name</th>
+                <td th:text="${jointing?.operatorName}"></td>
+                <th>Joining Remarks</th>
+                <td th:text="${jointing?.joiningRemarks}"></td>
+              </tr>
+              <tr>
+                <th>Received Qty</th>
+                <td th:text="${jointing?.receivedQty}"></td>
+                <th>Post Processed Qty</th>
+                <td th:text="${jointing?.postProcessedQty}"></td>
+              </tr>
+              <tr>
+                <th>Temperature</th>
+                <td th:text="${jointing?.temperature}"></td>
+                <th>Post Start Time</th>
+                <td th:text="${jointing?.postStartTime}"></td>
+              </tr>
+              <tr>
+                <th>Post End Time</th>
+                <td th:text="${jointing?.postEndTime}"></td>
+                <th>Duration</th>
+                <td th:text="${jointing?.duration}"></td>
+              </tr>
+              <tr>
+                <th>Post Remarks</th>
+                <td th:text="${jointing?.postRemarks}"></td>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Moulding Details Section -->
+      <div th:if="${moulding != null}" class="data-section">
+        <h2>
+          <i class="fas fa-cube"></i>
+          Moulding Details
+        </h2>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>Date</th>
+                <td th:text="${#dates.format(moulding?.date, 'yyyy-MM-dd')}"></td>
+                <th>Batch No</th>
+                <td th:text="${moulding?.batchNo}"></td>
+              </tr>
+              <tr>
+                <th>Batch Weight</th>
+                <td th:text="${moulding?.batchWeight}"></td>
+                <th>Route Card No</th>
+                <td th:text="${moulding?.routeCardNo}"></td>
+              </tr>
+              <tr>
+                <th>Balance Weight</th>
+                <td th:text="${moulding?.balanceWeight}"></td>
+                <th>Production Per Hour</th>
+                <td th:text="${moulding?.productionPerHour}"></td>
+              </tr>
+              <tr>
+                <th>Weight Per Piece</th>
+                <td th:text="${moulding?.weightPerPiece}"></td>
+                <th>Tool Die No</th>
+                <td th:text="${moulding?.toolDieNo}"></td>
+              </tr>
+              <tr>
+                <th>No Of Cavity</th>
+                <td th:text="${moulding?.noOfCavity}"></td>
+                <th>Setup Time</th>
+                <td th:text="${moulding?.setupTime}"></td>
+              </tr>
+              <tr>
+                <th>Clamp Pressure</th>
+                <td th:text="${moulding?.clampPressure}"></td>
+                <th>Cycle Time</th>
+                <td th:text="${moulding?.cycleTime}"></td>
+              </tr>
+              <tr>
+                <th>Curing Temp</th>
+                <td th:text="${moulding?.curingTemp}"></td>
+                <td colspan="2"></td>
+              </tr>
+              <tr>
+                <th>Start Time</th>
+                <td th:text="${moulding?.startTime}"></td>
+                <th>End Time</th>
+                <td th:text="${moulding?.endTime}"></td>
+              </tr>
+              <tr>
+                <th>Planned Qty</th>
+                <td th:text="${moulding?.plannedQty}"></td>
+                <th>Processed Qty</th>
+                <td th:text="${moulding?.processedQty}"></td>
+              </tr>
+              <tr>
+                <th>OK Qty</th>
+                <td th:text="${moulding?.okQty}"></td>
+                <th>Not OK Qty</th>
+                <td th:text="${moulding?.notOkQty}"></td>
+              </tr>
+              <tr>
+                <th>Operator Name</th>
+                <td th:text="${moulding?.operatorName}"></td>
+                <th>Remark</th>
+                <td th:text="${moulding?.remark}"></td>
+              </tr>
+              <tr>
+                <th>Received Qty</th>
+                <td th:text="${moulding?.receivedQty}"></td>
+                <th>Post Processed Qty</th>
+                <td th:text="${moulding?.postProcessedQty}"></td>
+              </tr>
+              <tr>
+                <th>Temperature</th>
+                <td th:text="${moulding?.temperature}"></td>
+                <th>Post Start Time</th>
+                <td th:text="${moulding?.postStartTime}"></td>
+              </tr>
+              <tr>
+                <th>Post End Time</th>
+                <td th:text="${moulding?.postEndTime}"></td>
+                <th>Duration</th>
+                <td th:text="${moulding?.duration}"></td>
+              </tr>
+              <tr>
+                <th>Post Remarks</th>
+                <td th:text="${moulding?.postRemarks}"></td>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sheeting Details Section -->
+      <div th:if="${sheeting != null}" class="data-section">
+        <h2>
+          <i class="fas fa-layer-group"></i>
+          Sheeting Details
+        </h2>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>Date</th>
+                <td th:text="${#dates.format(sheeting?.date, 'yyyy-MM-dd')}"></td>
+                <th>Batch No</th>
+                <td th:text="${sheeting?.batchNo}"></td>
+              </tr>
+              <tr>
+                <th>Batch Weight</th>
+                <td th:text="${sheeting?.batchWeight}"></td>
+                <th>Balance Weight</th>
+                <td th:text="${sheeting?.balanceWeight}"></td>
+              </tr>
+              <tr>
+                <th>Production Per Hour</th>
+                <td th:text="${sheeting?.productionPerHour}"></td>
+                <th>Setup Time</th>
+                <td th:text="${sheeting?.setupTime}"></td>
+              </tr>
+              <tr>
+                <th>Tool Die No</th>
+                <td th:text="${sheeting?.toolDieNo}"></td>
+                <th>Curing Temp</th>
+                <td th:text="${sheeting?.curingTemp}"></td>
+              </tr>
+              <tr>
+                <th>Sheeting Start Time</th>
+                <td th:text="${sheeting?.sheetingStartTime}"></td>
+                <th>Sheeting End Time</th>
+                <td th:text="${sheeting?.sheetingEndTime}"></td>
+              </tr>
+              <tr>
+                <th>Planned Qty</th>
+                <td th:text="${sheeting?.plannedQty}"></td>
+                <th>Processed Qty</th>
+                <td th:text="${sheeting?.processedQty}"></td>
+              </tr>
+              <tr>
+                <th>OK Qty</th>
+                <td th:text="${sheeting?.okQty}"></td>
+                <th>Not OK Qty</th>
+                <td th:text="${sheeting?.notOkQty}"></td>
+              </tr>
+              <tr>
+                <th>Operator Name</th>
+                <td th:text="${sheeting?.operatorName}"></td>
+                <th>Sheeting Remark</th>
+                <td th:text="${sheeting?.sheetingRemark}"></td>
+              </tr>
+              <tr>
+                <th>Received Qty</th>
+                <td th:text="${sheeting?.receivedQty}"></td>
+                <th>Post Processed Qty</th>
+                <td th:text="${sheeting?.postProcessedQty}"></td>
+              </tr>
+              <tr>
+                <th>Temperature</th>
+                <td th:text="${sheeting?.temperature}"></td>
+                <th>Post Start Time</th>
+                <td th:text="${sheeting?.postStartTime}"></td>
+              </tr>
+              <tr>
+                <th>Post End Time</th>
+                <td th:text="${sheeting?.postEndTime}"></td>
+                <th>Duration</th>
+                <td th:text="${sheeting?.duration}"></td>
+              </tr>
+              <tr>
+                <th>Post Remarks</th>
+                <td th:text="${sheeting?.postRemarks}"></td>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- QC Supervisor Details Section -->
+      <div th:if="${qc != null}" class="data-section">
+        <h2>
+          <i class="fas fa-user-shield"></i>
+          QC Supervisor Details
+        </h2>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>Date</th>
+                <td th:text="${#dates.format(qc?.date, 'yyyy-MM-dd')}"></td>
+                <th>Component Name</th>
+                <td th:text="${qc?.componentName}"></td>
+              </tr>
+              <tr>
+                <th>Formulation No</th>
+                <td th:text="${qc?.formulationNo}"></td>
+                <th>Order Date</th>
+                <td th:text="${qc?.orderDate}"></td>
+              </tr>
+              <tr>
+                <th>Machine</th>
+                <td th:text="${qc?.machine}"></td>
+                <th>Method</th>
+                <td th:text="${qc?.method}"></td>
+              </tr>
+              <tr>
+                <th>Material</th>
+                <td th:text="${qc?.material}"></td>
+                <th>Work Order No</th>
+                <td th:text="${qc?.workOrderNo}"></td>
+              </tr>
+              <tr>
+                <th>Tool Die No</th>
+                <td th:text="${qc?.toolDieNo}"></td>
+                <td colspan="2"></td>
+              </tr>
+              <tr>
+                <th>Batch No</th>
+                <td th:text="${qc?.batchNo}"></td>
+                <th>Batch Weight</th>
+                <td th:text="${qc?.batchWeight}"></td>
+              </tr>
+              <tr>
+                <th>Extruder RPM</th>
+                <td th:text="${qc?.extruderRPM}"></td>
+                <th>DC Oven Temp</th>
+                <td th:text="${qc?.dcOvenTemp}"></td>
+              </tr>
+              <tr>
+                <th>Weight Per Meter</th>
+                <td th:text="${qc?.weightPerMeter}"></td>
+                <th>Production Per Hour</th>
+                <td th:text="${qc?.productionPerHour}"></td>
+              </tr>
+              <tr>
+                <th>Conveyor RPM</th>
+                <td th:text="${qc?.conveyorRPM}"></td>
+                <th>Setup Tool Die No</th>
+                <td th:text="${qc?.setupToolDieNo}"></td>
+              </tr>
+              <tr>
+                <th>No Of Cavity</th>
+                <td th:text="${qc?.noOfCavity}"></td>
+                <td colspan="2"></td>
+              </tr>
+              <tr>
+                <th>Method Start Time</th>
+                <td th:text="${qc?.methodStartTime}"></td>
+                <th>Method End Time</th>
+                <td th:text="${qc?.methodEndTime}"></td>
+              </tr>
+              <tr>
+                <th>Planned Qty</th>
+                <td th:text="${qc?.plannedQty}"></td>
+                <th>Processed Qty</th>
+                <td th:text="${qc?.processedQty}"></td>
+              </tr>
+              <tr>
+                <th>OK Qty</th>
+                <td th:text="${qc?.okQty}"></td>
+                <th>Not OK Qty</th>
+                <td th:text="${qc?.notOkQty}"></td>
+              </tr>
+              <tr>
+                <th>Operator Name</th>
+                <td th:text="${qc?.operatorName}"></td>
+                <td colspan="2"></td>
+              </tr>
+              <tr>
+                <th>Post Received Qty</th>
+                <td th:text="${qc?.postReceivedQty}"></td>
+                <th>Post Processed Qty</th>
+                <td th:text="${qc?.postProcessedQty}"></td>
+              </tr>
+              <tr>
+                <th>Post Temperature</th>
+                <td th:text="${qc?.postTemperature}"></td>
+                <th>Post Start Time</th>
+                <td th:text="${qc?.postStartTime}"></td>
+              </tr>
+              <tr>
+                <th>Post End Time</th>
+                <td th:text="${qc?.postEndTime}"></td>
+                <th>Post Duration</th>
+                <td th:text="${qc?.postDuration}"></td>
+              </tr>
+              <tr>
+                <th>Post Remarks</th>
+                <td th:text="${qc?.postRemarks}"></td>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Planning Details Section -->
+      <div th:if="${planning != null}" class="data-section">
+        <h2>
+          <i class="fas fa-calendar-alt"></i>
+          Planning Details
+        </h2>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>Date</th>
+                <td th:text="${#dates.format(planning?.date, 'yyyy-MM-dd')}"></td>
+                <th>Route Card No</th>
+                <td th:text="${planning?.routeCardNo}"></td>
+              </tr>
+              <tr>
+                <th>Planned Qty</th>
+                <td th:text="${planning?.plannedQty}"></td>
+                <th>Processed Qty</th>
+                <td th:text="${planning?.processedQty}"></td>
+              </tr>
+              <tr>
+                <th>Size</th>
+                <td th:text="${planning?.size}"></td>
+                <th>OK Qty</th>
+                <td th:text="${planning?.okQty}"></td>
+              </tr>
+              <tr>
+                <th>Not OK Qty</th>
+                <td th:text="${planning?.notOkQty}"></td>
+                <th>Processed By</th>
+                <td th:text="${planning?.processedBy}"></td>
+              </tr>
+              <tr>
+                <th>Remarks</th>
+                <td th:text="${planning?.remarks}"></td>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Inspection Details Section -->
+      <div th:if="${inspection != null}" class="data-section">
+        <h2>
+          <i class="fas fa-clipboard-check"></i>
+          Inspection Details
+        </h2>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>Date</th>
+                <td th:text="${#dates.format(inspection?.date, 'yyyy-MM-dd')}"></td>
+                <th>Route Card No</th>
+                <td th:text="${inspection?.routeCardNo}"></td>
+              </tr>
+              <tr>
+                <th>Received Qty</th>
+                <td th:text="${inspection?.receivedQty}"></td>
+                <th>Inspection Qty</th>
+                <td th:text="${inspection?.inspectionQty}"></td>
+              </tr>
+              <tr>
+                <th>OK Qty</th>
+                <td th:text="${inspection?.okQty}"></td>
+                <th>Not OK Qty</th>
+                <td th:text="${inspection?.notOkQty}"></td>
+              </tr>
+              <tr>
+                <th>Report No</th>
+                <td th:text="${inspection?.reportNo}"></td>
+                <th>Inspected By</th>
+                <td th:text="${inspection?.inspectedBy}"></td>
+              </tr>
+              <tr>
+                <th>Remarks</th>
+                <td th:text="${inspection?.remarks}"></td>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Dispatch Details Section -->
+      <div th:if="${dispatch != null}" class="data-section">
+        <h2>
+          <i class="fas fa-truck"></i>
+          Dispatch Details
+        </h2>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>Date</th>
+                <td th:text="${#dates.format(dispatch?.date, 'yyyy-MM-dd')}"></td>
+                <th>Bill Type</th>
+                <td th:text="${dispatch?.bill_type}"></td>
+              </tr>
+              <tr>
+                <th>Dispatched By</th>
+                <td th:text="${dispatch?.dispatched_by}"></td>
+                <th>Transport Mode</th>
+                <td th:text="${dispatch?.transport_mode}"></td>
+              </tr>
+              <tr>
+                <th>Person Info</th>
+                <td th:text="${dispatch?.person_info}"></td>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Dispatch Approval Note (DAN) Details Section -->
+      <div th:if="${dan != null}" class="data-section">
+        <h2>
+          <i class="fas fa-file-signature"></i>
+          Dispatch Approval Note (DAN) Details
+        </h2>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>DAN No</th>
+                <td th:text="${dan?.danNo}"></td>
+                <th>Date of Inspection</th>
+                <td th:text="${dan?.dateOfInspection}"></td>
+              </tr>
+              <tr>
+                <th>Route Card No</th>
+                <td th:text="${dan?.routeCardNo}"></td>
+                <th>Final Inspection Report No</th>
+                <td th:text="${dan?.finalInspectionReportNo}"></td>
+              </tr>
+              <tr>
+                <th>Sr No</th>
+                <td th:text="${dan?.srNo}"></td>
+                <th>Product Code</th>
+                <td th:text="${dan?.productCode}"></td>
+              </tr>
+              <tr>
+                <th>Quantity</th>
+                <td th:text="${dan?.quantity}"></td>
+                <th>Inspected Qty</th>
+                <td th:text="${dan?.inspectedQty}"></td>
+              </tr>
+              <tr>
+                <th>OK Qty</th>
+                <td th:text="${dan?.okQty}"></td>
+                <th>Rejected Qty</th>
+                <td th:text="${dan?.rejectedQty}"></td>
+              </tr>
+              <tr>
+                <th>Inspected By</th>
+                <td th:text="${dan?.inspectedBy}"></td>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Defect Analysis Section -->
+        <div class="data-section">
+          <h2>
+            <i class="fas fa-exclamation-triangle"></i>
+            Observed Issues Analysis
+          </h2>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <tbody>
+                <tr>
+                  <th>Dimension Variation</th>
+                  <td>
+                    <span th:class="${dan?.dimensionVariation ? 'status-badge status-error' : 'status-badge status-active'}" 
+                          th:text="${dan?.dimensionVariation ? 'Yes' : 'No'}"></span>
+                  </td>
+                  <th>Colour Mismatch</th>
+                  <td>
+                    <span th:class="${dan?.colourMismatch ? 'status-badge status-error' : 'status-badge status-active'}" 
+                          th:text="${dan?.colourMismatch ? 'Yes' : 'No'}"></span>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Physical Damage</th>
+                  <td>
+                    <span th:class="${dan?.physicalDamage ? 'status-badge status-error' : 'status-badge status-active'}" 
+                          th:text="${dan?.physicalDamage ? 'Yes' : 'No'}"></span>
+                  </td>
+                  <th>Stains/Dust</th>
+                  <td>
+                    <span th:class="${dan?.stainsDust ? 'status-badge status-error' : 'status-badge status-active'}" 
+                          th:text="${dan?.stainsDust ? 'Yes' : 'No'}"></span>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Structural Damage</th>
+                  <td>
+                    <span th:class="${dan?.structuralDamage ? 'status-badge status-error' : 'status-badge status-active'}" 
+                          th:text="${dan?.structuralDamage ? 'Yes' : 'No'}"></span>
+
+                  </td>
+                  <th>Curing Problem</th>
+                  <td>
+                    <span th:class="${dan?.curingProblem ? 'status-badge status-error' : 'status-badge status-active'}" 
+                          th:text="${dan?.curingProblem ? 'Yes' : 'No'}"></span>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Size Deformation</th>
+                  <td>
+                    <span th:class="${dan?.sizeDeformation ? 'status-badge status-error' : 'status-badge status-active'}" 
+                          th:text="${dan?.sizeDeformation ? 'Yes' : 'No'}"></span>
+                  </td>
+                  <th>Twist/Kink</th>
+                  <td>
+                    <span th:class="${dan?.twistKink ? 'status-badge status-error' : 'status-badge status-active'}" 
+                          th:text="${dan?.twistKink ? 'Yes' : 'No'}"></span>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Hardness Variation</th>
+                  <td>
+                    <span th:class="${dan?.hardnessVariation ? 'status-badge status-error' : 'status-badge status-active'}" 
+                          th:text="${dan?.hardnessVariation ? 'Yes' : 'No'}"></span>
+                  </td>
+                  <td colspan="2"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Final Approval Section -->
+        <div class="data-section">
+          <h2>
+            <i class="fas fa-check-circle"></i>
+            Final Approval Details
+          </h2>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <tbody>
+                <tr>
+                  <th>Approval Status</th>
+                  <td>
+                    <span th:class="${dan?.approvalStatus == 'Approved' ? 'status-badge status-active' : 'status-badge status-pending'}" 
+                          th:text="${dan?.approvalStatus}"></span>
+                  </td>
+                  <th>QC Signature</th>
+                  <td th:text="${dan?.qcSignature}"></td>
+                </tr>
+                <tr>
+                  <th>Reviewed By</th>
+                  <td th:text="${dan?.reviewedBy}"></td>
+                  <th>Review Date</th>
+                  <td th:text="${dan?.reviewDate}"></td>
+                </tr>
+                <tr>
+                  <th>Responsible Person</th>
+                  <td th:text="${dan?.responsiblePerson}"></td>
+                  <th>Responsible Signature</th>
+                  <td th:text="${dan?.responsibleSignature}"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Data Message -->
+      <div th:if="${order == null}" class="no-data-message">
+        <i class="fas fa-search"></i>
+        <h3>No Data Found</h3>
+        <p>Please enter a valid Route Card Number to search for manufacturing data.</p>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Enhanced JavaScript -->
+  <script>
+    // Sidebar toggle functionality
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('active');
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.querySelector('.sidebar-toggle');
+      
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(event.target) && 
+          !toggleBtn.contains(event.target) && 
+          sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+      }
+    });
+
+    // Enhanced search functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchForm = document.querySelector('.search-form');
+      const searchInput = document.getElementById('routeCardNo');
+      const searchBtn = document.querySelector('.search-btn');
+
+      // Auto-focus search input
+      if (searchInput && !searchInput.value) {
+        setTimeout(() => searchInput.focus(), 500);
+      }
+
+      // Enhanced form submission
+      if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+          const routeCardValue = searchInput.value.trim();
+          
+          if (!routeCardValue) {
+            e.preventDefault();
+            showNotification('Please enter a Route Card Number', 'error');
+            searchInput.focus();
+            return;
+          }
+
+          // Add loading state to search button
+          if (searchBtn) {
+            searchBtn.classList.add('loading');
+            searchBtn.disabled = true;
+            
+            const originalText = searchBtn.innerHTML;
+            searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+            
+            // Reset after timeout (in case of slow response)
+            setTimeout(() => {
+              searchBtn.classList.remove('loading');
+              searchBtn.disabled = false;
+              searchBtn.innerHTML = originalText;
+            }, 10000);
+          }
+        });
+      }
+
+      // Input validation and formatting
+      if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+          let value = e.target.value.toUpperCase().trim();
+          
+          // Remove any non-alphanumeric characters except hyphens
+          value = value.replace(/[^A-Z0-9-]/g, '');
+          
+          e.target.value = value;
+          
+          // Clear any previous error states
+          e.target.style.borderColor = '';
+          e.target.style.backgroundColor = '';
+        });
+
+        // Enter key handling
+        searchInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            searchForm.dispatchEvent(new Event('submit'));
+          }
+        });
+      }
+    });
+
+    // Table enhancement functions
+    function enhanceTables() {
+      const tables = document.querySelectorAll('.data-table');
+      
+      tables.forEach(table => {
+        // Add zebra striping
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach((row, index) => {
+          if (index % 2 === 0) {
+            row.style.backgroundColor = 'rgba(0, 0, 0, 0.02)';
+          }
+        });
+
+        // Add hover effects
+        rows.forEach(row => {
+          row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'var(--background-secondary)';
+            this.style.transform = 'translateY(-1px)';
+            this.style.boxShadow = 'var(--shadow-sm)';
+          });
+
+          row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+            this.style.transform = '';
+            this.style.boxShadow = '';
+          });
+        });
+      });
+    }
+
+    // Print functionality
+    function printSearchResults() {
+      const printContent = document.querySelector('.main-content').cloneNode(true);
+      
+      // Remove search form from print content
+      const searchContainer = printContent.querySelector('.search-container');
+      if (searchContainer) {
+        searchContainer.remove();
+      }
+
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Manufacturing Search Results</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .data-section { margin-bottom: 30px; page-break-inside: avoid; }
+            .data-section h2 { color: #1e40af; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; }
+            .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            .data-table th, .data-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+            .data-table th { background-color: #f3f4f6; font-weight: bold; }
+            .status-badge { padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+            .status-active { background-color: #d1fae5; color: #059669; }
+            .status-error { background-color: #fee2e2; color: #dc2626; }
+            .status-pending { background-color: #fef3c7; color: #d97706; }
+            @media print { body { margin: 0; } }
+          </style>
+        </head>
+        <body>
+          <h1>Manufacturing Search Results</h1>
+          <p>Generated on: ${new Date().toLocaleString()}</p>
+          ${printContent.innerHTML}
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    }
+
+    // Export functionality
+    function exportToCSV() {
+      const tables = document.querySelectorAll('.data-table');
+      let csvContent = '';
+
+      tables.forEach((table, tableIndex) => {
+        const sectionTitle = table.closest('.data-section').querySelector('h2').textContent.trim();
+        csvContent += `\n"${sectionTitle}"\n`;
+
+        const rows = table.querySelectorAll('tr');
+        rows.forEach(row => {
+          const cells = row.querySelectorAll('th, td');
+          const rowData = Array.from(cells).map(cell => {
+            return `"${cell.textContent.trim().replace(/"/g, '""')}"`;
+          });
+          csvContent += rowData.join(',') + '\n';
+        });
+        csvContent += '\n';
+      });
+
+      // Download CSV
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `manufacturing_search_results_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Notification system
+    function showNotification(message, type = 'info') {
+      // Remove existing notifications
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      
+      const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+      };
+
+      notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fas ${icons[type] || icons.info}"></i>
+          <span>${message}</span>
+        </div>
+      `;
+
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        z-index: 1001;
+        transform: translateX(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        max-width: 300px;
+        background-color: ${type === 'success' ? '#059669' : type === 'error' ? '#dc2626' : type === 'warning' ? '#d97706' : '#0284c7'};
+      `;
+
+      document.body.appendChild(notification);
+
+      // Animate in
+      setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+      }, 100);
+
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }, 5000);
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(event) {
+      // Ctrl/Cmd + F to focus search
+      if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+        event.preventDefault();
+        const searchInput = document.getElementById('routeCardNo');
+        if (searchInput) {
+          searchInput.focus();
+          searchInput.select();
+        }
+      }
+      
+      // Ctrl/Cmd + P to print
+      if ((event.ctrlKey || event.metaKey) && event.key === 'p') {
+        event.preventDefault();
+        printSearchResults();
+      }
+      
+      // Ctrl/Cmd + E to export
+      if ((event.ctrlKey || event.metaKey) && event.key === 'e') {
+        event.preventDefault();
+        exportToCSV();
+      }
+      
+      // Escape to close sidebar on mobile
+      if (event.key === 'Escape') {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+        }
+      }
+    });
+
+    // Responsive handling
+    function handleResize() {
+      const sidebar = document.getElementById('sidebar');
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('active');
+      }
+    }
+
+    window.addEventListener('resize', handleResize);
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add loading animation to page
+      document.body.style.opacity = '0';
+      document.body.style.transition = 'opacity 0.5s ease';
+      
+      setTimeout(() => {
+        document.body.style.opacity = '1';
+      }, 100);
+
+      // Enhance tables
+      enhanceTables();
+
+      // Add action buttons if data exists
+      const hasData = document.querySelector('.data-section');
+      if (hasData) {
+        addActionButtons();
+      }
+
+      // Initialize tooltips for mobile
+      if (window.innerWidth <= 768) {
+        initializeMobileTooltips();
+      }
+      
+      console.log('Search & Analytics System initialized successfully');
+    });
+
+    // Add action buttons for print and export
+    function addActionButtons() {
+      const pageHeader = document.querySelector('.page-header');
+      if (pageHeader && !pageHeader.querySelector('.action-buttons')) {
+        const actionButtons = document.createElement('div');
+        actionButtons.className = 'action-buttons';
+        actionButtons.style.cssText = `
+          display: flex;
+          gap: 12px;
+          margin-top: 16px;
+          flex-wrap: wrap;
+        `;
+
+        actionButtons.innerHTML = `
+          <button onclick="printSearchResults()" class="action-btn print-btn">
+            <i class="fas fa-print"></i>
+            Print Results
+          </button>
+          <button onclick="exportToCSV()" class="action-btn export-btn">
+            <i class="fas fa-download"></i>
+            Export CSV
+          </button>
+          <button onclick="window.location.reload()" class="action-btn refresh-btn">
+            <i class="fas fa-sync-alt"></i>
+            Refresh
+          </button>
+        `;
+
+        // Add styles for action buttons
+        const style = document.createElement('style');
+        style.textContent = `
+          .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: white;
+          }
+          .print-btn { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+          .export-btn { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); }
+          .refresh-btn { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
+          .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          }
+          @media (max-width: 768px) {
+            .action-buttons {
+              flex-direction: column;
+            }
+            .action-btn {
+              width: 100%;
+              justify-content: center;
+            }
+          }
+        `;
+        document.head.appendChild(style);
+
+        pageHeader.appendChild(actionButtons);
+      }
+    }
+
+    // Initialize mobile tooltips
+    function initializeMobileTooltips() {
+      document.querySelectorAll('[title]').forEach(el => {
+        const title = el.getAttribute('title');
+        el.removeAttribute('title');
+        
+        el.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (title) {
+            showNotification(title, 'info');
+          }
+        });
+      });
+    }
+
+    // Enhanced mobile sidebar handling
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.getElementById('sidebar');
+      
+      // Touch events for mobile swipe
+      let touchStartX = 0;
+      let touchEndX = 0;
+      
+      document.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+      });
+      
+      document.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      });
+      
+      function handleSwipe() {
+        const swipeThreshold = 50;
+        const swipeDistance = touchEndX - touchStartX;
+        
+        if (window.innerWidth <= 768) {
+          // Swipe right to open sidebar
+          if (swipeDistance > swipeThreshold && touchStartX < 50) {
+            sidebar.classList.add('active');
+          }
+          // Swipe left to close sidebar
+          else if (swipeDistance < -swipeThreshold && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+          }
+        }
+      }
+    });
+
+    // Search history functionality
+    function saveSearchHistory(routeCardNo) {
+      if (!routeCardNo) return;
+      
+      let history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+      
+      // Remove if already exists
+      history = history.filter(item => item.routeCardNo !== routeCardNo);
+      
+      // Add to beginning
+      history.unshift({
+        routeCardNo: routeCardNo,
+        timestamp: new Date().toISOString(),
+        url: window.location.href
+      });
+      
+      // Keep only last 10 searches
+      history = history.slice(0, 10);
+      
+      localStorage.setItem('searchHistory', JSON.stringify(history));
+    }
+
+    function loadSearchHistory() {
+      const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+      const searchInput = document.getElementById('routeCardNo');
+      
+      if (history.length > 0 && searchInput) {
+        // Create datalist for autocomplete
+        let datalist = document.getElementById('routeCardHistory');
+        if (!datalist) {
+          datalist = document.createElement('datalist');
+          datalist.id = 'routeCardHistory';
+          document.body.appendChild(datalist);
+          searchInput.setAttribute('list', 'routeCardHistory');
+        }
+        
+        datalist.innerHTML = '';
+        history.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item.routeCardNo;
+          option.textContent = `${item.routeCardNo} (${new Date(item.timestamp).toLocaleDateString()})`;
+          datalist.appendChild(option);
+        });
+      }
+    }
+
+    // Initialize search history
+    document.addEventListener('DOMContentLoaded', function() {
+      loadSearchHistory();
+      
+      // Save search when form is submitted
+      const searchForm = document.querySelector('.search-form');
+      if (searchForm) {
+        searchForm.addEventListener('submit', function() {
+          const routeCardNo = document.getElementById('routeCardNo').value.trim();
+          if (routeCardNo) {
+            saveSearchHistory(routeCardNo);
+          }
+        });
+      }
+    });
+
+    // Advanced table features
+    function addTableFeatures() {
+      const tables = document.querySelectorAll('.data-table');
+      
+      tables.forEach(table => {
+        // Add table wrapper for horizontal scroll
+        if (!table.closest('.table-wrapper')) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'table-wrapper';
+          table.parentNode.insertBefore(wrapper, table);
+          wrapper.appendChild(table);
+        }
+
+        // Add copy functionality to cells
+        const cells = table.querySelectorAll('td');
+        cells.forEach(cell => {
+          if (cell.textContent.trim()) {
+            cell.style.cursor = 'pointer';
+            cell.title = 'Click to copy';
+            
+            cell.addEventListener('click', function() {
+              const text = this.textContent.trim();
+              if (text && text !== 'N/A' && text !== '') {
+                navigator.clipboard.writeText(text).then(() => {
+                  showNotification(`Copied: ${text}`, 'success');
+                }).catch(() => {
+                  // Fallback for older browsers
+                  const textArea = document.createElement('textarea');
+                  textArea.value = text;
+                  document.body.appendChild(textArea);
+                  textArea.select();
+                  document.execCommand('copy');
+                  document.body.removeChild(textArea);
+                  showNotification(`Copied: ${text}`, 'success');
+                });
+              }
+            });
+          }
+        });
+      });
+    }
+
+    // Performance optimization
+    function optimizePerformance() {
+      // Lazy load images if any
+      const images = document.querySelectorAll('img[data-src]');
+      if (images.length > 0) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const img = entry.target;
+              img.src = img.dataset.src;
+              img.removeAttribute('data-src');
+              observer.unobserve(img);
+            }
+          });
+        });
+
+        images.forEach(img => imageObserver.observe(img));
+      }
+
+      // Debounce resize events
+      let resizeTimer;
+      window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(handleResize, 250);
+      });
+    }
+
+    // Error handling
+    window.addEventListener('error', function(event) {
+      console.error('Application error:', event.error);
+      showNotification('An unexpected error occurred. Please refresh the page.', 'error');
+    });
+
+    // Connection status monitoring
+    function updateConnectionStatus() {
+      const isOnline = navigator.onLine;
+      
+      if (!isOnline) {
+        showNotification('You are offline. Some features may not work.', 'warning');
+      }
+    }
+
+    window.addEventListener('online', function() {
+      showNotification('Connection restored', 'success');
+    });
+    
+    window.addEventListener('offline', updateConnectionStatus);
+
+    // Service worker registration for offline support (if available)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function(error) {
+        console.log('Service Worker registration failed:', error);
+      });
+    }
+
+    // Final initialization
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize all features
+      setTimeout(() => {
+        addTableFeatures();
+        optimizePerformance();
+        updateConnectionStatus();
+      }, 500);
+
+      // Add keyboard navigation for tables
+      const tables = document.querySelectorAll('.data-table');
+      tables.forEach(table => {
+        const cells = table.querySelectorAll('td, th');
+        cells.forEach((cell, index) => {
+          cell.setAttribute('tabindex', '0');
+          
+          cell.addEventListener('keydown', function(e) {
+            let nextIndex;
+            const cols = table.rows[0].cells.length;
+            
+            switch(e.key) {
+              case 'ArrowRight':
+                nextIndex = index + 1;
+                break;
+              case 'ArrowLeft':
+                nextIndex = index - 1;
+                break;
+              case 'ArrowDown':
+                nextIndex = index + cols;
+                break;
+              case 'ArrowUp':
+                nextIndex = index - cols;
+                break;
+              default:
+                return;
+            }
+            
+            if (cells[nextIndex]) {
+              e.preventDefault();
+              cells[nextIndex].focus();
+            }
+          });
+        });
+      });
+
+      // Add smooth scrolling to sections
+      const sections = document.querySelectorAll('.data-section');
+      sections.forEach((section, index) => {
+        section.style.scrollMarginTop = '100px';
+        
+        // Add section navigation
+        const header = section.querySelector('h2');
+        if (header) {
+          header.style.cursor = 'pointer';
+          header.addEventListener('click', function() {
+            section.scrollIntoView({ behavior: 'smooth' });
+          });
+        }
+      });
+
+      console.log('Enhanced Search System fully initialized');
+    });
+
+    // Accessibility improvements
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add ARIA labels
+      const searchInput = document.getElementById('routeCardNo');
+      if (searchInput) {
+        searchInput.setAttribute('aria-label', 'Enter Route Card Number to search');
+        searchInput.setAttribute('aria-describedby', 'search-help');
+        
+        // Add help text
+        const helpText = document.createElement('div');
+        helpText.id = 'search-help';
+        helpText.className = 'sr-only';
+        helpText.textContent = 'Enter a valid route card number to search for manufacturing data across all departments';
+        searchInput.parentNode.appendChild(helpText);
+      }
+
+      // Add table captions
+      const tables = document.querySelectorAll('.data-table');
+      tables.forEach(table => {
+        if (!table.querySelector('caption')) {
+          const section = table.closest('.data-section');
+          const sectionTitle = section ? section.querySelector('h2').textContent : 'Data Table';
+          
+          const caption = document.createElement('caption');
+          caption.textContent = sectionTitle;
+          caption.style.cssText = 'position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;';
+          table.insertBefore(caption, table.firstChild);
+        }
+      });
+
+      // Add skip links
+      const skipLink = document.createElement('a');
+      skipLink.href = '#main-content';
+      skipLink.textContent = 'Skip to main content';
+      skipLink.style.cssText = `
+        position: absolute;
+        top: -40px;
+        left: 6px;
+        background: #000;
+        color: #fff;
+        padding: 8px;
+        text-decoration: none;
+        z-index: 1000;
+        border-radius: 4px;
+      `;
+      skipLink.addEventListener('focus', function() {
+        this.style.top = '6px';
+      });
+      skipLink.addEventListener('blur', function() {
+        this.style.top = '-40px';
+      });
+      document.body.insertBefore(skipLink, document.body.firstChild);
+
+      // Add main content ID
+      const mainContent = document.querySelector('.main-content');
+      if (mainContent) {
+        mainContent.id = 'main-content';
+      }
+    });
+  </script>
+</body>
+</html>
+

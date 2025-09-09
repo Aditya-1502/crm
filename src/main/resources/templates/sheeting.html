@@ -1,0 +1,2209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ManufacturePro CRM - Sheeting Department</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Manufacturing CRM Color Palette */
+      --primary-color: #1e40af;
+      --primary-dark: #1e3a8a;
+      --primary-light: rgb(0, 0, 0);
+      --secondary-color: #f59e0b;
+      --accent-color: #10b981;
+      --success-color: #059669;
+      --warning-color: #d97706;
+      --error-color: #dc2626;
+      --info-color: #0284c7;
+      
+      /* Background & Surface Colors */
+      --background-primary: #f8fafc;
+      --background-secondary: #f1f5f9;
+      --card-background: #ffffff;
+      --sidebar-background: rgb(128, 0, 0);
+      --sidebar-hover: #F3CE14;
+      
+      /* Text Colors */
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --text-light: #9ca3af;
+      --text-white: #ffffff;
+      
+      /* Border & Shadow */
+      --border-color: #e5e7eb;
+      --border-light: #f3f4f6;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      
+      /* Gradients */
+      --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      --gradient-secondary: linear-gradient(135deg, var(--secondary-color) 0%, #ea580c 100%);
+      --gradient-success: linear-gradient(135deg, var(--accent-color) 0%, var(--success-color) 100%);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Container Layout */
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Enhanced Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar-background);
+      color: var(--text-white);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      box-shadow: var(--shadow-xl);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header {
+      position: sticky;
+      top: 0;
+      padding: 24px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-background);
+      background: linear-gradient(135deg, rgba(30, 64, 175, 0.1) 0%, rgba(30, 58, 138, 0.1) 100%);
+      z-index: 1001;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .sidebar h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+    }
+
+    .sidebar h2 i {
+      font-size: 24px;
+      color: var(--primary-light);
+    }
+
+    .sidebar-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .nav-container {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 0;
+    }
+
+    .nav-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .nav-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    .nav-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .nav-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-links li {
+      margin: 0;
+      position: relative;
+    }
+
+    .nav-links li.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: var(--primary-light);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .nav-links li.active {
+      background: var(--sidebar-hover);
+    }
+
+    .nav-links a {
+      color: var(--text-white);
+      text-decoration: none;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 500;
+      font-size: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-links a::before {
+      content: '';
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-links a:hover::before {
+      left: 100%;
+    }
+
+    .nav-links a:hover {
+      background: var(--sidebar-hover);
+      transform: translateX(4px);
+      color: var(--primary-light);
+    }
+
+    .nav-links a i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      color: #94a3b8;
+      transition: color 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .nav-links a:hover i,
+    .nav-links li.active a i {
+      color: var(--primary-light);
+    }
+
+    .user-info {
+      position: sticky;
+      bottom: 0;
+      padding: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-background);
+      background: rgba(0, 0, 0, 0.2);
+      z-index: 1001;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .user-info img {
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 280px;
+      padding: 32px 40px;
+      width: calc(100% - 280px);
+      min-height: 100vh;
+      background: var(--background-primary);
+    }
+
+    /* Page Header */
+    .page-header {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-title i {
+      color: var(--primary-color);
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .success-message {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      color: var(--success-color);
+      padding: 16px 20px;
+      border-radius: 12px;
+      border-left: 4px solid var(--success-color);
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Enhanced Form Container */
+    .sheeting-form-container {
+      background: var(--card-background);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+      max-width: none;
+      margin: 0;
+      left: 0;
+    }
+
+    .sheeting-form-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .sheeting-form-container h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 32px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .sheeting-form-container h1 i {
+      color: var(--primary-color);
+    }
+
+    /* Route Card Fetch Section */
+    .fetch-section {
+      background: var(--background-secondary);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+      border: 2px dashed var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .fetch-section:hover {
+      border-color: var(--primary-color);
+      background: rgba(30, 64, 175, 0.05);
+    }
+
+    .fetch-section h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .fetch-section h3 i {
+      color: var(--info-color);
+    }
+
+    .fetch-form {
+      display: flex;
+      gap: 16px;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+
+    .fetch-form .form-group {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    /* Form Layout */
+    .sheeting-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    /* Form Groups */
+    .form-group {
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 14px;
+      letter-spacing: 0.025em;
+      position: relative;
+    }
+
+    .form-group label.required::after {
+      content: " *";
+      color: var(--error-color);
+      font-weight: 700;
+    }
+
+    /* Enhanced Form Inputs */
+    .form-group input[type="text"],
+    .form-group input[type="date"],
+    .form-group input[type="time"],
+    .form-group input[type="number"],
+    .form-group select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--card-background);
+      color: var(--text-primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .form-group input:hover,
+    .form-group select:hover {
+      border-color: var(--primary-light);
+    }
+
+    .form-group input[required] {
+      border-left: 3px solid var(--warning-color);
+    }
+
+    .form-group input[required]:valid {
+            border-left-color: var(--success-color);
+    }
+
+    .form-group input[readonly] {
+      background-color: var(--background-secondary);
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    /* Full width form groups */
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Image Section */
+    .image-section {
+      background: var(--background-secondary);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+
+    .image-section h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .image-section h3 i {
+      color: var(--info-color);
+    }
+
+    .image-view-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .image-view-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .image-view-btn:hover::before {
+      left: 100%;
+    }
+
+    .image-view-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .no-image-message {
+      color: var(--error-color);
+      font-weight: 500;
+      padding: 16px;
+      background: rgba(220, 38, 38, 0.1);
+      border-radius: 8px;
+      border: 1px solid rgba(220, 38, 38, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* Form Section Headers */
+    .form-section {
+      margin-bottom: 32px;
+    }
+
+    .form-section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      grid-column: 1 / -1;
+    }
+
+    .form-section-title i {
+      color: var(--primary-color);
+    }
+
+    /* FIXED BUTTON STYLES */
+    .button-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-light);
+      flex-wrap: wrap;
+      grid-column: 1 / -1;
+    }
+
+    /* Base Button Styles */
+    .btn {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      min-width: 160px;
+      font-family: inherit;
+      line-height: 1.5;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:focus {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    /* Specific Button Types */
+    .draft-btn {
+      background: linear-gradient(135deg, var(--warning-color) 0%, #ea580c 100%);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .draft-btn:hover {
+      background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+      box-shadow: 0 8px 25px rgba(234, 88, 12, 0.3);
+    }
+
+    .submit-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #1e3a8a 100%);
+      box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+    }
+
+    .download-btn {
+      background: var(--gradient-success);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .download-btn:hover {
+      background: linear-gradient(135deg, var(--success-color) 0%, #047857 100%);
+      box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);
+    }
+
+    .home-btn {
+      background: var(--gradient-secondary);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .home-btn:hover {
+      background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+      box-shadow: 0 8px 25px rgba(234, 88, 12, 0.3);
+    }
+
+    .fetch-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: 2px solid transparent;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 120px;
+      justify-content: center;
+      font-family: inherit;
+      font-size: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .fetch-btn:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #1e3a8a 100%);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Loading States */
+    .btn.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .btn.loading::after {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Sidebar Toggle for Mobile */
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+
+    /* Form Validation Styles */
+    .form-group input:invalid:not(:focus):not(:placeholder-shown) {
+      border-color: var(--error-color);
+      background-color: rgba(220, 38, 38, 0.05);
+    }
+
+    .form-group input:valid:not(:focus):not(:placeholder-shown) {
+      border-color: var(--success-color);
+      background-color: rgba(5, 150, 105, 0.05);
+    }
+
+    /* Required field indicator */
+    .required {
+      color: var(--error-color);
+      font-weight: 700;
+    }
+
+    /* Notification styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      z-index: 1001;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-lg);
+      max-width: 300px;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification-success { background-color: var(--success-color); }
+    .notification-error { background-color: var(--error-color); }
+    .notification-warning { background-color: var(--warning-color); }
+    .notification-info { background-color: var(--info-color); }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .sheeting-form {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-toggle {
+        display: block;
+      }
+      
+      .sidebar {
+        width: 70px;
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+        width: 280px;
+      }
+      
+      .sidebar:not(.active) .sidebar-header {
+        padding: 20px 10px;
+      }
+      
+      .sidebar:not(.active) .sidebar h2 span {
+        display: none;
+      }
+      
+      .sidebar:not(.active) .nav-links a span {
+        display: none;
+      }
+      
+      .sidebar:not(.active) .nav-links a {
+        justify-content: center;
+        padding: 12px 10px;
+      }
+      
+      .sidebar:not(.active) .nav-links a i {
+        margin-right: 0;
+        font-size: 18px;
+      }
+      
+      .sidebar:not(.active) .user-info {
+        padding: 15px 10px;
+      }
+      
+      .sidebar:not(.active) .user-info img {
+        max-width: 40px;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 80px 16px 20px 16px;
+      }
+      
+      .sheeting-form-container {
+        padding: 24px 20px;
+      }
+      
+      .sheeting-form {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .button-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn {
+        width: 100%;
+        min-width: auto;
+      }
+      
+      .page-title {
+        font-size: 24px;
+      }
+      
+      .fetch-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .fetch-form .form-group {
+        min-width: auto;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 70px 12px 16px 12px;
+      }
+      
+      .sheeting-form-container {
+        padding: 20px 16px;
+      }
+      
+      .page-title {
+        font-size: 20px;
+      }
+      
+      .fetch-section {
+        padding: 20px 16px;
+      }
+      
+      .image-section {
+        padding: 20px 16px;
+      }
+    }
+
+    /* Animation for form elements */
+    .form-group {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .form-group:nth-child(4) { animation-delay: 0.4s; }
+    .form-group:nth-child(5) { animation-delay: 0.5s; }
+    .form-group:nth-child(6) { animation-delay: 0.6s; }
+    .form-group:nth-child(7) { animation-delay: 0.7s; }
+    .form-group:nth-child(8) { animation-delay: 0.8s; }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      .sidebar,
+      .sidebar-toggle,
+      .button-group {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .sheeting-form-container {
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Toggle Button for Mobile -->
+  <button class="sidebar-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <div class="container">
+    <!-- Enhanced Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>
+          <i class="fas fa-industry"></i>
+          <span>ManufacturePro</span>
+        </h2>
+      </div>
+      
+      <div class="sidebar-body">
+        <div class="nav-container">
+          <ul class="nav-links">
+            <li><a href="/"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i><span>Overview</span></a></li>
+            <li><a href="/reports"><i class="fas fa-chart-bar"></i><span>Reports</span></a></li>
+            <li><a href="/search"><i class="fas fa-search"></i><span>Search</span></a></li>
+            <li><a href="/order"><i class="fas fa-clipboard-list"></i><span>Order Log</span></a></li>
+            <li><a href="/mixing"><i class="fas fa-blender"></i><span>Mixing</span></a></li>
+            <li><a href="/production"><i class="fas fa-cogs"></i><span>Production</span></a></li>
+            <li><a href="/extrusion"><i class="fas fa-industry"></i><span>Extrusion</span></a></li>
+            <li><a href="/coating"><i class="fas fa-brush"></i><span>Coating</span></a></li>
+            <li><a href="/jointing"><i class="fas fa-link"></i><span>Jointing</span></a></li>
+            <li><a href="/moulding"><i class="fas fa-cube"></i><span>Moulding</span></a></li>
+            <li class="active"><a href="/sheeting"><i class="fas fa-layer-group"></i><span>Sheeting</span></a></li>
+            <li><a href="/qc"><i class="fas fa-user-shield"></i><span>QC Supervisor</span></a></li>
+            <li><a href="/planning"><i class="fas fa-calendar-alt"></i><span>Planning</span></a></li>
+            <li><a href="/inspection"><i class="fas fa-clipboard-check"></i><span>Inspection</span></a></li>
+            <li><a href="/finalinspection"><i class="fas fa-check-double"></i><span>Final Inspection</span></a></li>
+            <li><a href="/dispatch-note"><i class="fas fa-file-signature"></i><span>Dispatch Approval</span></a></li>
+            <li><a href="/packing"><i class="fas fa-box"></i><span>Packing</span></a></li>
+            <li><a href="/dispatch"><i class="fas fa-truck"></i><span>Dispatch</span></a></li>
+          </ul>
+        </div>
+        
+        <div class="user-info">
+          <img src="armol-removebg-preview.png" alt="ManufacturePro Logo">
+        </div>
+      </div>
+    </nav>
+
+    <!-- Enhanced Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">
+          <i class="fas fa-layer-group"></i>
+          Sheeting Department
+        </h1>
+        <p class="page-subtitle">Manage sheeting processes and production tracking with precision control</p>
+        
+        <!-- Success Message -->
+        <div class="success-message" th:if="${message}" th:text="${message}"></div>
+      </div>
+
+      <!-- Enhanced Form Container -->
+      <div class="sheeting-form-container">
+        <h1>
+          <i class="fas fa-layer-group"></i>
+          SHEETING PRODUCTION
+        </h1>
+
+        <!-- Route Card Fetch Section -->
+        <div class="fetch-section">
+          <h3>
+            <i class="fas fa-search"></i>
+            Fetch Order Details
+          </h3>
+          <form class="fetch-form" action="/fetch-by-route-sheeting" method="get">
+            <div class="form-group">
+              <label for="fetchRouteCardNo" class="required">Route Card Number</label>
+              <input 
+                type="text" 
+                id="fetchRouteCardNo" 
+                name="routeCardNo" 
+                th:value="${order?.routeCardNo}" 
+                placeholder="Enter Route Card Number (e.g., RC001234)" 
+                required
+              >
+            </div>
+            <button type="submit" class="fetch-btn">
+              <i class="fas fa-download"></i>
+              Fetch Details
+            </button>
+          </form>
+        </div>
+
+        <!-- Main Sheeting Form -->
+        <form class="sheeting-form" action="/sheeting" method="post" id="sheetingFormMain">
+          
+          <!-- Section 1: Mixing Details -->
+          <div class="form-section-title">
+            <i class="fas fa-blender"></i>
+            MIXING DETAILS
+          </div>
+          
+          <div class="form-group">
+            <label for="batchNo">Batch No.</label>
+            <input 
+              type="text" 
+              id="batchNo" 
+              name="batchNo" 
+              th:value="${production?.batchNo}" 
+              readonly
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="batchWeight">Batch Weight</label>
+            <input 
+              type="text" 
+              id="batchWeight" 
+              name="batchWeight" 
+              th:value="${production?.batchWeight}" 
+              readonly
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="routeCardNo">Route Card No</label>
+            <input 
+              type="text" 
+              id="routeCardNo" 
+              name="routeCardNo" 
+              th:value="${production?.routeCardNo}" 
+              readonly
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="balanceWeight" class="required">Balance Weight</label>
+            <input 
+              type="text" 
+              id="balanceWeight" 
+              name="balanceWeight" 
+              th:value="${production?.balanceWeight}" 
+              placeholder="Enter Balance Weight"
+              required
+            >
+          </div>
+
+          <!-- Section 2: Setup Parameters -->
+          <div class="form-section-title">
+            <i class="fas fa-cogs"></i>
+            SETUP PARAMETERS
+          </div>
+
+          <div class="form-group">
+            <label for="productionPerHour">Production Per Hour</label>
+            <input 
+              type="text" 
+              id="productionPerHour" 
+              name="productionPerHour" 
+              th:value="${production?.productionPerHour}" 
+              readonly
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="setupTime">Setup Time</label>
+            <input 
+              type="text" 
+              id="setupTime" 
+              name="setupTime" 
+              th:value="${production?.time}" 
+              readonly
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="toolDieNo">Tool / Die No.</label>
+            <input 
+              type="text" 
+              id="toolDieNo" 
+              name="toolDieNo" 
+              th:value="${production?.toolDieNo}" 
+              readonly
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="curingTemp">Curing Temp.</label>
+            <input 
+              type="text" 
+              id="curingTemp" 
+              name="curingTemp" 
+              th:value="${production?.curingTemp}" 
+              readonly
+            >
+          </div>
+
+          <!-- Section 3: Sheeting Process -->
+          <div class="form-section-title">
+            <i class="fas fa-layer-group"></i>
+            SHEETING PROCESS
+          </div>
+
+          <div class="form-group">
+            <label for="date">Date</label>
+            <input 
+              type="date" 
+              id="date" 
+              name="date"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="sheetingStartTime" class="required">Start Time</label>
+            <input 
+              type="time" 
+              id="sheetingStartTime" 
+              name="sheetingStartTime" 
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="sheetingEndTime" class="required">End Time</label>
+            <input 
+              type="time" 
+              id="sheetingEndTime" 
+              name="sheetingEndTime" 
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="plannedQty">Planned Qty.</label>
+            <input 
+              type="number" 
+              id="plannedQty" 
+              name="plannedQty" 
+              placeholder="Enter Planned Quantity"
+              min="0"
+              step="0.01"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="processedQty" class="required">Processed Qty.</label>
+            <input 
+              type="number" 
+              id="processedQty" 
+              name="processedQty" 
+              placeholder="Enter Processed Quantity"
+              min="0"
+              step="0.01"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="okQty" class="required">OK Qty.</label>
+            <input 
+              type="number" 
+              id="okQty" 
+              name="okQty" 
+              placeholder="Enter OK Quantity"
+              min="0"
+              step="0.01"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="notOkQty" class="required">Not OK Qty.</label>
+            <input 
+              type="number" 
+              id="notOkQty" 
+              name="notOkQty" 
+              placeholder="Enter Not OK Quantity"
+              min="0"
+              step="0.01"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="operatorName" class="required">Operator Name</label>
+            <input 
+              type="text" 
+              id="operatorName" 
+              name="operatorName" 
+              placeholder="Enter Operator Name"
+              required
+            >
+          </div>
+
+          <div class="form-group full-width">
+            <label for="sheetingRemark">Remark (if any)</label>
+            <input 
+              type="text" 
+              id="sheetingRemark" 
+              name="sheetingRemark" 
+              placeholder="Enter any remarks or observations"
+            >
+          </div>
+
+          <!-- Section 4: Post-Curing -->
+          <div class="form-section-title">
+            <i class="fas fa-fire"></i>
+            POST-CURING PROCESS
+          </div>
+
+          <div class="form-group">
+            <label for="receivedQty">Received Qty</label>
+            <input 
+              type="number" 
+              id="receivedQty" 
+              name="receivedQty" 
+              th:value="${extrusion?.receivedQty}" 
+              placeholder="Enter Received Quantity"
+              min="0"
+              step="0.01"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="postProcessedQty">Processed Qty.</label>
+            <input 
+              type="number" 
+              id="postProcessedQty" 
+              name="postProcessedQty" 
+              th:value="${extrusion?.postProcessedQty}" 
+              placeholder="Enter Post-Processed Quantity"
+              min="0"
+              step="0.01"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="temperature" class="required">Temperature</label>
+            <input 
+              type="number" 
+              id="temperature" 
+              name="temperature" 
+              th:value="${extrusion?.temperature}" 
+              placeholder="Enter Temperature (°C)"
+              min="0"
+              step="0.1"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="postStartTime" class="required">Start Time</label>
+            <input 
+              type="time" 
+              id="postStartTime" 
+              name="postStartTime" 
+              th:value="${extrusion?.postStartTime}" 
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="postEndTime" class="required">End Time</label>
+            <input 
+              type="time" 
+              id="postEndTime" 
+              name="postEndTime" 
+              th:value="${extrusion?.postEndTime}" 
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="duration" class="required">Duration</label>
+            <input 
+              type="text" 
+              id="duration" 
+              name="duration" 
+              th:value="${extrusion?.duration}" 
+              placeholder="Enter Duration (e.g., 2 hours)"
+              required
+            >
+          </div>
+
+          <div class="form-group full-width">
+            <label for="postRemarks">Remarks (if any)</label>
+            <input 
+              type="text" 
+              id="postRemarks" 
+              name="postRemarks" 
+              th:value="${extrusion?.postRemarks}" 
+              placeholder="Enter any post-curing remarks"
+            >
+          </div>
+
+          <!-- Enhanced Button Group -->
+          <div class="button-group">
+            <button type="button" class="btn draft-btn">
+              <i class="fas fa-save"></i>
+              Save as Draft
+            </button>
+            
+            <button type="submit" class="btn submit-btn">
+              <i class="fas fa-paper-plane"></i>
+              Submit
+            </button>
+            
+            <a href="/export-sheeting-report" class="btn download-btn">
+              <i class="fas fa-file-excel"></i>
+              Download Report (Excel)
+            </a>
+            
+            <a href="/production" class="btn home-btn">
+              <i class="fas fa-home"></i>
+              HOME
+            </a>
+          </div>
+        </form>
+
+        <!-- Image/Drawing Section -->
+        <div class="image-section">
+          <h3>
+            <i class="fas fa-image"></i>
+            Technical Drawing / Reference Image
+          </h3>
+          
+          <!-- Show View Button only if imageUrl is available -->
+          <div th:if="${order.imageUrl != null}">
+            <a th:href="${order.imageUrl}" target="_blank" class="image-view-btn">
+              <i class="fas fa-eye"></i>
+              View Technical Drawing
+            </a>
+          </div>
+
+          <!-- If image is not present, show message -->
+          <div th:if="${order.imageUrl == null}">
+            <div class="no-image-message">
+              <i class="fas fa-exclamation-triangle"></i>
+              No technical drawing available for this Route Card
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Enhanced JavaScript -->
+  <script>
+    // Sidebar toggle functionality
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.querySelector('.sidebar-toggle');
+      
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(event.target) && 
+          !toggleBtn.contains(event.target) && 
+          sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+      }
+    });
+
+    // Form enhancement and validation
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('sheetingFormMain');
+      const inputs = form.querySelectorAll('input[required]');
+      
+      // Set current date as default
+      const dateField = document.getElementById('date');
+      if (dateField && !dateField.value) {
+        dateField.value = new Date().toISOString().split('T')[0];
+      }
+
+      // Real-time validation
+      inputs.forEach(input => {
+        input.addEventListener('blur', validateField);
+        input.addEventListener('input', clearError);
+      });
+
+      // Auto-calculate Not OK quantity
+      const processedQtyField = document.getElementById('processedQty');
+      const okQtyField = document.getElementById('okQty');
+      const notOkQtyField = document.getElementById('notOkQty');
+
+      function calculateNotOkQty() {
+        const processed = parseFloat(processedQtyField.value) || 0;
+        const ok = parseFloat(okQtyField.value) || 0;
+        const notOk = processed - ok;
+        
+        if (notOk >= 0) {
+          notOkQtyField.value = notOk.toFixed(2);
+        }
+      }
+
+      if (processedQtyField && okQtyField && notOkQtyField) {
+        processedQtyField.addEventListener('input', calculateNotOkQty);
+        okQtyField.addEventListener('input', calculateNotOkQty);
+      }
+
+      // Form submission handling
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        let isValid = true;
+        
+        inputs.forEach(input => {
+          if (!validateField.call(input)) {
+            isValid = false;
+          }
+        });
+
+        // Additional validations
+        if (!validateTimeRange()) {
+          isValid = false;
+          showNotification('End time must be after start time', 'error');
+        }
+
+        if (!validateQuantities()) {
+          isValid = false;
+          showNotification('OK quantity + Not OK quantity cannot exceed processed quantity', 'error');
+        }
+
+        if (!isValid) {
+          showNotification('Please fix all errors before submitting', 'error');
+          return;
+        }
+
+        // Show confirmation dialog
+        if (confirm('Are you sure you want to submit the sheeting data?')) {
+          // Add loading state to submit button
+          const submitBtn = document.querySelector('.submit-btn');
+          if (submitBtn) {
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+          }
+
+          // Submit the form
+          this.submit();
+          
+          // Clear saved data after successful submission
+          setTimeout(() => {
+            clearSavedData();
+            showNotification('Sheeting data submitted successfully!', 'success');
+          }, 1000);
+        }
+      });
+
+      // Auto-save functionality
+      let autoSaveTimer;
+      inputs.forEach(input => {
+        input.addEventListener('input', function() {
+          clearTimeout(autoSaveTimer);
+          autoSaveTimer = setTimeout(autoSave, 30000); // Auto-save after 30 seconds
+        });
+      });
+
+      // Focus first empty field
+      const firstEmptyField = Array.from(inputs).find(input => !input.value);
+      if (firstEmptyField) {
+        setTimeout(() => firstEmptyField.focus(), 500);
+      }
+    });
+
+    // Field validation function
+    function validateField() {
+      const field = this;
+      const value = field.value.trim();
+      let isValid = true;
+      let errorMessage = '';
+
+      // Check if required field is empty
+      if (field.hasAttribute('required') && !value) {
+        isValid = false;
+        errorMessage = 'This field is required';
+      }
+      // Validate number fields
+      else if (field.type === 'number' && value) {
+        const num = parseFloat(value);
+        const min = parseFloat(field.getAttribute('min'));
+        const max = parseFloat(field.getAttribute('max'));
+        
+        if (isNaN(num)) {
+          isValid = false;
+          errorMessage = 'Please enter a valid number';
+        } else if (min !== null && num < min) {
+          isValid = false;
+          errorMessage = `Value must be at least ${min}`;
+        } else if (max !== null && num > max) {
+          isValid = false;
+          errorMessage = `Value must be no more than ${max}`;
+        }
+      }
+      // Validate time fields
+      else if (field.type === 'time' && value) {
+        const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+        if (!timeRegex.test(value)) {
+          isValid = false;
+          errorMessage = 'Please enter a valid time format';
+        }
+      }
+
+      // Show/hide error state
+      if (!isValid) {
+        field.style.borderColor = 'var(--error-color)';
+        field.style.backgroundColor = 'rgba(220, 38, 38, 0.05)';
+        showFieldError(field, errorMessage);
+      } else {
+        field.style.borderColor = 'var(--success-color)';
+        field.style.backgroundColor = 'rgba(5, 150, 105, 0.05)';
+        hideFieldError(field);
+      }
+
+      return isValid;
+    }
+
+    // Clear error state on input
+    function clearError() {
+      this.style.borderColor = '';
+      this.style.backgroundColor = '';
+      hideFieldError(this);
+    }
+
+    // Show field error
+    function showFieldError(field, message) {
+      hideFieldError(field); // Remove existing error
+      
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'field-error';
+      errorDiv.style.cssText = `
+        color: var(--error-color);
+        font-size: 12px;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      `;
+      errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i>${message}`;
+      
+      field.parentNode.appendChild(errorDiv);
+    }
+
+    // Hide field error
+    function hideFieldError(field) {
+      const existingError = field.parentNode.querySelector('.field-error');
+      if (existingError) {
+        existingError.remove();
+      }
+    }
+
+    // Validate time range
+    function validateTimeRange() {
+      const startTime = document.getElementById('sheetingStartTime').value;
+      const endTime = document.getElementById('sheetingEndTime').value;
+      
+      if (startTime && endTime) {
+        return endTime > startTime;
+      }
+      return true;
+    }
+
+    // Validate quantities
+    function validateQuantities() {
+      const processed = parseFloat(document.getElementById('processedQty').value) || 0;
+      const ok = parseFloat(document.getElementById('okQty').value) || 0;
+      const notOk = parseFloat(document.getElementById('notOkQty').value) || 0;
+      
+      return (ok + notOk) <= processed;
+    }
+
+    // Auto-save functionality
+    function autoSave() {
+      const form = document.getElementById('sheetingFormMain');
+      const formData = new FormData(form);
+      
+      // Only auto-save if there's meaningful data
+      let hasData = false;
+      for (let [key, value] of formData.entries()) {
+        if (value && value.toString().trim()) {
+          hasData = true;
+          break;
+        }
+      }
+
+      if (hasData) {
+        // Simulate auto-save (replace with actual endpoint)
+        console.log('Auto-saving sheeting data...');
+        showNotification('Draft saved automatically', 'success');
+      }
+    }
+
+    // Notification system
+    function showNotification(message, type = 'info') {
+      // Remove existing notifications
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      
+      const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+      };
+
+      notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fas ${icons[type] || icons.info}"></i>
+          <span>${message}</span>
+        </div>
+      `;
+
+      document.body.appendChild(notification);
+
+      // Animate in
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 100);
+
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }, 5000);
+    }
+
+    // Form data persistence (localStorage backup)
+    function saveFormData() {
+      const form = document.getElementById('sheetingFormMain');
+      const formData = new FormData(form);
+      const data = {};
+      
+      for (let [key, value] of formData.entries()) {
+        if (value && typeof value === 'string') {
+          data[key] = value;
+        }
+      }
+      
+      localStorage.setItem('sheetingFormData', JSON.stringify(data));
+    }
+
+    function loadFormData() {
+      const savedData = localStorage.getItem('sheetingFormData');
+      if (savedData) {
+        try {
+          const data = JSON.parse(savedData);
+          const form = document.getElementById('sheetingFormMain');
+          
+          Object.keys(data).forEach(key => {
+            const field = form.querySelector(`[name="${key}"]`);
+            if (field && !field.readOnly) {
+              field.value = data[key];
+            }
+          });
+        } catch (error) {
+          console.error('Error loading saved form data:', error);
+        }
+      }
+    }
+
+    // Clear saved data on successful submission
+    function clearSavedData() {
+      localStorage.removeItem('sheetingFormData');
+    }
+
+    // Initialize form data persistence
+    document.addEventListener('DOMContentLoaded', function() {
+      loadFormData();
+      
+      // Save form data on input
+      const form = document.getElementById('sheetingFormMain');
+      const inputs = form.querySelectorAll('input, select, textarea');
+      
+      inputs.forEach(input => {
+        input.addEventListener('input', debounce(saveFormData, 1000));
+      });
+      
+      // Clear saved data on successful form submission
+      form.addEventListener('submit', function(e) {
+        setTimeout(clearSavedData, 1000);
+      });
+    });
+
+    // Debounce utility function
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(event) {
+      // Ctrl/Cmd + S to save
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault();
+        const submitBtn = document.querySelector('.submit-btn');
+        if (submitBtn) {
+          submitBtn.click();
+        }
+      }
+      
+      // Ctrl/Cmd + D to save as draft
+      if ((event.ctrlKey || event.metaKey) && event.key === 'd') {
+        event.preventDefault();
+        const draftBtn = document.querySelector('.draft-btn');
+        if (draftBtn) {
+          draftBtn.click();
+        }
+      }
+      
+      // Escape to close sidebar on mobile
+      if (event.key === 'Escape') {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+        }
+      }
+    });
+
+    // Responsive handling
+    function handleResize() {
+      const sidebar = document.getElementById('sidebar');
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('active');
+      }
+    }
+
+    window.addEventListener('resize', handleResize);
+
+    // Draft button functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const draftBtn = document.querySelector('.draft-btn');
+      if (draftBtn) {
+        draftBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Save current form data
+          saveFormData();
+          showNotification('Form saved as draft successfully!', 'success');
+          
+          // You can add additional draft saving logic here
+          console.log('Form saved as draft');
+        });
+      }
+    });
+
+    // Connection status monitoring
+    function updateConnectionStatus() {
+      const isOnline = navigator.onLine;
+      
+      if (!isOnline) {
+        showNotification('You are offline. Form data will be saved locally.', 'warning');
+      }
+    }
+
+    window.addEventListener('online', function() {
+      showNotification('Connection restored', 'success');
+    });
+    
+    window.addEventListener('offline', updateConnectionStatus);
+
+    // Initialize connection status
+    document.addEventListener('DOMContentLoaded', updateConnectionStatus);
+
+    // Print functionality
+    function printForm() {
+      window.print();
+    }
+
+    // Add print shortcut
+    document.addEventListener('keydown', function(event) {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'p') {
+        event.preventDefault();
+        printForm();
+      }
+    });
+
+    // Accessibility enhancements
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add ARIA labels and descriptions
+      const requiredFields = document.querySelectorAll('input[required]');
+      requiredFields.forEach(field => {
+        field.setAttribute('aria-required', 'true');
+        
+        const label = document.querySelector(`label[for="${field.id}"]`);
+        if (label) {
+          field.setAttribute('aria-labelledby', field.id + '-label');
+          label.id = field.id + '-label';
+        }
+      });
+
+      // Keyboard navigation improvements
+      const form = document.getElementById('sheetingFormMain');
+      const inputs = form.querySelectorAll('input, select, textarea, button');
+      
+      inputs.forEach((input, index) => {
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && input.type !== 'textarea') {
+            e.preventDefault();
+            const nextInput = inputs[index + 1];
+            if (nextInput) {
+              nextInput.focus();
+            } else {
+              // If last field, focus submit button
+              const submitBtn = document.querySelector('.submit-btn');
+              if (submitBtn) {
+                submitBtn.focus();
+              }
+            }
+          }
+        });
+      });
+    });
+
+       // Enhanced mobile sidebar handling
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.getElementById('sidebar');
+      const sidebarToggle = document.querySelector('.sidebar-toggle');
+      
+      // Touch events for mobile
+      let touchStartX = 0;
+      let touchEndX = 0;
+      
+      document.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+      });
+      
+      document.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      });
+      
+      function handleSwipe() {
+        const swipeThreshold = 50;
+        const swipeDistance = touchEndX - touchStartX;
+        
+        if (window.innerWidth <= 768) {
+          // Swipe right to open sidebar
+          if (swipeDistance > swipeThreshold && touchStartX < 50) {
+            sidebar.classList.add('active');
+          }
+          // Swipe left to close sidebar
+          else if (swipeDistance < -swipeThreshold && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+          }
+        }
+      }
+      
+      // Prevent body scroll when sidebar is open on mobile
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            if (sidebar.classList.contains('active') && window.innerWidth <= 768) {
+              document.body.style.overflow = 'hidden';
+            } else {
+              document.body.style.overflow = '';
+            }
+          }
+        });
+      });
+      
+      observer.observe(sidebar, { attributes: true });
+    });
+
+    // Performance optimization
+    document.addEventListener('DOMContentLoaded', function() {
+      // Lazy load non-critical features
+      const lazyFeatures = [
+        () => console.log('Sheeting form initialized'),
+        () => updateConnectionStatus(),
+        () => loadFormData()
+      ];
+      
+      // Load features with delay to improve initial page load
+      lazyFeatures.forEach((feature, index) => {
+        setTimeout(feature, index * 100);
+      });
+    });
+
+    // Error handling
+    window.addEventListener('error', function(event) {
+      console.error('Application error:', event.error);
+      showNotification('An unexpected error occurred. Please try again.', 'error');
+    });
+
+    // Service worker registration for offline support (if available)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function(error) {
+        console.log('Service Worker registration failed:', error);
+      });
+    }
+
+    // Calculate duration automatically
+    document.addEventListener('DOMContentLoaded', function() {
+      const postStartTimeField = document.getElementById('postStartTime');
+      const postEndTimeField = document.getElementById('postEndTime');
+      const durationField = document.getElementById('duration');
+
+      function calculateDuration() {
+        const startTime = postStartTimeField.value;
+        const endTime = postEndTimeField.value;
+        
+        if (startTime && endTime) {
+          const start = new Date(`2000-01-01T${startTime}:00`);
+          const end = new Date(`2000-01-01T${endTime}:00`);
+          
+          if (end > start) {
+            const diffMs = end - start;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+            
+            let duration = '';
+            if (diffHours > 0) {
+              duration += `${diffHours} hour${diffHours > 1 ? 's' : ''}`;
+            }
+            if (diffMinutes > 0) {
+              if (duration) duration += ' ';
+              duration += `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
+            }
+            
+            durationField.value = duration || '0 minutes';
+          }
+        }
+      }
+
+      if (postStartTimeField && postEndTimeField && durationField) {
+        postStartTimeField.addEventListener('change', calculateDuration);
+        postEndTimeField.addEventListener('change', calculateDuration);
+      }
+    });
+
+    // Form validation summary
+    function showValidationSummary() {
+      const form = document.getElementById('sheetingFormMain');
+      const requiredFields = form.querySelectorAll('input[required]');
+      const errors = [];
+      
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          const label = document.querySelector(`label[for="${field.id}"]`);
+          const fieldName = label ? label.textContent.replace('*', '').trim() : field.name;
+          errors.push(fieldName);
+        }
+      });
+      
+      if (errors.length > 0) {
+        const errorMessage = `Please fill in the following required fields:\n• ${errors.join('\n• ')}`;
+        alert(errorMessage);
+        return false;
+      }
+      
+      return true;
+    }
+
+    // Enhanced form reset with confirmation
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('sheetingFormMain');
+      
+      // Add reset button if needed
+      const resetBtn = document.createElement('button');
+      resetBtn.type = 'button';
+      resetBtn.className = 'btn';
+      resetBtn.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+      resetBtn.innerHTML = '<i class="fas fa-undo"></i> Reset Form';
+      
+      resetBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (confirm('Are you sure you want to reset all form data? This action cannot be undone.')) {
+          form.reset();
+          clearSavedData();
+          showNotification('Form has been reset', 'info');
+          
+          // Clear all field errors and styles
+          const inputs = document.querySelectorAll('#sheetingFormMain input');
+          inputs.forEach(input => {
+            input.style.borderColor = '';
+            input.style.backgroundColor = '';
+            hideFieldError(input);
+          });
+          
+          // Set current date again
+          const dateField = document.getElementById('date');
+          if (dateField) {
+            dateField.value = new Date().toISOString().split('T')[0];
+          }
+        }
+      });
+      
+      // Add reset button to button group (optional)
+      // const buttonGroup = document.querySelector('.button-group');
+      // if (buttonGroup) {
+      //   buttonGroup.insertBefore(resetBtn, buttonGroup.firstChild);
+      // }
+    });
+
+    // Final initialization
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add loading animation to page
+      document.body.style.opacity = '0';
+      document.body.style.transition = 'opacity 0.5s ease';
+      
+      setTimeout(() => {
+        document.body.style.opacity = '1';
+      }, 100);
+
+      // Initialize tooltips for mobile
+      if (window.innerWidth <= 768) {
+        document.querySelectorAll('[data-tooltip]').forEach(el => {
+          el.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tooltip = this.getAttribute('data-tooltip');
+            if (tooltip) {
+              showNotification(tooltip, 'info');
+            }
+          });
+        });
+      }
+
+      // Add form validation on submit
+      const form = document.getElementById('sheetingFormMain');
+      form.addEventListener('submit', function(e) {
+        if (!showValidationSummary()) {
+          e.preventDefault();
+          return false;
+        }
+      });
+      
+      console.log('Sheeting Department System initialized successfully');
+    });
+
+    // Export functionality for reports
+    function exportToExcel() {
+      const form = document.getElementById('sheetingFormMain');
+      const formData = new FormData(form);
+      
+      // Create a simple CSV export
+      let csvContent = "Field,Value\n";
+      
+      for (let [key, value] of formData.entries()) {
+        if (value) {
+          const label = document.querySelector(`label[for="${key}"]`);
+          const fieldName = label ? label.textContent.replace('*', '').trim() : key;
+          csvContent += `"${fieldName}","${value}"\n`;
+        }
+      }
+      
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sheeting_data_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      showNotification('Data exported successfully!', 'success');
+    }
+
+    // Add export button functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const exportBtn = document.querySelector('.download-btn');
+      if (exportBtn) {
+        exportBtn.addEventListener('click', function(e) {
+          // If it's not already linked to a server endpoint, use client-side export
+          if (this.href.includes('export-sheeting-report')) {
+            // Server-side export - let it proceed normally
+            return;
+          } else {
+            // Client-side export
+            e.preventDefault();
+            exportToExcel();
+          }
+        });
+      }
+    });
+
+    // Add smooth scrolling for form sections
+    document.addEventListener('DOMContentLoaded', function() {
+      const sectionTitles = document.querySelectorAll('.form-section-title');
+      
+      sectionTitles.forEach(title => {
+        title.style.cursor = 'pointer';
+        title.addEventListener('click', function() {
+          this.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    });
+
+    // Add form progress indicator
+    function updateFormProgress() {
+      const form = document.getElementById('sheetingFormMain');
+      const requiredFields = form.querySelectorAll('input[required]');
+      const filledFields = Array.from(requiredFields).filter(field => field.value.trim());
+      
+      const progress = (filledFields.length / requiredFields.length) * 100;
+      
+      // Create or update progress bar
+      let progressBar = document.querySelector('.form-progress');
+      if (!progressBar) {
+        progressBar = document.createElement('div');
+        progressBar.className = 'form-progress';
+        progressBar.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 280px;
+          right: 0;
+          height: 4px;
+          background: rgba(30, 64, 175, 0.1);
+          z-index: 999;
+          transition: all 0.3s ease;
+        `;
+        
+        const progressFill = document.createElement('div');
+        progressFill.className = 'form-progress-fill';
+        progressFill.style.cssText = `
+          height: 100%;
+          background: var(--gradient-primary);
+          width: 0%;
+          transition: width 0.3s ease;
+        `;
+        
+        progressBar.appendChild(progressFill);
+        document.body.appendChild(progressBar);
+      }
+      
+      const progressFill = progressBar.querySelector('.form-progress-fill');
+      progressFill.style.width = `${progress}%`;
+      
+      // Update mobile progress bar position
+      if (window.innerWidth <= 768) {
+        progressBar.style.left = '0';
+      }
+    }
+
+    // Initialize progress tracking
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('sheetingFormMain');
+      const inputs = form.querySelectorAll('input[required]');
+      
+      inputs.forEach(input => {
+        input.addEventListener('input', updateFormProgress);
+        input.addEventListener('change', updateFormProgress);
+      });
+      
+      // Initial progress update
+      updateFormProgress();
+    });
+
+    // Update progress bar position on resize
+    window.addEventListener('resize', function() {
+      const progressBar = document.querySelector('.form-progress');
+      if (progressBar) {
+        if (window.innerWidth <= 768) {
+          progressBar.style.left = '0';
+        } else {
+          progressBar.style.left = '280px';
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+

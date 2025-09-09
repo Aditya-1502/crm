@@ -1,0 +1,2107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ManufacturePro CRM - QC Supervisor</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Manufacturing CRM Color Palette - Consistent with mixing.html */
+      --primary-color: #1e40af;
+      --primary-dark: #1e3a8a;
+      --primary-light: rgb(0, 0, 0);
+      --secondary-color: #f59e0b;
+      --accent-color: #10b981;
+      --success-color: #059669;
+      --warning-color: #d97706;
+      --error-color: #dc2626;
+      --info-color: #0284c7;
+      
+      /* Background & Surface Colors */
+      --background-primary: #f8fafc;
+      --background-secondary: #f1f5f9;
+      --card-background: #ffffff;
+     --sidebar-background: rgb(128, 0, 0);
+      --sidebar-hover: #F3CE14;
+      
+      /* Text Colors */
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --text-light: #9ca3af;
+      --text-white: #ffffff;
+      
+      /* Border & Shadow */
+      --border-color: #e5e7eb;
+      --border-light: #f3f4f6;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      
+      /* Gradients */
+      --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      --gradient-secondary: linear-gradient(135deg, var(--secondary-color) 0%, #ea580c 100%);
+      --gradient-success: linear-gradient(135deg, var(--accent-color) 0%, var(--success-color) 100%);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Container Layout */
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Enhanced Sidebar - EXACT SAME AS MIXING.HTML */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar-background);
+      color: var(--text-white);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      box-shadow: var(--shadow-xl);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Sidebar Header - FIXED POSITION */
+    .sidebar-header {
+      position: sticky;
+      top: 0;
+      padding: 24px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-background);
+     background: linear-gradient(135deg, rgb(255, 128, 0) 0%, rgba(30, 58, 138, 0.1) 100%);
+      z-index: 1001;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .sidebar h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+    }
+
+    .sidebar h2 i {
+      font-size: 24px;
+      color: var(--primary-light);
+    }
+
+    /* Sidebar Body - SCROLLABLE AREA */
+    .sidebar-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Navigation Links Container - SCROLLABLE */
+    .nav-container {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 0;
+    }
+
+    /* Custom Scrollbar for Sidebar */
+    .nav-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .nav-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    .nav-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Navigation Links */
+    .nav-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-links li {
+      margin: 0;
+      position: relative;
+    }
+
+    .nav-links li.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: var(--primary-light);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .nav-links li.active {
+      background: var(--sidebar-hover);
+    }
+
+    .nav-links a {
+      color: var(--text-white);
+      text-decoration: none;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 500;
+      font-size: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-links a::before {
+      content: '';
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-links a:hover::before {
+      left: 100%;
+    }
+
+    .nav-links a:hover {
+      background: var(--sidebar-hover);
+      transform: translateX(4px);
+      color: var(--primary-light);
+    }
+
+    .nav-links a i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      color: #94a3b8;
+      transition: color 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .nav-links a:hover i,
+    .nav-links li.active a i {
+      color: var(--primary-light);
+    }
+
+    /* User Info Section - FIXED AT BOTTOM */
+    .user-info {
+      position: sticky;
+      bottom: 0;
+      padding: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-background);
+      background: rgba(0, 0, 0, 0.2);
+      z-index: 1001;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .user-info img {
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 280px;
+      padding: 32px 40px;
+      width: calc(100% - 280px);
+      min-height: 100vh;
+      background: var(--background-primary);
+    }
+
+    /* Page Header */
+    .page-header {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-title i {
+      color: var(--primary-color);
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .success-message {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      color: var(--success-color);
+      padding: 16px 20px;
+      border-radius: 12px;
+      border-left: 4px solid var(--success-color);
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Enhanced Form Container */
+    .qc-form-container {
+      background: var(--card-background);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+      max-width: none;
+      margin: 0;
+      left: 0;
+    }
+
+    .qc-form-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .qc-form-container h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--success-color);
+      margin-bottom: 32px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .qc-form-container h1 i {
+      color: var(--primary-color);
+    }
+
+    /* Route Card Fetch Section */
+    .fetch-section {
+      background: var(--background-secondary);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+      border: 2px dashed var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .fetch-section:hover {
+      border-color: var(--primary-color);
+      background: rgba(30, 64, 175, 0.05);
+    }
+
+    .fetch-section h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .fetch-section h3 i {
+      color: var(--info-color);
+    }
+
+    .fetch-form {
+      display: flex;
+      gap: 16px;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+
+    .fetch-form .form-group {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    /* Form Layout */
+    .qc-form {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    /* Form Section Headers */
+    .form-section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 32px 0 20px 0;
+      padding: 12px 16px;
+      background: var(--primary-color);
+      color: var(--text-white);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      grid-column: span 4;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .form-section-title i {
+      color: var(--text-white);
+    }
+
+    /* Form Groups */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 14px;
+      letter-spacing: 0.025em;
+      position: relative;
+    }
+
+    .form-group label.required::after {
+      content: " *";
+      color: var(--error-color);
+      font-weight: 700;
+    }
+
+    /* Enhanced Form Inputs */
+    .form-group input[type="text"],
+    .form-group input[type="date"],
+    .form-group input[type="time"],
+    .form-group input[type="number"],
+    .form-group select,
+    .form-group datalist {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--card-background);
+            color: var(--text-primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .form-group input:hover,
+    .form-group select:hover {
+      border-color: var(--primary-light);
+    }
+
+    .form-group input[required] {
+      border-left: 3px solid var(--warning-color);
+    }
+
+    .form-group input[required]:valid {
+      border-left-color: var(--success-color);
+    }
+
+    .form-group input[readonly] {
+      background-color: var(--background-secondary);
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    /* Status Row Special Styling */
+    .status-row {
+      grid-column: span 4;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 20px;
+      padding: 20px;
+      background: var(--background-secondary);
+      border-radius: 12px;
+      border: 2px solid var(--border-color);
+    }
+
+    .status-row label {
+      font-weight: 700;
+      color: var(--text-primary);
+      min-width: 80px;
+    }
+
+    .status-row input[type="text"] {
+      width: 200px;
+      padding: 12px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      background: var(--card-background);
+    }
+
+    .status-row input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    .status-row span {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    /* View Button Styling */
+    .view-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .view-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .view-btn:hover::before {
+      left: 100%;
+    }
+
+    .view-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Enhanced Button Group */
+    .submit-buttons {
+      grid-column: span 4;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-light);
+      flex-wrap: wrap;
+    }
+
+    /* Button Styles */
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      min-width: 140px;
+      justify-content: center;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .submit-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #1e3a8a 100%);
+      box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+    }
+
+    .draft-btn {
+      background: linear-gradient(135deg, var(--secondary-color) 0%, #ea580c 100%);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .draft-btn:hover {
+      background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+      box-shadow: 0 8px 25px rgba(234, 88, 12, 0.3);
+    }
+
+    .download-btn {
+      background: var(--gradient-success);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .download-btn:hover {
+      background: linear-gradient(135deg, var(--success-color) 0%, #047857 100%);
+      box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);
+    }
+
+    .fetch-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: 2px solid transparent;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 120px;
+      justify-content: center;
+    }
+
+    .fetch-btn:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #1e3a8a 100%);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Sidebar Toggle for Mobile */
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .qc-form {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      
+      .form-section-title {
+        grid-column: span 3;
+      }
+      
+      .status-row {
+        grid-column: span 3;
+      }
+      
+      .submit-buttons {
+        grid-column: span 3;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .qc-form {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+      
+      .form-section-title {
+        grid-column: span 2;
+      }
+      
+      .status-row {
+        grid-column: span 2;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .status-row input[type="text"] {
+        width: 100%;
+      }
+      
+      .submit-buttons {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-toggle {
+        display: block;
+      }
+      
+      .sidebar {
+        width: 70px;
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+        width: 280px;
+      }
+      
+      .sidebar:not(.active) .sidebar-header {
+        padding: 20px 10px;
+      }
+      
+      .sidebar:not(.active) .sidebar h2 span {
+        display: none;
+      }
+      
+      .sidebar:not(.active) .nav-links a span {
+        display: none;
+      }
+      
+      .sidebar:not(.active) .nav-links a {
+        justify-content: center;
+        padding: 12px 10px;
+      }
+      
+      .sidebar:not(.active) .nav-links a i {
+        margin-right: 0;
+        font-size: 18px;
+      }
+      
+      .sidebar:not(.active) .user-info {
+        padding: 15px 10px;
+      }
+      
+      .sidebar:not(.active) .user-info img {
+        max-width: 40px;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 80px 16px 20px 16px;
+      }
+      
+      .qc-form-container {
+        padding: 24px 20px;
+      }
+      
+      .qc-form {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .form-section-title {
+        grid-column: span 1;
+      }
+      
+      .status-row {
+        grid-column: span 1;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .submit-buttons {
+        grid-column: span 1;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .page-title {
+        font-size: 24px;
+      }
+      
+      .fetch-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .fetch-form .form-group {
+        min-width: auto;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 70px 12px 16px 12px;
+      }
+      
+      .qc-form-container {
+        padding: 20px 16px;
+      }
+      
+      .page-title {
+        font-size: 20px;
+      }
+      
+      .fetch-section {
+        padding: 20px 16px;
+      }
+    }
+
+    /* Loading States */
+    .btn.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .btn.loading::after {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Form Validation Styles */
+    .form-group input:invalid:not(:focus):not(:placeholder-shown) {
+      border-color: var(--error-color);
+      background-color: rgba(220, 38, 38, 0.05);
+    }
+
+    .form-group input:valid:not(:focus):not(:placeholder-shown) {
+      border-color: var(--success-color);
+      background-color: rgba(5, 150, 105, 0.05);
+    }
+
+    /* Accessibility Improvements */
+    .form-group input:focus,
+    .form-group select:focus,
+    .btn:focus {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      :root {
+        --primary-color: #000080;
+        --text-primary: #000000;
+        --border-color: #000000;
+      }
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      .sidebar,
+      .sidebar-toggle,
+      .submit-buttons {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .qc-form-container {
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+    }
+
+    /* Animation for form elements */
+    .form-group {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .form-group:nth-child(4) { animation-delay: 0.4s; }
+    .form-group:nth-child(5) { animation-delay: 0.5s; }
+    .form-group:nth-child(6) { animation-delay: 0.6s; }
+    .form-group:nth-child(7) { animation-delay: 0.7s; }
+    .form-group:nth-child(8) { animation-delay: 0.8s; }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Notification styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      z-index: 1001;
+            transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-lg);
+      max-width: 300px;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification-success { background-color: var(--success-color); }
+    .notification-error { background-color: var(--error-color); }
+    .notification-warning { background-color: var(--warning-color); }
+    .notification-info { background-color: var(--info-color); }
+
+    /* Status indicator styles */
+    .status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-approved { background-color: var(--success-color); }
+    .status-rejected { background-color: var(--error-color); }
+
+    /* Enhanced scrollbar for main content */
+    .main-content::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .main-content::-webkit-scrollbar-track {
+      background: var(--background-secondary);
+    }
+
+    .main-content::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    .main-content::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
+
+    /* Form progress indicator */
+    .form-progress {
+      position: fixed;
+      top: 0;
+      left: 280px;
+      right: 0;
+      height: 4px;
+      background: rgba(30, 64, 175, 0.1);
+      z-index: 999;
+      transition: all 0.3s ease;
+    }
+
+    .form-progress-fill {
+      height: 100%;
+      background: var(--gradient-primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+      .form-progress {
+        left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Toggle Button for Mobile -->
+  <button class="sidebar-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <div class="container">
+    <!-- Enhanced Sidebar Navigation - EXACT SAME AS MIXING.HTML -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>
+          <i class="fas fa-industry"></i>
+          <span>ManufacturePro</span>
+        </h2>
+      </div>
+      
+      <div class="sidebar-body">
+        <div class="nav-container">
+          <ul class="nav-links">
+            <li><a href="/"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i><span>Overview</span></a></li>
+            <li><a href="/reports"><i class="fas fa-chart-bar"></i><span>Reports</span></a></li>
+            <li><a href="/search"><i class="fas fa-search"></i><span>Search</span></a></li>
+            <li><a href="/order"><i class="fas fa-clipboard-list"></i><span>Order Log</span></a></li>
+            <li><a href="/mixing"><i class="fas fa-blender"></i><span>Mixing</span></a></li>
+            <li><a href="/production"><i class="fas fa-cogs"></i><span>Production</span></a></li>
+            <li><a href="/extrusion"><i class="fas fa-industry"></i><span>Extrusion</span></a></li>
+            <li><a href="/coating"><i class="fas fa-brush"></i><span>Coating</span></a></li>
+            <li><a href="/jointing"><i class="fas fa-link"></i><span>Jointing</span></a></li>
+            <li><a href="/moulding"><i class="fas fa-cube"></i><span>Moulding</span></a></li>
+            <li><a href="/sheeting"><i class="fas fa-layer-group"></i><span>Sheeting</span></a></li>
+            <li class="active"><a href="/qc"><i class="fas fa-user-shield"></i><span>QC Supervisor</span></a></li>
+            <li><a href="/planning"><i class="fas fa-calendar-alt"></i><span>Planning</span></a></li>
+            <li><a href="/inspection"><i class="fas fa-clipboard-check"></i><span>Inspection</span></a></li>
+            <li><a href="/finalinspection"><i class="fas fa-check-double"></i><span>Final Inspection</span></a></li>
+            <li><a href="/dispatch-note"><i class="fas fa-file-signature"></i><span>Dispatch Approval</span></a></li>
+            <li><a href="/packing"><i class="fas fa-box"></i><span>Packing</span></a></li>
+            <li><a href="/dispatch"><i class="fas fa-truck"></i><span>Dispatch</span></a></li>
+          </ul>
+        </div>
+        
+        <div class="user-info">
+          <img src="armol-removebg-preview.png" alt="ManufacturePro Logo">
+        </div>
+      </div>
+    </nav>
+
+    <!-- Enhanced Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">
+          <i class="fas fa-user-shield"></i>
+          QC Supervisor Department
+        </h1>
+        <p class="page-subtitle">Quality Control supervision and final production approval management</p>
+      </div>
+
+      <!-- Enhanced Form Container -->
+      <div class="qc-form-container">
+        <!-- Route Card Fetch Section -->
+        <div class="fetch-section">
+          <h3>
+            <i class="fas fa-search"></i>
+            Fetch Order Details
+          </h3>
+          <form class="fetch-form" action="/fetch-by-route-qc" method="get">
+            <div class="form-group">
+              <label for="fetchRouteCardNo" class="required">Route Card Number</label>
+              <input 
+                type="text" 
+                id="fetchRouteCardNo" 
+                name="routeCardNo" 
+                th:value="${order?.routeCardNo}" 
+                placeholder="Enter Route Card Number (e.g., RC001234)" 
+                required
+              >
+            </div>
+            <button type="submit" class="fetch-btn">
+              <i class="fas fa-download"></i>
+              Fetch Details
+            </button>
+          </form>
+        </div>
+
+        <!-- Main QC Form -->
+        <form class="qc-form" action="/qc" method="post" id="qcForm">
+          
+          <!-- Success Message -->
+          <div class="success-message" th:if="${message}" th:text="${message}"></div>
+
+          <!-- ORDER DETAILS Section -->
+          <h3 class="form-section-title">
+            <i class="fas fa-clipboard-list"></i>
+            ORDER DETAILS
+          </h3>
+          
+          <div class="form-group">
+            <label for="componentName">COMPONENT NAME</label>
+            <input type="text" id="componentName" name="componentName" th:value="${order?.componentName}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="routeCardNo">ROUTE CARD NO</label>
+            <input type="text" id="routeCardNo" name="routeCardNo" th:value="${order?.routeCardNo}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="formulationNo">FORMULATION NO</label>
+            <input type="text" id="formulationNo" name="formulationNo" th:value="${order?.formulationNo}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="orderDate">DATE</label>
+            <input type="text" id="orderDate" name="orderDate" th:value="${order?.date}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="machine">MACHINE</label>
+            <input type="text" id="machine" name="machine" th:value="${production?.machine}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="method">METHOD</label>
+            <input type="text" id="method" name="method" th:value="${order?.method}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="material">MATERIAL</label>
+            <input type="text" id="material" name="material" th:value="${order?.material}" readonly />
+          </div>
+
+          
+           
+                              <!-- Show View Button only if imageUrl is available -->
+                              <div th:if="${order?.imageUrl != null}" class="form-group" style="text-align: center; margin: 20px 0;">
+                                <a th:href="${order?.imageUrl}" target="_blank" class="image-view-btn">
+                                  <i class="fas fa-eye"></i>
+                                  View Technical Drawing
+                                </a>
+                              </div>
+              <style>
+                .image-section {
+                  margin: 20px 0;
+                  padding: 15px;
+                  border: 1px solid #ddd;
+                  border-radius: 5px;
+                  background-color: #f9f9f9;
+                }
+                
+                .image-view-btn {
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 8px;
+                  padding: 10px 20px;
+                  background-color: #4CAF50;
+                  color: white;
+                  text-decoration: none;
+                  border-radius: 4px;
+                  transition: background-color 0.3s ease;
+                }
+                
+                .image-view-btn:hover {
+                  background-color: #45a049;
+                }
+                
+                .image-view-btn i {
+                  font-size: 16px;
+                }
+              </style>
+           
+
+          <div class="form-group">
+            <label for="workOrderNo">WORK ORDER NO</label>
+            <input type="text" id="workOrderNo" name="workOrderNo" th:value="${order?.workOrderNo}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="toolDieNo">TOOL / DIE NO.</label>
+            <input type="text" id="toolDieNo" name="toolDieNo" th:value="${order?.toolDieNo}" readonly />
+          </div>
+
+          <!-- MIXING DETAILS Section -->
+          <h3 class="form-section-title">
+            <i class="fas fa-flask"></i>
+            MIXING DETAILS
+          </h3>
+          
+          <div class="form-group">
+            <label for="batchNo">BATCH NO.</label>
+            <input type="text" id="batchNo" name="batchNo" th:value="${production?.batchNo}" readonly>
+          </div>
+          
+          <div class="form-group">
+            <label for="batchWeight">BATCH WEIGHT</label>
+            <input type="text" id="batchWeight" name="batchWeight" th:value="${production?.batchWeight}" readonly>
+          </div>
+
+          <!-- SETUP PARAMETERS Section -->
+          <h3 class="form-section-title">
+            <i class="fas fa-cogs"></i>
+            SETUP PARAMETERS
+          </h3>
+
+          <div class="form-group">
+            <label for="extruderRPM">Extruder RPM</label>
+            <input type="text" id="extruderRPM" name="extruderRPM" th:value="${production?.extruderRPM}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="dcOvenTemp">DC Oven Temp.</label>
+            <input type="text" id="dcOvenTemp" name="dcOvenTemp" th:value="${production?.dcOvenTemp}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="weightPerMeter">Weight per Meter</label>
+            <input type="text" id="weightPerMeter" name="weightPerMeter" th:value="${production?.weightPerMeter}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="productionPerHour">Production Per Hour</label>
+            <input type="text" id="productionPerHour" name="productionPerHour" th:value="${production?.productionPerHour}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="conveyorRPM">Conveyor RPM</label>
+            <input type="text" id="conveyorRPM" name="conveyorRPM" th:value="${production?.conveyorRPM}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="setupToolDieNo">Tool / Die No.</label>
+            <input type="text" id="setupToolDieNo" name="setupToolDieNo" th:value="${production?.setupToolDieNo}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="noOfCavity">No. of Cavity</label>
+            <input type="text" id="noOfCavity" name="noOfCavity" th:value="${production?.noOfCavity}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="time">Time</label>
+            <input type="text" id="time" name="time" th:value="${production?.time}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="clampPressure">Clamp Pressure</label>
+            <input type="text" id="clampPressure" name="clampPressure" th:value="${production?.clampPressure}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="cycleTime">Cycle Time</label>
+            <input type="text" id="cycleTime" name="cycleTime" th:value="${production?.cycleTime}" readonly />
+          </div>
+
+          <div class="form-group">
+            <label for="curingTemp">Curing Temp.</label>
+            <input type="text" id="curingTemp" name="curingTemp" th:value="${production?.curingTemp}" readonly />
+          </div>
+
+          <!-- METHOD Section -->
+          <h3 class="form-section-title">
+            <i class="fas fa-tools"></i>
+            METHOD
+          </h3>
+
+          <div class="form-group">
+            <label for="date" class="required">DATE</label>
+            <input type="date" id="date" name="date" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="methodStartTime" class="required">START TIME</label>
+            <input type="time" id="methodStartTime" name="methodStartTime" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="methodEndTime" class="required">END TIME</label>
+            <input type="time" id="methodEndTime" name="methodEndTime" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="plannedQty">PLANNED QTY.</label>
+            <input type="text" id="plannedQty" name="plannedQty">
+          </div>
+          
+          <div class="form-group">
+            <label for="processedQty" class="required">PROCESSED QTY.</label>
+            <input type="text" id="processedQty" name="processedQty" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="okQty" class="required">OK QTY.</label>
+            <input type="text" id="okQty" name="okQty" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="notOkQty" class="required">NOT OK QTY.</label>
+            <input type="text" id="notOkQty" name="notOkQty" required>
+          </div>
+          
+          <div class="form-group">
+                       <label for="operatorName" class="required">OPERATOR NAME</label>
+            <input type="text" id="operatorName" name="operatorName" required>
+          </div>
+
+          <!-- POST-CURING Section -->
+          <h3 class="form-section-title">
+            <i class="fas fa-fire"></i>
+            POST-CURING
+          </h3>
+
+          <div class="form-group">
+            <label for="postReceivedQty">Received Qty</label>
+            <input type="text" id="postReceivedQty" name="postReceivedQty" th:value="${extrusion?.receivedQty}" readonly>
+          </div>
+          
+          <div class="form-group">
+            <label for="postProcessedQty">Processed Qty.</label>
+            <input type="text" id="postProcessedQty" name="postProcessedQty" th:value="${extrusion?.postProcessedQty}" readonly>
+          </div>
+          
+          <div class="form-group">
+            <label for="postTemperature" class="required">Temperature</label>
+            <input type="text" id="postTemperature" name="postTemperature" th:value="${extrusion?.temperature}" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="postStartTime" class="required">Start Time</label>
+            <input type="text" id="postStartTime" name="postStartTime" th:value="${extrusion?.postStartTime}" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="postEndTime" class="required">End Time</label>
+            <input type="text" id="postEndTime" name="postEndTime" th:value="${extrusion?.postEndTime}" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="postDuration" class="required">Duration</label>
+            <input type="text" id="postDuration" name="postDuration" th:value="${extrusion?.duration}" required>
+          </div>
+          
+          <div class="form-group" style="grid-column: span 4;">
+            <label for="postRemarks">Remarks (if any)</label>
+            <input type="text" id="postRemarks" name="postRemarks" th:value="${extrusion?.postRemarks}">
+          </div>
+
+          <!-- STATUS Section -->
+          <div class="status-row">
+            <label for="status" class="required">STATUS</label>
+            <input type="text" id="status" name="status" list="status-options" required placeholder="Select status">
+            <datalist id="status-options">
+              <option value="APPROVED">
+              <option value="REJECTED">
+            </datalist>
+            <span>(DROPDOWN TO CHOOSE APPROVED AND REJECTED)</span>
+          </div>
+
+          <!-- Enhanced Button Group -->
+          <div class="submit-buttons">
+            <button type="button" class="btn draft-btn">
+              <i class="fas fa-save"></i>
+              SAVE AS DRAFT
+            </button>
+            
+            <button type="submit" class="btn submit-btn">
+              <i class="fas fa-paper-plane"></i>
+              SUBMIT
+            </button>
+            
+            <a href="/export-qcsupervisor-report" class="btn download-btn">
+              <i class="fas fa-file-excel"></i>
+              Download Report (Excel)
+            </a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <!-- Enhanced JavaScript -->
+  <script>
+    // Sidebar toggle functionality
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('active');
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.querySelector('.sidebar-toggle');
+      
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(event.target) && 
+          !toggleBtn.contains(event.target) && 
+          sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+      }
+    });
+
+    // Form enhancement and validation
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('qcForm');
+      const inputs = form.querySelectorAll('input[required]');
+      
+      // Set current date as default
+      const dateField = document.getElementById('date');
+      if (dateField && !dateField.value) {
+        dateField.value = new Date().toISOString().split('T')[0];
+      }
+
+      // Real-time validation
+      inputs.forEach(input => {
+        input.addEventListener('blur', validateField);
+        input.addEventListener('input', clearError);
+      });
+
+      // Form submission handling
+      form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        inputs.forEach(input => {
+          if (!validateField.call(input)) {
+            isValid = false;
+          }
+        });
+
+        if (!isValid) {
+          e.preventDefault();
+          showNotification('Please fix all errors before submitting', 'error');
+          return;
+        }
+
+        // Add loading state to submit button
+        const submitBtn = document.querySelector('.submit-btn');
+        if (submitBtn) {
+          submitBtn.classList.add('loading');
+          submitBtn.disabled = true;
+          
+          // Reset after 3 seconds (simulate server response)
+          setTimeout(() => {
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+          }, 3000);
+        }
+      });
+
+      // Auto-save functionality
+      let autoSaveTimer;
+      inputs.forEach(input => {
+        input.addEventListener('input', function() {
+          clearTimeout(autoSaveTimer);
+          autoSaveTimer = setTimeout(autoSave, 30000); // Auto-save after 30 seconds
+        });
+      });
+
+      // Focus first empty field
+      const firstEmptyField = Array.from(inputs).find(input => !input.value);
+      if (firstEmptyField) {
+        setTimeout(() => firstEmptyField.focus(), 500);
+      }
+    });
+
+    // Field validation function
+    function validateField() {
+      const field = this;
+      const value = field.value.trim();
+      let isValid = true;
+      let errorMessage = '';
+
+      // Check if required field is empty
+      if (field.hasAttribute('required') && !value) {
+        isValid = false;
+        errorMessage = 'This field is required';
+      }
+      // Validate number fields
+      else if (field.type === 'number' && value) {
+        const num = parseFloat(value);
+        const min = parseFloat(field.getAttribute('min'));
+        const max = parseFloat(field.getAttribute('max'));
+        
+        if (isNaN(num)) {
+          isValid = false;
+          errorMessage = 'Please enter a valid number';
+        } else if (min !== null && num < min) {
+          isValid = false;
+          errorMessage = `Value must be at least ${min}`;
+        } else if (max !== null && num > max) {
+          isValid = false;
+          errorMessage = `Value must be no more than ${max}`;
+        }
+      }
+      // Validate status field
+      else if (field.name === 'status' && value) {
+        if (!['APPROVED', 'REJECTED'].includes(value.toUpperCase())) {
+          isValid = false;
+          errorMessage = 'Status must be either APPROVED or REJECTED';
+        }
+      }
+
+      // Show/hide error state
+      if (!isValid) {
+        field.style.borderColor = 'var(--error-color)';
+        field.style.backgroundColor = 'rgba(220, 38, 38, 0.05)';
+        showFieldError(field, errorMessage);
+      } else {
+        field.style.borderColor = 'var(--success-color)';
+        field.style.backgroundColor = 'rgba(5, 150, 105, 0.05)';
+        hideFieldError(field);
+      }
+
+      return isValid;
+    }
+
+    // Clear error state on input
+    function clearError() {
+      this.style.borderColor = '';
+      this.style.backgroundColor = '';
+      hideFieldError(this);
+    }
+
+    // Show field error
+    function showFieldError(field, message) {
+      hideFieldError(field); // Remove existing error
+      
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'field-error';
+      errorDiv.style.cssText = `
+        color: var(--error-color);
+        font-size: 12px;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      `;
+      errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i>${message}`;
+      
+      field.parentNode.appendChild(errorDiv);
+    }
+
+    // Hide field error
+    function hideFieldError(field) {
+      const existingError = field.parentNode.querySelector('.field-error');
+      if (existingError) {
+        existingError.remove();
+      }
+    }
+
+    // Auto-save functionality
+    function autoSave() {
+      const form = document.getElementById('qcForm');
+      const formData = new FormData(form);
+      
+      // Only auto-save if there's meaningful data
+      let hasData = false;
+      for (let [key, value] of formData.entries()) {
+        if (value && value.toString().trim()) {
+          hasData = true;
+          break;
+        }
+      }
+
+      if (hasData) {
+        // Simulate auto-save (replace with actual endpoint)
+        console.log('Auto-saving QC data...');
+        showNotification('Draft saved automatically', 'success');
+      }
+    }
+
+    // Notification system
+    function showNotification(message, type = 'info') {
+      // Remove existing notifications
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        existingNotification.remove();
+      }
+
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      
+      const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+      };
+
+      notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fas ${icons[type] || icons.info}"></i>
+          <span>${message}</span>
+        </div>
+      `;
+
+      document.body.appendChild(notification);
+
+      // Animate in
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 100);
+
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }, 5000);
+    }
+
+    // Form data persistence (localStorage backup)
+    function saveFormData() {
+      const form = document.getElementById('qcForm');
+      const formData = new FormData(form);
+      const data = {};
+      
+      for (let [key, value] of formData.entries()) {
+        if (value && typeof value === 'string') {
+          data[key] = value;
+        }
+      }
+      
+      localStorage.setItem('qcFormData', JSON.stringify(data));
+    }
+
+    function loadFormData() {
+      const savedData = localStorage.getItem('qcFormData');
+      if (savedData) {
+        try {
+          const data = JSON.parse(savedData);
+          const form = document.getElementById('qcForm');
+          
+          Object.keys(data).forEach(key => {
+            const field = form.querySelector(`[name="${key}"]`);
+            if (field && !field.readOnly) {
+              field.value = data[key];
+            }
+          });
+        } catch (error) {
+          console.error('Error loading saved form data:', error);
+        }
+      }
+    }
+
+    // Clear saved data on successful submission
+    function clearSavedData() {
+      localStorage.removeItem('qcFormData');
+    }
+
+    // Initialize form data persistence
+    document.addEventListener('DOMContentLoaded', function() {
+      loadFormData();
+      
+      // Save form data on input
+      const form = document.getElementById('qcForm');
+      const inputs = form.querySelectorAll('input:not([readonly]), select, textarea');
+      
+      inputs.forEach(input => {
+        input.addEventListener('input', debounce(saveFormData, 1000));
+      });
+      
+      // Clear saved data on successful form submission
+      form.addEventListener('submit', function(e) {
+        setTimeout(clearSavedData, 1000);
+      });
+    });
+
+    // Debounce utility function
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Status field enhancement
+    document.addEventListener('DOMContentLoaded', function() {
+      const statusField = document.getElementById('status');
+      
+      if (statusField) {
+        // Add status indicator
+        statusField.addEventListener('input', function() {
+          const value = this.value.toUpperCase();
+          const indicator = this.parentNode.querySelector('.status-indicator');
+          
+          if (indicator) {
+            indicator.remove();
+          }
+          
+          if (value === 'APPROVED' || value === 'REJECTED') {
+            const newIndicator = document.createElement('span');
+            newIndicator.className = `status-indicator status-${value.toLowerCase()}`;
+            this.parentNode.insertBefore(newIndicator, this);
+          }
+        });
+        
+        // Auto-complete functionality
+        statusField.addEventListener('keydown', function(e) {
+          if (e.key === 'Tab' || e.key === 'Enter') {
+            const value = this.value.toLowerCase();
+            if (value.startsWith('a')) {
+              this.value = 'APPROVED';
+            } else if (value.startsWith('r')) {
+              this.value = 'REJECTED';
+            }
+          }
+        });
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(event) {
+      // Ctrl/Cmd + S to save
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault();
+        const submitBtn = document.querySelector('.submit-btn');
+        if (submitBtn) {
+          submitBtn.click();
+        }
+      }
+      
+      // Ctrl/Cmd + D to save as draft
+      if ((event.ctrlKey || event.metaKey) && event.key === 'd') {
+        event.preventDefault();
+        const draftBtn = document.querySelector('.draft-btn');
+        if (draftBtn) {
+          draftBtn.click();
+        }
+      }
+      
+      // Escape to close sidebar on mobile
+      if (event.key === 'Escape') {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+        }
+      }
+    });
+
+    // Responsive handling
+    function handleResize() {
+      const sidebar = document.getElementById('sidebar');
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('active');
+      }
+    }
+
+    window.addEventListener('resize', handleResize);
+    // Enhanced draft button functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const draftBtn = document.querySelector('.draft-btn');
+      if (draftBtn) {
+        draftBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Save current form data
+          saveFormData();
+          showNotification('Form saved as draft successfully', 'success');
+          
+          // Add visual feedback
+          this.classList.add('loading');
+          this.disabled = true;
+          
+          setTimeout(() => {
+            this.classList.remove('loading');
+            this.disabled = false;
+          }, 1500);
+        });
+      }
+    });
+
+    // Connection status monitoring
+    function updateConnectionStatus() {
+      const isOnline = navigator.onLine;
+      
+      if (!isOnline) {
+        showNotification('You are offline. Form data will be saved locally.', 'warning');
+      }
+    }
+
+    window.addEventListener('online', function() {
+      showNotification('Connection restored', 'success');
+    });
+    
+    window.addEventListener('offline', updateConnectionStatus);
+
+    // Initialize connection status
+    document.addEventListener('DOMContentLoaded', updateConnectionStatus);
+
+    // Print functionality
+    function printForm() {
+      window.print();
+    }
+
+    // Accessibility enhancements
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add ARIA labels and descriptions
+      const requiredFields = document.querySelectorAll('input[required]');
+      requiredFields.forEach(field => {
+        field.setAttribute('aria-required', 'true');
+        
+        const label = document.querySelector(`label[for="${field.id}"]`);
+        if (label) {
+          field.setAttribute('aria-labelledby', field.id + '-label');
+          label.id = field.id + '-label';
+        }
+      });
+
+      // Keyboard navigation improvements
+      const form = document.getElementById('qcForm');
+      const inputs = form.querySelectorAll('input:not([readonly]), select, textarea, button');
+      
+      inputs.forEach((input, index) => {
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && input.type !== 'textarea') {
+            e.preventDefault();
+            const nextInput = inputs[index + 1];
+            if (nextInput) {
+              nextInput.focus();
+            } else {
+              // If last field, focus submit button
+              const submitBtn = document.querySelector('.submit-btn');
+              if (submitBtn) {
+                submitBtn.focus();
+              }
+            }
+          }
+        });
+      });
+    });
+
+    // Enhanced mobile sidebar handling
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.getElementById('sidebar');
+      const sidebarToggle = document.querySelector('.sidebar-toggle');
+      
+      // Touch events for mobile
+      let touchStartX = 0;
+      let touchEndX = 0;
+      
+      document.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+      });
+      
+      document.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      });
+      
+      function handleSwipe() {
+        const swipeThreshold = 50;
+        const swipeDistance = touchEndX - touchStartX;
+        
+        if (window.innerWidth <= 768) {
+          // Swipe right to open sidebar
+          if (swipeDistance > swipeThreshold && touchStartX < 50) {
+            sidebar.classList.add('active');
+          }
+          // Swipe left to close sidebar
+          else if (swipeDistance < -swipeThreshold && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+          }
+        }
+      }
+      
+      // Prevent body scroll when sidebar is open on mobile
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            if (sidebar.classList.contains('active') && window.innerWidth <= 768) {
+              document.body.style.overflow = 'hidden';
+            } else {
+              document.body.style.overflow = '';
+            }
+          }
+        });
+      });
+      
+      observer.observe(sidebar, { attributes: true });
+    });
+
+    // Form progress tracking
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('qcForm');
+      const requiredFields = form.querySelectorAll('input[required]');
+      const progressBar = document.createElement('div');
+      progressBar.className = 'form-progress';
+      progressBar.innerHTML = '<div class="form-progress-fill"></div>';
+      document.body.appendChild(progressBar);
+      
+      function updateProgress() {
+        const filledFields = Array.from(requiredFields).filter(field => field.value.trim() !== '');
+        const progress = (filledFields.length / requiredFields.length) * 100;
+        const progressFill = progressBar.querySelector('.form-progress-fill');
+        progressFill.style.width = progress + '%';
+      }
+      
+      requiredFields.forEach(field => {
+        field.addEventListener('input', updateProgress);
+      });
+      
+      // Initial progress calculation
+      updateProgress();
+    });
+
+    // Performance optimization
+    document.addEventListener('DOMContentLoaded', function() {
+      // Lazy load non-critical features
+      const lazyFeatures = [
+        () => console.log('QC Supervisor form initialized'),
+        () => updateConnectionStatus(),
+        () => loadFormData()
+      ];
+      
+      // Load features with delay to improve initial page load
+      lazyFeatures.forEach((feature, index) => {
+        setTimeout(feature, index * 100);
+      });
+    });
+
+    // Error handling
+    window.addEventListener('error', function(event) {
+      console.error('Application error:', event.error);
+      showNotification('An unexpected error occurred. Please try again.', 'error');
+    });
+
+    // Service worker registration for offline support (if available)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function(error) {
+        console.log('Service Worker registration failed:', error);
+      });
+    }
+
+    // Quantity validation logic
+    document.addEventListener('DOMContentLoaded', function() {
+      const processedQtyField = document.getElementById('processedQty');
+      const okQtyField = document.getElementById('okQty');
+      const notOkQtyField = document.getElementById('notOkQty');
+      
+      function validateQuantities() {
+        const processed = parseFloat(processedQtyField.value) || 0;
+        const ok = parseFloat(okQtyField.value) || 0;
+        const notOk = parseFloat(notOkQtyField.value) || 0;
+        
+        if (processed > 0 && (ok + notOk) !== processed) {
+          showNotification('OK Qty + Not OK Qty should equal Processed Qty', 'warning');
+        }
+      }
+      
+      [processedQtyField, okQtyField, notOkQtyField].forEach(field => {
+        if (field) {
+          field.addEventListener('blur', validateQuantities);
+        }
+      });
+    });
+
+    // Time validation
+    document.addEventListener('DOMContentLoaded', function() {
+      const startTimeField = document.getElementById('methodStartTime');
+      const endTimeField = document.getElementById('methodEndTime');
+      
+      function validateTimes() {
+        if (startTimeField.value && endTimeField.value) {
+          const startTime = new Date('2000-01-01 ' + startTimeField.value);
+          const endTime = new Date('2000-01-01 ' + endTimeField.value);
+          
+          if (endTime <= startTime) {
+            showNotification('End time must be after start time', 'error');
+            endTimeField.style.borderColor = 'var(--error-color)';
+          } else {
+            endTimeField.style.borderColor = '';
+          }
+        }
+      }
+      
+      if (startTimeField && endTimeField) {
+        startTimeField.addEventListener('change', validateTimes);
+        endTimeField.addEventListener('change', validateTimes);
+      }
+    });
+
+    // Final initialization
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add loading animation to page
+      document.body.style.opacity = '0';
+      document.body.style.transition = 'opacity 0.5s ease';
+      
+      setTimeout(() => {
+        document.body.style.opacity = '1';
+      }, 100);
+
+      // Initialize tooltips for mobile
+      if (window.innerWidth <= 768) {
+        document.querySelectorAll('.tooltip').forEach(el => {
+          el.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tooltip = this.getAttribute('data-tooltip');
+            if (tooltip) {
+              showNotification(tooltip, 'info');
+            }
+          });
+        });
+      }
+      
+      console.log('QC Supervisor Department System initialized successfully');
+    });
+
+    // Auto-calculate duration for post-curing
+    document.addEventListener('DOMContentLoaded', function() {
+      const postStartTimeField = document.getElementById('postStartTime');
+      const postEndTimeField = document.getElementById('postEndTime');
+      const postDurationField = document.getElementById('postDuration');
+      
+      function calculateDuration() {
+        if (postStartTimeField.value && postEndTimeField.value) {
+          try {
+            const startTime = new Date('2000-01-01 ' + postStartTimeField.value);
+            const endTime = new Date('2000-01-01 ' + postEndTimeField.value);
+            
+            if (endTime > startTime) {
+              const diffMs = endTime - startTime;
+              const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+              const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+              
+              postDurationField.value = `${diffHours}h ${diffMinutes}m`;
+            }
+          } catch (error) {
+            console.error('Error calculating duration:', error);
+          }
+        }
+      }
+      
+      if (postStartTimeField && postEndTimeField && postDurationField) {
+        postStartTimeField.addEventListener('change', calculateDuration);
+        postEndTimeField.addEventListener('change', calculateDuration);
+      }
+    });
+
+    // Enhanced status field with visual feedback
+    document.addEventListener('DOMContentLoaded', function() {
+      const statusField = document.getElementById('status');
+      
+      if (statusField) {
+        statusField.addEventListener('input', function() {
+          const value = this.value.toUpperCase();
+          const formContainer = document.querySelector('.qc-form-container');
+          
+          // Remove existing status classes
+          formContainer.classList.remove('status-approved', 'status-rejected');
+          
+          // Add appropriate status class
+          if (value === 'APPROVED') {
+            formContainer.classList.add('status-approved');
+            this.style.borderColor = 'var(--success-color)';
+            this.style.backgroundColor = 'rgba(5, 150, 105, 0.1)';
+          } else if (value === 'REJECTED') {
+            formContainer.classList.add('status-rejected');
+            this.style.borderColor = 'var(--error-color)';
+            this.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
+          } else {
+            this.style.borderColor = '';
+            this.style.backgroundColor = '';
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
+
+   
+
+
+

@@ -1,0 +1,2133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Production Supervisor - Manufacturing CRM</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Manufacturing CRM Color Palette - Consistent with dashboard */
+      --primary-color: rgb(255, 0, 0);
+      --primary-dark: #1e3a8a;
+       --primary-light: rgb(0, 0, 0);
+      --secondary-color: #f59e0b;
+      --accent-color: #10b981;
+      --success-color: #059669;
+      --warning-color: #d97706;
+      --error-color: #dc2626;
+      --info-color: #0284c7;
+      
+      /* Background & Surface Colors */
+      --background-primary: #f8fafc;
+      --background-secondary: #f1f5f9;
+      --card-background: #ffffff;
+      --sidebar-background: rgb(128, 0, 0);
+      --sidebar-hover: #F3CE14;
+      
+      /* Text Colors */
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --text-light: #9ca3af;
+      --text-white: #ffffff;
+      
+      /* Border & Shadow */
+      --border-color: #e5e7eb;
+      --border-light: #f3f4f6;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      
+      /* Gradients */
+      --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      --gradient-secondary: linear-gradient(135deg, var(--secondary-color) 0%, #ea580c 100%);
+      --gradient-success: linear-gradient(135deg, var(--accent-color) 0%, var(--success-color) 100%);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Container Layout */
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Enhanced Sidebar - FIXED STRUCTURE */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar-background);
+      color: var(--text-white);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      box-shadow: var(--shadow-xl);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Sidebar Header - FIXED POSITION */
+    .sidebar-header {
+      position: sticky;
+      top: 0;
+      padding: 24px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-background);
+     background: linear-gradient(135deg, rgb(255, 128, 0) 0%, rgba(30, 58, 138, 0.1) 100%);
+      z-index: 1001;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .sidebar h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+    }
+
+    .sidebar h2 i {
+      font-size: 24px;
+      color: var(--primary-light);
+    }
+
+    /* Sidebar Body - SCROLLABLE AREA */
+    .sidebar-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Navigation Links Container - SCROLLABLE */
+    .nav-container {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 0;
+    }
+
+    /* Custom Scrollbar for Sidebar */
+    .nav-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .nav-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    .nav-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Navigation Links */
+    .nav-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-links li {
+      margin: 0;
+      position: relative;
+    }
+
+    .nav-links li.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: var(--primary-light);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .nav-links li.active {
+      background: var(--sidebar-hover);
+    }
+
+    .nav-links a {
+      color: var(--text-white);
+      text-decoration: none;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 500;
+      font-size: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-links a::before {
+      content: '';
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-links a:hover::before {
+      left: 100%;
+    }
+
+    .nav-links a:hover {
+      background: var(--sidebar-hover);
+      transform: translateX(4px);
+      color: var(--primary-light);
+    }
+
+    .nav-links a i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      color: #94a3b8;
+      transition: color 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .nav-links a:hover i,
+    .nav-links li.active a i {
+      color: var(--primary-light);
+    }
+
+    /* User Info Section - FIXED AT BOTTOM */
+    .user-info {
+      position: sticky;
+      bottom: 0;
+      padding: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--sidebar-background);
+      background: rgba(0, 0, 0, 0.2);
+      z-index: 1001;
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .user-info img {
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 280px;
+      padding: 24px;
+      width: calc(100% - 280px);
+      min-height: 100vh;
+      background: var(--background-primary);
+    }
+
+    /* Page Header */
+    .page-header {
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-title i {
+      color: var(--primary-color);
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .success-message {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      color: var(--success-color);
+      padding: 16px 20px;
+      border-radius: 12px;
+      border-left: 4px solid var(--success-color);
+      font-size: 16px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* Fetch Form */
+    .fetch-container {
+      background: var(--card-background);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fetch-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .fetch-form {
+      display: flex;
+      gap: 20px;
+      align-items: end;
+    }
+
+    .fetch-group {
+      flex: 1;
+    }
+
+    .fetch-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+
+    .fetch-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--card-background);
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+
+    .fetch-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    .fetch-btn {
+      padding: 12px 24px;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .fetch-btn:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #1e3a8a 100%);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Enhanced Form Container */
+    .form-container {
+      background: var(--card-background);
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .form-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .form-content {
+      padding: 32px;
+    }
+
+    /* IMPROVED FORM LAYOUT - PERFECT ALIGNMENT */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 0;
+    }
+
+    .form-column {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .form-column h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid var(--primary-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-column h2::after {
+      content: "";
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: var(--primary-dark);
+      border-radius: 2px;
+    }
+
+    .form-column h2 i {
+            color: var(--primary-color);
+      font-size: 16px;
+    }
+
+    /* PERFECT FORM GROUP ALIGNMENT */
+    .form-group {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 14px;
+      letter-spacing: 0.025em;
+      position: relative;
+    }
+
+    .form-group label.required::after {
+      content: " *";
+      color: var(--error-color);
+      font-weight: 700;
+    }
+
+    /* ENHANCED FORM INPUTS - PERFECT ALIGNMENT */
+    .form-group input[type="text"],
+    .form-group input[type="date"],
+    .form-group input[type="number"],
+    .form-group input[type="time"],
+    .form-group select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--card-background);
+      color: var(--text-primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      height: 44px;
+      box-sizing: border-box;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .form-group input:hover,
+    .form-group select:hover {
+      border-color: var(--primary-light);
+    }
+
+    input:read-only {
+      background-color: #f8fafc;
+      color: var(--text-secondary);
+      cursor: not-allowed;
+    }
+
+    /* Datalist Styling */
+    datalist {
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Image Section - IMPROVED DESIGN */
+    .image-section {
+      margin-bottom: 20px;
+    }
+
+    .image-available {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gradient-primary);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 14px;
+      width: 100%;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+
+    .image-available:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #1e3a8a 100%);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .image-unavailable {
+      color: var(--text-secondary);
+      font-style: italic;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px dashed var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      box-sizing: border-box;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* ENHANCED BUTTON GROUP - PERFECT ALIGNMENT */
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-light);
+      width: 100%;
+    }
+
+    /* BUTTON STYLES - CONSISTENT SIZING */
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      height: 44px;
+      box-sizing: border-box;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-submit {
+      background: var(--gradient-success);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .btn-submit:hover {
+      background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+      box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--gradient-secondary);
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+      box-shadow: 0 8px 25px rgba(234, 88, 12, 0.3);
+    }
+
+    .btn-print {
+      background: var(--card-background);
+      color: var(--text-primary);
+      border: 2px solid var(--border-color);
+    }
+
+    .btn-print:hover {
+      background: var(--background-secondary);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    /* Sidebar Toggle for Mobile */
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+
+    /* RESPONSIVE DESIGN - IMPROVED BREAKPOINTS */
+    @media (max-width: 1400px) {
+      .form-row {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 24px;
+      }
+      
+      .form-column:nth-child(4) {
+        grid-column: 1 / -1;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-light);
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .form-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      
+      .form-column:nth-child(3),
+      .form-column:nth-child(4) {
+        grid-column: 1 / -1;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-light);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-toggle {
+        display: block;
+      }
+      
+      .sidebar {
+        width: 70px;
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+        width: 280px;
+      }
+      
+      .sidebar:not(.active) .sidebar-header {
+        padding: 20px 10px;
+      }
+      
+      .sidebar:not(.active) .sidebar h2 span {
+        display: none;
+      }
+      
+      .sidebar:not(.active) .nav-links a span {
+        display: none;
+      }
+      
+      .sidebar:not(.active) .nav-links a {
+        justify-content: center;
+        padding: 12px 10px;
+      }
+      
+      .sidebar:not(.active) .nav-links a i {
+        margin-right: 0;
+        font-size: 18px;
+      }
+      
+      .sidebar:not(.active) .user-info {
+        padding: 15px 10px;
+      }
+      
+      .sidebar:not(.active) .user-info img {
+        max-width: 40px;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 80px 16px 20px 16px;
+      }
+      
+      .form-container {
+        padding: 20px;
+      }
+      
+      .form-content {
+        padding: 20px;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .form-column:nth-child(n) {
+        grid-column: auto;
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+      }
+      
+      .form-column:not(:first-child) {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-light);
+      }
+      
+      .page-title {
+        font-size: 24px;
+      }
+
+      .fetch-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .fetch-btn {
+        margin-top: 8px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 70px 12px 16px 12px;
+      }
+      
+      .form-container {
+        padding: 16px;
+      }
+      
+      .form-content {
+        padding: 16px;
+      }
+      
+      .page-title {
+        font-size: 20px;
+      }
+      
+      .form-column h2 {
+        font-size: 16px;
+      }
+    }
+
+    /* Loading States */
+    .btn.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .btn.loading::after {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Form Validation Styles */
+    .form-group input:invalid:not(:focus):not(:placeholder-shown) {
+      border-color: var(--error-color);
+      background-color: rgba(220, 38, 38, 0.05);
+    }
+
+    .form-group input:valid:not(:focus):not(:placeholder-shown) {
+      border-color: var(--success-color);
+      background-color: rgba(5, 150, 105, 0.05);
+    }
+
+    /* Save Notification */
+    .save-notification {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      background: var(--success-color);
+      color: white;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Print Styles */
+    @media print {
+      .sidebar,
+      .fetch-container,
+      .button-group,
+      .sidebar-toggle,
+      .save-notification {
+        display: none !important;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 0;
+      }
+      
+      .form-container {
+        box-shadow: none;
+        border: 1px solid #000;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+    }
+
+    /* COLUMN EQUAL HEIGHT FIX */
+    .form-row {
+      align-items: start;
+    }
+
+    .form-column {
+      height: 100%;
+    }
+
+    /* IMPROVED SPACING */
+    .form-column:not(:last-child) {
+      border-right: 1px solid var(--border-light);
+      padding-right: 24px;
+    }
+
+    .form-column:not(:first-child) {
+      padding-left: 24px;
+    }
+
+    /* VISUAL SEPARATORS FOR BETTER ORGANIZATION */
+    .form-column::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: -16px;
+      width: 1px;
+      height: 100%;
+      background: linear-gradient(to bottom, transparent, var(--border-color), transparent);
+    }
+
+    .form-column:last-child::before {
+      display: none;
+    }
+
+    /* ENHANCED FOCUS STATES */
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      background-color: rgba(30, 64, 175, 0.02);
+    }
+
+    /* IMPROVED HOVER STATES */
+    .form-group:hover input:not(:focus),
+    .form-group:hover select:not(:focus) {
+      border-color: var(--primary-light);
+    }
+
+    /* CONSISTENT SPACING FOR ALL ELEMENTS */
+    .form-group {
+      position: relative;
+    }
+
+    .form-group label {
+      min-height: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* BETTER VISUAL HIERARCHY */
+    .form-column h2 {
+      position: sticky;
+      top: 0;
+      background: var(--card-background);
+      z-index: 10;
+      margin: -8px -8px 24px -8px;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Mobile Toggle Button -->
+    <button class="mobile-toggle" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Enhanced Sidebar -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>
+          <i class="fas fa-industry"></i>
+          <span>ManufacturePro</span>
+        </h2>
+      </div>
+      
+      <div class="sidebar-body">
+        <div class="nav-container">
+          <ul class="nav-links">
+            <li><a href="/dashboard"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <!-- <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i><span>Overview</span></a></li> -->
+            <!-- <li><a href="/reports"><i class="fas fa-chart-bar"></i><span>Reports</span></a></li> -->
+            <li ><a href="/search"><i class="fas fa-search"></i><span>Search</span></a></li>
+            <li ><a href="/order"><i class="fas fa-clipboard-list"></i><span>Order Log</span></a></li>
+            <li ><a href="/mixing"><i class="fas fa-blender"></i><span>Mixing</span></a></li>
+            <li class="active"><a href="/production"><i class="fas fa-cogs"></i><span>Production</span></a></li>
+            <li><a href="/extrusion"><i class="fas fa-industry"></i><span>Extrusion</span></a></li>
+            <li><a href="/coating"><i class="fas fa-brush"></i><span>Coating</span></a></li>
+            <li><a href="/jointing"><i class="fas fa-link"></i><span>Jointing</span></a></li>
+            <li><a href="/moulding"><i class="fas fa-cube"></i><span>Moulding</span></a></li>
+            <li><a href="/sheeting"><i class="fas fa-layer-group"></i><span>Sheeting</span></a></li>
+            <li><a href="/qc"><i class="fas fa-user-shield"></i><span>QC Supervisor</span></a></li>
+            <li><a href="/planning"><i class="fas fa-calendar-alt"></i><span>Planning</span></a></li>
+            <li><a href="/inspection"><i class="fas fa-clipboard-check"></i><span>Inspection</span></a></li>
+            <li><a href="/finalinspection"><i class="fas fa-check-double"></i><span>Final Inspection</span></a></li>
+            <li><a href="/dispatch-note"><i class="fas fa-file-signature"></i><span>Dispatch Approval</span></a></li>
+            <li><a href="/packing"><i class="fas fa-box"></i><span>Packing</span></a></li>
+            <li><a href="/dispatch"><i class="fas fa-truck"></i><span>Dispatch</span></a></li>
+          </ul>
+        </div>
+        
+        <div class="user-info">
+          <img src="armol-removebg-preview.png" alt="ManufacturePro Logo">
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">
+          <i class="fas fa-user-tie"></i>
+          Production Supervisor
+        </h1>
+        <p class="page-subtitle">Manage production orders and setup parameters</p>
+      </div>
+
+      <!-- Route Card Fetch Section -->
+      <div class="fetch-container">
+        <form class="fetch-form" action="/fetch-by-route-production">
+          <div class="fetch-group">
+            <label for="routeCardNo">Route Card Number</label>
+            <input 
+              type="text" 
+              id="routeCardNo"
+              name="routeCardNo" 
+              class="fetch-input"
+              th:value="${order?.routeCardNo}" 
+              placeholder="Enter Route Card Number" 
+              required
+            >
+          </div>
+          <button type="submit" class="fetch-btn">
+            <i class="fas fa-search"></i>
+            Fetch Details
+          </button>
+        </form>
+      </div>
+
+      <!-- Main Form -->
+      <div class="form-container">
+        <!-- Success Message -->
+        <div th:if="${message}" class="success-message">
+          <i class="fas fa-check-circle"></i>
+          <span th:text="${message}"></span>
+        </div>
+
+        <div class="form-content">
+          <form action="/production" method="post">
+            <div class="form-row">
+              <!-- Column 1: Order Details -->
+              <div class="form-column">
+                <h2><i class="fas fa-clipboard-list"></i> Order Details</h2>
+                
+                <div class="form-group">
+                  <label class="required">Route Card No.</label>
+                  <input type="text" name="routeCardNo" th:value="${order?.routeCardNo}" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="required">Date</label>
+                  <input type="date" name="date" th:value="${order?.date}" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="required">Component Name</label>
+                  <input type="text" name="componentName" th:value="${order?.componentName}" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="required">Customer No.</label>
+                  <input type="number" name="customerNo" th:value="${order?.customerNo}" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="required">Method</label>
+                  <input type="text" name="method" th:value="${order?.method}" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="required">Enquiry No.</label>
+                  <input type="text" name="enquiryNo" th:value="${order?.enquiryNo}" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="required">Material</label>
+                  <input type="text" name="material" th:value="${order?.material}" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="required">Quotation No.</label>
+                  <input type="text" name="quotationNo" th:value="${order?.quotationNo}" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="required">Tool / Die No.</label>
+                  <input type="text" name="toolDieNo" th:value="${order?.toolDieNo}" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="required">Purchase Order No.</label>
+                  <input type="text" name="purchaseOrder" th:value="${order?.purchaseOrder}" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="required">Formulation No.</label>
+                  <input type="text" name="formulationNo" th:value="${order?.formulationNo}" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="required">Work Order No.</label>
+                  <input type="text" name="workOrderNo" th:value="${order?.workOrderNo}" required />
+                </div>
+              </div>
+
+              <!-- Column 2: Mixing Details -->
+              <div class="form-column">
+                <h2><i class="fas fa-blender"></i> Mixing Details</h2>
+                
+                <div class="form-group">
+                  <label>Batch No.</label>
+                  <input type="text" name="batchNo" th:value="${mixing?.batchNo}">
+                </div>
+                
+                <div class="form-group">
+                  <label>Batch Weight</label>
+                  <input type="number" name="batchWeight" th:value="${mixing?.batchWeight}" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                  <label>Balance Weight</label>
+                  <input type="number" name="balanceWeight" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                  <label>Man</label>
+                  <input type="text" name="man">
+                </div>
+                
+                <div class="form-group">
+                  <label>Planned Quantity</label>
+                  <input type="number" name="plannedQty" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                  <label>Colour</label>
+                  <input type="text" name="colour" th:value="${mixing?.colour}">
+                </div>
+                
+                <div class="form-group">
+                  <label>Hardness</label>
+                  <input type="number" name="hardness" th:value="${mixing?.hardness}" step="0.01">
+                </div>
+              </div>
+
+              <!-- Column 3: Setup Parameters -->
+              <div class="form-column">
+                <h2><i class="fas fa-cogs"></i> Setup Parameters</h2>
+                
+                <div class="form-group">
+                  <label class="required">Extruder RPM</label>
+                  <input type="number" name="extruderRPM" required step="0.01">
+                </div>
+                
+                <div class="form-group">
+                  <label class="required">DC Oven Temp.</label>
+                  <input type="number" name="dcOvenTemp" required step="0.01">
+                </div>
+                
+                <div class="form-group">
+                  <label class="required">Weight per Meter</label>
+                  <input type="number" name="weightPerMeter" required step="0.01">
+                </div>
+                
+                <div class="form-group">
+                  <label class="required">Production per Hour</label>
+                  <input type="number" name="productionPerHour" required step="0.01">
+                </div>
+                
+                <div class="form-group">
+                  <label class="required">Conveyor RPM</label>
+                  <input type="number" name="conveyorRPM" required step="0.01">
+                </div>
+                
+                <div class="form-group">
+                  <label class="required">Tool / Die No.</label>
+                  <input type="text" name="setupToolDieNo" required>
+                </div>
+                
+                <div class="form-group">
+                  <label class="required">No. of Cavity</label>
+                  <input type="number" name="noOfCavity" required>
+                </div>
+                
+                <div class="form-group">
+                  <label class="required">Time</label>
+                  <input type="time" name="time" required>
+                </div>
+                
+                <div class="form-group">
+                  <label class="required">Clamp Pressure</label>
+                  <input type="number" name="clampPressure" required step="0.01">
+                </div>
+                
+                <div class="form-group">
+                  <label class="required">Cycle Time</label>
+                  <input type="number" name="cycleTime" required step="0.01">
+                </div>
+                
+                <div class="form-group">
+                  <label class="required">Curing Temp.</label>
+                  <input type="number" name="curingTemp" required step="0.01">
+                </div>
+              </div>
+
+              <!-- Column 4: Other Details -->
+              <div class="form-column">
+                <h2><i class="fas fa-ellipsis-h"></i> Additional Details</h2>
+                
+                <div class="form-group image-section">
+                  <label>Drawing / Image</label>
+                  <div th:if="${order.imageUrl != null}">
+                    <a th:href="${order.imageUrl}" target="_blank" class="image-available">
+                      <i class="fas fa-image"></i>
+                      View Drawing/Image
+                    </a>
+                  </div>
+                  <div th:if="${order.imageUrl == null}" class="image-unavailable">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    No image available for this Route Card
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="required">Machine</label>
+                  <input type="text" name="machine" list="machines" required>
+                  <datalist id="machines">
+                    <option value="Extruder Machine 1">
+                    <option value="Extruder Machine 2">
+                    <option value="Molding Machine 1">
+                    <option value="Molding Machine 2">
+                    <option value="Coating Machine 1">
+                    <option value="Assembly Line 1">
+                    <option value="Assembly Line 2">
+                  </datalist>
+                </div>
+                
+                <div class="form-group">
+                  <label class="required">Last Supply Details</label>
+                  <input type="text" name="lastSupply" required>
+                </div>
+                
+                <div class="form-group">
+                  <label class="required">Item Code</label>
+                  <input type="text" name="itemCode" required>
+                </div>
+                
+                <div class="form-group">
+                  <label class="required">Issued By</label>
+                  <input type="text" name="issuedBy" required>
+                </div>
+
+                <div class="button-group">
+                  <button type="submit" class="btn btn-submit">
+                    <i class="fas fa-save"></i>
+                    Submit Production Data
+                  </button>
+                  <a href="/export-supervisor-report" class="btn btn-secondary">
+                    <i class="fas fa-download"></i>
+                    Download Report
+                  </a>
+                  <button type="button" class="btn btn-print" onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                    Print Form
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Mobile sidebar toggle
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('active');
+    }
+
+    // Form validation and UX enhancements
+    document.addEventListener('DOMContentLoaded', function() {
+      // Auto-focus on route card input
+      const routeCardInput = document.getElementById('routeCardNo');
+      if (routeCardInput && !routeCardInput.value) {
+        routeCardInput.focus();
+      }
+
+      // Form submission loading state
+      const forms = document.querySelectorAll('form');
+      forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+          const submitBtn = form.querySelector('button[type="submit"]');
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            // Re-enable button after 5 seconds (fallback)
+            setTimeout(() => {
+                      submitBtn.disabled = false;
+              submitBtn.innerHTML = originalText;
+            }, 5000);
+          }
+        });
+      });
+
+      // Auto-save form data to localStorage
+      const formInputs = document.querySelectorAll('input, select');
+      formInputs.forEach(input => {
+        // Load saved data
+        const savedValue = localStorage.getItem(`production_${input.name}`);
+        if (savedValue && !input.value) {
+          input.value = savedValue;
+        }
+
+        // Save data on change
+        input.addEventListener('change', function() {
+          localStorage.setItem(`production_${input.name}`, input.value);
+          showSaveNotification();
+        });
+      });
+
+      // Clear localStorage on successful form submission
+      const mainForm = document.querySelector('form[action="/production"]');
+      if (mainForm) {
+        mainForm.addEventListener('submit', function() {
+          // Clear saved form data after successful submission
+          setTimeout(() => {
+            formInputs.forEach(input => {
+              localStorage.removeItem(`production_${input.name}`);
+            });
+          }, 1000);
+        });
+      }
+
+      // Enhanced number input validation
+      const numberInputs = document.querySelectorAll('input[type="number"]');
+      numberInputs.forEach(input => {
+        input.addEventListener('input', function() {
+          if (this.value < 0) {
+            this.value = 0;
+          }
+        });
+      });
+
+      // Date input default to today if empty
+      const dateInputs = document.querySelectorAll('input[type="date"]');
+      dateInputs.forEach(input => {
+        if (!input.value) {
+          const today = new Date().toISOString().split('T')[0];
+          input.value = today;
+        }
+      });
+
+      // Time input default to current time if empty
+      const timeInputs = document.querySelectorAll('input[type="time"]');
+      timeInputs.forEach(input => {
+        if (!input.value) {
+          const now = new Date();
+          const hours = String(now.getHours()).padStart(2, '0');
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+          input.value = `${hours}:${minutes}`;
+        }
+      });
+
+      // Smooth scrolling for form navigation
+      const formColumns = document.querySelectorAll('.form-column h2');
+      formColumns.forEach(header => {
+        header.style.cursor = 'pointer';
+        header.addEventListener('click', function() {
+          this.parentElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+        });
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener('keydown', function(e) {
+        // Ctrl + S to submit form
+        if (e.ctrlKey && e.key === 's') {
+          e.preventDefault();
+          const submitBtn = document.querySelector('.btn-submit');
+          if (submitBtn && !submitBtn.disabled) {
+            submitBtn.click();
+          }
+        }
+        
+        // Ctrl + F to focus on route card search
+        if (e.ctrlKey && e.key === 'f') {
+          e.preventDefault();
+          const searchInput = document.getElementById('routeCardNo');
+          if (searchInput) {
+            searchInput.focus();
+            searchInput.select();
+          }
+        }
+
+        // Escape to close mobile sidebar
+        if (e.key === 'Escape') {
+          const sidebar = document.getElementById('sidebar');
+          if (sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+          }
+        }
+      });
+
+      // Form field dependencies and calculations
+      const batchWeightInput = document.querySelector('input[name="batchWeight"]');
+      const balanceWeightInput = document.querySelector('input[name="balanceWeight"]');
+      const plannedQtyInput = document.querySelector('input[name="plannedQty"]');
+
+      if (batchWeightInput && balanceWeightInput) {
+        [batchWeightInput, balanceWeightInput].forEach(input => {
+          input.addEventListener('input', function() {
+            const batchWeight = parseFloat(batchWeightInput.value) || 0;
+            const balanceWeight = parseFloat(balanceWeightInput.value) || 0;
+            
+            // Auto-calculate planned quantity if both weights are available
+            if (batchWeight > 0 && balanceWeight >= 0 && plannedQtyInput) {
+              const usedWeight = batchWeight - balanceWeight;
+              if (usedWeight > 0) {
+                plannedQtyInput.value = usedWeight.toFixed(2);
+              }
+            }
+          });
+        });
+      }
+
+      // Production per hour calculation
+      const cycleTimeInput = document.querySelector('input[name="cycleTime"]');
+      const cavityInput = document.querySelector('input[name="noOfCavity"]');
+      const productionPerHourInput = document.querySelector('input[name="productionPerHour"]');
+
+      if (cycleTimeInput && cavityInput && productionPerHourInput) {
+        [cycleTimeInput, cavityInput].forEach(input => {
+          input.addEventListener('input', function() {
+            const cycleTime = parseFloat(cycleTimeInput.value) || 0;
+            const cavities = parseInt(cavityInput.value) || 0;
+            
+            if (cycleTime > 0 && cavities > 0) {
+              // Calculate production per hour: (3600 seconds / cycle time) * cavities
+              const productionPerHour = (3600 / cycleTime) * cavities;
+              productionPerHourInput.value = Math.round(productionPerHour);
+            }
+          });
+        });
+      }
+
+      // Machine selection enhancement
+      const machineInput = document.querySelector('input[name="machine"]');
+      if (machineInput) {
+        machineInput.addEventListener('input', function() {
+          // Add visual feedback for machine selection
+          this.style.borderColor = this.value ? 'var(--success-color)' : 'var(--border-color)';
+        });
+      }
+
+      // Real-time form validation feedback
+      const requiredInputs = document.querySelectorAll('input[required]');
+      requiredInputs.forEach(input => {
+        input.addEventListener('blur', function() {
+          if (this.value.trim() === '') {
+            this.style.borderColor = 'var(--error-color)';
+            this.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+          } else {
+            this.style.borderColor = 'var(--success-color)';
+            this.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.1)';
+          }
+        });
+
+        input.addEventListener('focus', function() {
+          this.style.borderColor = 'var(--primary-color)';
+          this.style.boxShadow = '0 0 0 3px rgba(30, 64, 175, 0.1)';
+        });
+      });
+
+      // Progress indicator
+      function updateFormProgress() {
+        const totalRequired = document.querySelectorAll('input[required]').length;
+        const filledRequired = Array.from(document.querySelectorAll('input[required]')).filter(input => input.value.trim() !== '').length;
+        
+        const progress = Math.round((filledRequired / totalRequired) * 100);
+        
+        // Update page title with progress
+        document.title = `Production Supervisor (${progress}% Complete) - Manufacturing CRM`;
+      }
+
+      // Update progress on input change
+      requiredInputs.forEach(input => {
+        input.addEventListener('input', updateFormProgress);
+      });
+
+      // Initialize progress
+      updateFormProgress();
+
+      // Close mobile sidebar when clicking outside
+      document.addEventListener('click', function(e) {
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.querySelector('.mobile-toggle');
+        
+        if (window.innerWidth <= 768 && 
+            sidebar.classList.contains('active') && 
+            !sidebar.contains(e.target) && 
+            !toggleBtn.contains(e.target)) {
+          sidebar.classList.remove('active');
+        }
+      });
+
+      // Responsive adjustments
+      function handleResize() {
+        const sidebar = document.getElementById('sidebar');
+        if (window.innerWidth > 768) {
+          sidebar.classList.remove('active');
+        }
+      }
+
+      window.addEventListener('resize', handleResize);
+      handleResize(); // Initial call
+    });
+
+    // Auto-save notification
+    let saveTimeout;
+    function showSaveNotification() {
+      clearTimeout(saveTimeout);
+      
+      let notification = document.querySelector('.save-notification');
+      if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'save-notification';
+        notification.innerHTML = '<i class="fas fa-check"></i> Draft saved';
+        document.body.appendChild(notification);
+      }
+      
+      notification.style.opacity = '1';
+      
+      saveTimeout = setTimeout(() => {
+        notification.style.opacity = '0';
+      }, 2000);
+    }
+
+    // Form validation before submission
+    function validateForm() {
+      const requiredFields = document.querySelectorAll('input[required]');
+      let isValid = true;
+      let firstInvalidField = null;
+
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          field.style.borderColor = 'var(--error-color)';
+          field.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+          if (!firstInvalidField) {
+            firstInvalidField = field;
+          }
+          isValid = false;
+        }
+      });
+
+      if (!isValid && firstInvalidField) {
+        firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstInvalidField.focus();
+        
+        // Show error notification
+        showNotification('Please fill all required fields', 'error');
+      }
+
+      return isValid;
+    }
+
+    // Add validation to form submission
+    document.querySelector('form[action="/production"]')?.addEventListener('submit', function(e) {
+      if (!validateForm()) {
+        e.preventDefault();
+      }
+    });
+
+    // Enhanced mobile sidebar handling
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.getElementById('sidebar');
+      
+      // Touch events for mobile
+      let touchStartX = 0;
+      let touchEndX = 0;
+      
+      document.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+      });
+      
+      document.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      });
+      
+      function handleSwipe() {
+        const swipeThreshold = 50;
+        const swipeDistance = touchEndX - touchStartX;
+        
+        if (window.innerWidth <= 768) {
+          // Swipe right to open sidebar
+          if (swipeDistance > swipeThreshold && touchStartX < 50) {
+            sidebar.classList.add('active');
+          }
+          // Swipe left to close sidebar
+          else if (swipeDistance < -swipeThreshold && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+          }
+        }
+      }
+      
+      // Prevent body scroll when sidebar is open on mobile
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            if (sidebar.classList.contains('active') && window.innerWidth <= 768) {
+              document.body.style.overflow = 'hidden';
+            } else {
+              document.body.style.overflow = '';
+            }
+          }
+        });
+      });
+      
+      observer.observe(sidebar, { attributes: true });
+    });
+
+    // Show notification function
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        background: ${type === 'error' ? 'var(--error-color)' : type === 'warning' ? 'var(--warning-color)' : 'var(--success-color)'};
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        z-index: 1000;
+        box-shadow: var(--shadow-md);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      `;
+      
+      const icon = type === 'error' ? 'exclamation-triangle' : type === 'warning' ? 'exclamation-triangle' : 'check-circle';
+      notification.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.opacity = '1';
+      }, 100);
+      
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }, 3000);
+    }
+
+    // Connection status monitoring
+    function updateConnectionStatus() {
+      const isOnline = navigator.onLine;
+      const form = document.querySelector('form[action="/production"]');
+      
+      if (!isOnline) {
+        showNotification('You are offline. Form data will be saved locally.', 'warning');
+        if (form) form.classList.add('offline-mode');
+      } else {
+        if (form) form.classList.remove('offline-mode');
+      }
+    }
+
+    window.addEventListener('online', updateConnectionStatus);
+    window.addEventListener('offline', updateConnectionStatus);
+    
+    // Initialize connection status
+    document.addEventListener('DOMContentLoaded', updateConnectionStatus);
+
+    // Accessibility enhancements
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add ARIA labels and descriptions
+      const requiredFields = document.querySelectorAll('input[required], select[required]');
+      requiredFields.forEach(field => {
+        field.setAttribute('aria-required', 'true');
+        
+        const label = document.querySelector(`label[for="${field.id}"]`);
+        if (label) {
+          field.setAttribute('aria-labelledby', field.id + '-label');
+          label.id = field.id + '-label';
+        }
+      });
+    });
+
+    // Debounce utility function
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Print functionality enhancement
+    window.addEventListener('beforeprint', function() {
+      document.title = 'Production Supervisor Form - Manufacturing CRM';
+    });
+
+    window.addEventListener('afterprint', function() {
+      // Restore dynamic title
+      const totalRequired = document.querySelectorAll('input[required]').length;
+      const filledRequired = Array.from(document.querySelectorAll('input[required]')).filter(input => input.value.trim() !== '').length;
+      const progress = Math.round((filledRequired / totalRequired) * 100);
+      document.title = `Production Supervisor (${progress}% Complete) - Manufacturing CRM`;
+          });
+
+    // Enhanced form field interactions
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add floating label effect
+      const inputs = document.querySelectorAll('input, select');
+      inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentElement.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+          if (!this.value) {
+            this.parentElement.classList.remove('focused');
+          }
+        });
+        
+        // Initialize focused state for pre-filled inputs
+        if (input.value) {
+          input.parentElement.classList.add('focused');
+        }
+      });
+
+      // Enhanced form field validation
+      const validateField = (field) => {
+        const value = field.value.trim();
+        const isRequired = field.hasAttribute('required');
+        const fieldType = field.type;
+        
+        // Reset validation state
+        field.classList.remove('valid', 'invalid');
+        
+        if (isRequired && !value) {
+          field.classList.add('invalid');
+          return false;
+        }
+        
+        // Type-specific validation
+        if (value) {
+          switch (fieldType) {
+            case 'number':
+              const num = parseFloat(value);
+              const min = parseFloat(field.getAttribute('min'));
+              const max = parseFloat(field.getAttribute('max'));
+              
+              if (isNaN(num) || (min !== null && num < min) || (max !== null && num > max)) {
+                field.classList.add('invalid');
+                return false;
+              }
+              break;
+              
+            case 'email':
+              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              if (!emailRegex.test(value)) {
+                field.classList.add('invalid');
+                return false;
+              }
+              break;
+          }
+          
+          field.classList.add('valid');
+        }
+        
+        return true;
+      };
+
+      // Apply validation to all form fields
+      inputs.forEach(input => {
+        input.addEventListener('blur', () => validateField(input));
+        input.addEventListener('input', debounce(() => validateField(input), 500));
+      });
+
+      // Form auto-completion and suggestions
+      const setupAutoComplete = () => {
+        // Machine suggestions
+        const machineInput = document.querySelector('input[name="machine"]');
+        const commonMachines = [
+          'Extruder Machine 1', 'Extruder Machine 2', 'Extruder Machine 3',
+          'Molding Machine 1', 'Molding Machine 2', 'Molding Machine 3',
+          'Coating Machine 1', 'Coating Machine 2',
+          'Assembly Line 1', 'Assembly Line 2', 'Assembly Line 3'
+        ];
+        
+        if (machineInput) {
+          machineInput.addEventListener('input', function() {
+            const value = this.value.toLowerCase();
+            const matches = commonMachines.filter(machine => 
+              machine.toLowerCase().includes(value)
+            );
+            
+            // Update datalist options
+            const datalist = document.getElementById('machines');
+            if (datalist) {
+              datalist.innerHTML = '';
+              matches.forEach(match => {
+                const option = document.createElement('option');
+                option.value = match;
+                datalist.appendChild(option);
+              });
+            }
+          });
+        }
+
+        // Material suggestions
+        const materialInput = document.querySelector('input[name="material"]');
+        const commonMaterials = [
+          'PVC', 'HDPE', 'LDPE', 'PP', 'ABS', 'PC', 'PMMA', 'PET', 'PS', 'PA'
+        ];
+        
+        if (materialInput) {
+          const materialDatalist = document.createElement('datalist');
+          materialDatalist.id = 'materials';
+          commonMaterials.forEach(material => {
+            const option = document.createElement('option');
+            option.value = material;
+            materialDatalist.appendChild(option);
+          });
+          materialInput.setAttribute('list', 'materials');
+          materialInput.parentNode.appendChild(materialDatalist);
+        }
+      };
+
+      setupAutoComplete();
+
+      // Enhanced keyboard navigation
+      document.addEventListener('keydown', function(e) {
+        // Tab navigation enhancement
+        if (e.key === 'Tab') {
+          const focusableElements = document.querySelectorAll(
+            'input:not([disabled]), select:not([disabled]), button:not([disabled]), a[href]'
+          );
+          const focusedIndex = Array.from(focusableElements).indexOf(document.activeElement);
+          
+          if (e.shiftKey && focusedIndex === 0) {
+            e.preventDefault();
+            focusableElements[focusableElements.length - 1].focus();
+          } else if (!e.shiftKey && focusedIndex === focusableElements.length - 1) {
+            e.preventDefault();
+            focusableElements[0].focus();
+          }
+        }
+        
+        // Quick navigation shortcuts
+        if (e.altKey) {
+          switch (e.key) {
+            case '1':
+              e.preventDefault();
+              document.querySelector('.form-column:nth-child(1) input').focus();
+              break;
+            case '2':
+              e.preventDefault();
+              document.querySelector('.form-column:nth-child(2) input').focus();
+              break;
+            case '3':
+              e.preventDefault();
+              document.querySelector('.form-column:nth-child(3) input').focus();
+              break;
+            case '4':
+              e.preventDefault();
+              document.querySelector('.form-column:nth-child(4) input').focus();
+              break;
+          }
+        }
+      });
+
+      // Form data persistence with versioning
+      const FORM_DATA_KEY = 'production_form_data_v1';
+      const FORM_DATA_TIMESTAMP_KEY = 'production_form_timestamp';
+      
+      const saveFormData = debounce(() => {
+        const formData = {};
+        const form = document.querySelector('form[action="/production"]');
+        const formElements = form.querySelectorAll('input, select, textarea');
+        
+        formElements.forEach(element => {
+          if (element.name && element.value && element.type !== 'file') {
+            formData[element.name] = element.value;
+          }
+        });
+        
+        localStorage.setItem(FORM_DATA_KEY, JSON.stringify(formData));
+        localStorage.setItem(FORM_DATA_TIMESTAMP_KEY, Date.now().toString());
+      }, 1000);
+
+      const loadFormData = () => {
+        try {
+          const savedData = localStorage.getItem(FORM_DATA_KEY);
+          const timestamp = localStorage.getItem(FORM_DATA_TIMESTAMP_KEY);
+          
+          if (savedData && timestamp) {
+            const data = JSON.parse(savedData);
+            const saveTime = parseInt(timestamp);
+            const now = Date.now();
+            const hoursSinceLastSave = (now - saveTime) / (1000 * 60 * 60);
+            
+            // Only load data if it's less than 24 hours old
+            if (hoursSinceLastSave < 24) {
+              Object.keys(data).forEach(key => {
+                const element = document.querySelector(`[name="${key}"]`);
+                if (element && !element.value) {
+                  element.value = data[key];
+                  validateField(element);
+                }
+              });
+              
+              showNotification('Previous form data restored', 'info');
+            } else {
+              // Clear old data
+              localStorage.removeItem(FORM_DATA_KEY);
+              localStorage.removeItem(FORM_DATA_TIMESTAMP_KEY);
+            }
+          }
+        } catch (error) {
+          console.error('Error loading form data:', error);
+        }
+      };
+
+      // Load saved data on page load
+      loadFormData();
+
+      // Save data on input changes
+      inputs.forEach(input => {
+        input.addEventListener('input', saveFormData);
+        input.addEventListener('change', saveFormData);
+      });
+
+      // Clear saved data on successful submission
+      const form = document.querySelector('form[action="/production"]');
+      if (form) {
+        form.addEventListener('submit', function() {
+          setTimeout(() => {
+            localStorage.removeItem(FORM_DATA_KEY);
+            localStorage.removeItem(FORM_DATA_TIMESTAMP_KEY);
+          }, 1000);
+        });
+      }
+
+      // Advanced form calculations
+      const setupCalculations = () => {
+        // Weight calculations
+        const weightPerMeterInput = document.querySelector('input[name="weightPerMeter"]');
+        const plannedQtyInput = document.querySelector('input[name="plannedQty"]');
+        
+        const calculateTotalWeight = () => {
+          const weightPerMeter = parseFloat(weightPerMeterInput?.value) || 0;
+          const plannedQty = parseFloat(plannedQtyInput?.value) || 0;
+          
+          if (weightPerMeter > 0 && plannedQty > 0) {
+            const totalWeight = weightPerMeter * plannedQty;
+            // You can display this calculation somewhere if needed
+            console.log(`Total estimated weight: ${totalWeight.toFixed(2)} kg`);
+          }
+        };
+
+        if (weightPerMeterInput && plannedQtyInput) {
+          [weightPerMeterInput, plannedQtyInput].forEach(input => {
+            input.addEventListener('input', calculateTotalWeight);
+          });
+        }
+
+        // Efficiency calculations
+        const extruderRpmInput = document.querySelector('input[name="extruderRPM"]');
+        const conveyorRpmInput = document.querySelector('input[name="conveyorRPM"]');
+        
+        const calculateEfficiency = () => {
+          const extruderRpm = parseFloat(extruderRpmInput?.value) || 0;
+          const conveyorRpm = parseFloat(conveyorRpmInput?.value) || 0;
+          
+          if (extruderRpm > 0 && conveyorRpm > 0) {
+            const ratio = extruderRpm / conveyorRpm;
+            // You can use this ratio for efficiency calculations
+            console.log(`Extruder to Conveyor ratio: ${ratio.toFixed(2)}`);
+          }
+        };
+
+        if (extruderRpmInput && conveyorRpmInput) {
+          [extruderRpmInput, conveyorRpmInput].forEach(input => {
+            input.addEventListener('input', calculateEfficiency);
+          });
+        }
+      };
+
+      setupCalculations();
+
+      // Form completion progress indicator
+      const updateProgressIndicator = () => {
+        const allInputs = document.querySelectorAll('input, select');
+        const requiredInputs = document.querySelectorAll('input[required], select[required]');
+        const filledRequired = Array.from(requiredInputs).filter(input => input.value.trim() !== '');
+        const filledAll = Array.from(allInputs).filter(input => input.value.trim() !== '');
+        
+        const requiredProgress = (filledRequired.length / requiredInputs.length) * 100;
+        const overallProgress = (filledAll.length / allInputs.length) * 100;
+        
+        // Update document title with progress
+        document.title = `Production Supervisor (${Math.round(requiredProgress)}% Complete) - Manufacturing CRM`;
+        
+        // You can add a visual progress bar here if needed
+        console.log(`Form completion: ${Math.round(requiredProgress)}% required, ${Math.round(overallProgress)}% overall`);
+      };
+
+      // Update progress on any input change
+      inputs.forEach(input => {
+        input.addEventListener('input', debounce(updateProgressIndicator, 300));
+      });
+
+      // Initialize progress
+      updateProgressIndicator();
+
+      // Enhanced error handling
+      window.addEventListener('unhandledrejection', function(event) {
+        console.error('Unhandled promise rejection:', event.reason);
+        showNotification('An error occurred. Please try again.', 'error');
+      });
+
+      // Form submission analytics (if needed)
+      const trackFormSubmission = (formData) => {
+        const submissionData = {
+          timestamp: new Date().toISOString(),
+          formType: 'production_supervisor',
+          fieldsCompleted: Object.keys(formData).length,
+          userAgent: navigator.userAgent,
+          screenResolution: `${screen.width}x${screen.height}`
+        };
+        
+        // You can send this data to your analytics service
+        console.log('Form submission tracked:', submissionData);
+      };
+
+      // Track form submission
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          const formData = new FormData(this);
+          const dataObject = {};
+          for (let [key, value] of formData.entries()) {
+            dataObject[key] = value;
+          }
+          trackFormSubmission(dataObject);
+        });
+      }
+
+      console.log('Production Supervisor form initialized successfully');
+    });
+
+    // Service Worker registration for offline functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js')
+          .then(function(registration) {
+            console.log('ServiceWorker registration successful');
+          })
+          .catch(function(err) {
+            console.log('ServiceWorker registration failed');
+          });
+      });
+    }
+
+    // Final initialization and cleanup
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set focus to first empty required field
+      const firstEmptyRequired = document.querySelector('input[required]:not([value]), input[required][value=""]');
+      if (firstEmptyRequired) {
+        setTimeout(() => firstEmptyRequired.focus(), 500);
+      }
+
+      // Initialize tooltips for mobile devices
+      if ('ontouchstart' in window) {
+        document.querySelectorAll('[data-tooltip]').forEach(element => {
+          element.addEventListener('touchstart', function(e) {
+            const tooltip = this.getAttribute('data-tooltip');
+            if (tooltip) {
+              showNotification(tooltip, 'info');
+            }
+          });
+        });
+      }
+
+      // Performance monitoring
+      if (window.performance && window.performance.timing) {
+        const loadTime = window.performance.timing.loadEventEnd - window.performance.timing.navigationStart;
+        console.log(`Page load time: ${loadTime}ms`);
+      }
+
+      // Memory usage monitoring (if available)
+      if (window.performance && window.performance.memory) {
+        const memoryInfo = window.performance.memory;
+        console.log(`Memory usage: ${Math.round(memoryInfo.usedJSHeapSize / 1024 / 1024)}MB`);
+      }
+
+      // Final success message
+      console.log('✅ Production Supervisor Management System fully loaded and ready!');
+    });
+  </script>
+</body>
+</html>
+
+
