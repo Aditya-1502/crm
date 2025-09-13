@@ -189,7 +189,7 @@ public class CrmController {
 	        int otp = new Random().nextInt(100000, 1000000);
 	        sendEmail(email, otp);   // your existing sendEmail method
 	        session.setAttribute("otp", otp);
-	        return "redirect:/admin/otp";
+	        return "admin-otp.html";
 	    } else {
 	        session.setAttribute("fail", "Invalid Email");
 	        return "redirect:/";

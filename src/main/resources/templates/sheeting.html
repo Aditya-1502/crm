@@ -17,7 +17,7 @@
 
     :root {
       /* Manufacturing CRM Color Palette */
-      --primary-color: #1e40af;
+      --primary-color: rgb(255, 0, 0);
       --primary-dark: #1e3a8a;
       --primary-light: rgb(0, 0, 0);
       --secondary-color: #f59e0b;
@@ -91,7 +91,7 @@
       padding: 24px 20px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       background: var(--sidebar-background);
-      background: linear-gradient(135deg, rgba(30, 64, 175, 0.1) 0%, rgba(30, 58, 138, 0.1) 100%);
+       background: linear-gradient(135deg, rgb(255, 128, 0) 0%, rgba(30, 58, 138, 0.1) 100%);
       z-index: 1001;
       flex-shrink: 0;
       backdrop-filter: blur(10px);
@@ -934,19 +934,19 @@
       <div class="sidebar-header">
         <h2>
           <i class="fas fa-industry"></i>
-          <span>ManufacturePro</span>
+          <span>Menu</span>
         </h2>
       </div>
       
       <div class="sidebar-body">
         <div class="nav-container">
           <ul class="nav-links">
-            <li><a href="/"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-            <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i><span>Overview</span></a></li>
-            <li><a href="/reports"><i class="fas fa-chart-bar"></i><span>Reports</span></a></li>
-            <li><a href="/search"><i class="fas fa-search"></i><span>Search</span></a></li>
-            <li><a href="/order"><i class="fas fa-clipboard-list"></i><span>Order Log</span></a></li>
-            <li><a href="/mixing"><i class="fas fa-blender"></i><span>Mixing</span></a></li>
+            <li><a href="/dashboard"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <!-- <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i><span>Overview</span></a></li> -->
+            <!-- <li><a href="/reports"><i class="fas fa-chart-bar"></i><span>Reports</span></a></li> -->
+            <li ><a href="/search"><i class="fas fa-search"></i><span>Search</span></a></li>
+            <li ><a href="/order"><i class="fas fa-clipboard-list"></i><span>Order Log</span></a></li>
+            <li ><a href="/mixing"><i class="fas fa-blender"></i><span>Mixing</span></a></li>
             <li><a href="/production"><i class="fas fa-cogs"></i><span>Production</span></a></li>
             <li><a href="/extrusion"><i class="fas fa-industry"></i><span>Extrusion</span></a></li>
             <li><a href="/coating"><i class="fas fa-brush"></i><span>Coating</span></a></li>
